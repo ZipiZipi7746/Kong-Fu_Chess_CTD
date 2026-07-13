@@ -1,6 +1,6 @@
-from src.engine.real_time_arbiter import RealTimeArbiter
-from src.rules.rule_engine import RuleEngine
-from src.rules.promotion_rule import PromotionRule
+from kungfu_chess.realtime.real_time_arbiter import RealTimeArbiter
+from kungfu_chess.rules.rule_engine import RuleEngine
+from kungfu_chess.rules.promotion_rule import PromotionRule
 
 
 class GameEngine:
@@ -89,6 +89,19 @@ class GameEngine:
             return
 
         destination = self.board.get_cell(motion.to_row, motion.to_col)
+
+        # Friendly collision: the destination is already occupied by a
+        # piece of the same color (an earlier-resolved motion got there
+        # first) - this later-arriving piece stops one cell short of its
+        # destination instead of landing on it. If that fallback cell is
+        # itself occupied (by anyone), it stays at its own source
+        # instead of overwriting whatever is there.
+        if destination is not None and destination.color == piece.color:
+            stop_row, stop_col = motion.previous_cell()
+            if self.board.get_cell(stop_row, stop_col) is None:
+                self.board.set_cell(stop_row, stop_col, piece)
+                self.board.set_cell(motion.from_row, motion.from_col, None)
+            return
 
         # Landing on a square whose piece is still (or just now) airborne
         # kills the moving piece instead of capturing.

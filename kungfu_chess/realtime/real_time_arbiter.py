@@ -1,4 +1,4 @@
-from src.domain.motion import Motion
+from kungfu_chess.realtime.motion import Motion
 
 
 class RealTimeArbiter:
@@ -57,6 +57,7 @@ class RealTimeArbiter:
             motion for motion in self.pending_motions
             if motion.has_arrived(self.clock)
         ]
+        arrived.sort(key=lambda motion: motion.arrival_time)
         for motion in arrived:
             self.pending_motions.remove(motion)
 

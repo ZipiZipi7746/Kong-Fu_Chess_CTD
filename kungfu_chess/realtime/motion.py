@@ -21,3 +21,28 @@ class Motion:
 
     def has_arrived(self, current_time):
         return current_time >= self.arrival_time
+
+    def previous_cell(self):
+        """The cell one step back from the destination, along this
+        motion's own straight-line path. Used to resolve friendly
+        collisions: a piece that would arrive on a friendly-occupied
+        square stops here instead. A non-straight-line motion (the
+        Knight's L-shaped jump) has no meaningful midpoint, so it
+        simply returns the source cell."""
+        row_delta = self.to_row - self.from_row
+        col_delta = self.to_col - self.from_col
+
+        if row_delta != 0 and col_delta != 0 and abs(row_delta) != abs(col_delta):
+            return self.from_row, self.from_col
+
+        row_step = self._sign(row_delta)
+        col_step = self._sign(col_delta)
+        return self.to_row - row_step, self.to_col - col_step
+
+    @staticmethod
+    def _sign(n):
+        if n > 0:
+            return 1
+        if n < 0:
+            return -1
+        return 0

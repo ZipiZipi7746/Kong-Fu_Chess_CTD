@@ -1,6 +1,6 @@
-from src.domain.board import Board
-from src.domain.piece import Piece
-from src.engine.game_engine import GameEngine
+from kungfu_chess.model.board import Board
+from kungfu_chess.model.piece import Piece
+from kungfu_chess.engine.game_engine import GameEngine
 
 
 def make_board(rows):
@@ -202,6 +202,75 @@ class TestAdvanceTimeAndResolveMotion:
         engine.advance_time(1000)
         assert board.get_cell(0, 0) is None
         assert board.get_cell(0, 1) == Piece("b", "N")
+
+    def test_friendly_collision_later_mover_stops_before_destination(self):
+        # Two same-color rooks converge on cell (0, 3): the one starting
+        # at (0, 4) has a 1-cell trip (arrives at 1000ms) and claims the
+        # square first; the one starting at (0, 0) has a 3-cell trip
+        # (arrives at 3000ms) and must stop one cell short instead of
+        # landing on its now friendly-occupied destination.
+        board = make_board([["wR", ".", ".", ".", "wR"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 3)
+        engine.request_move(0, 4, 0, 3)
+        engine.advance_time(3000)
+        assert board.get_cell(0, 0) is None
+        assert board.get_cell(0, 2) == Piece("w", "R")
+        assert board.get_cell(0, 3) == Piece("w", "R")
+        assert board.get_cell(0, 4) is None
+
+    def test_friendly_collision_over_single_cell_distance_stays_put(self):
+        # Both rooks are exactly one cell from the shared destination, so
+        # they arrive in a tie; ties resolve in request order (stable),
+        # so the first-requested one lands normally and the second one's
+        # own "previous cell" is its own source cell - it must simply
+        # stay there rather than vanish.
+        board = make_board([["wR", ".", "wR"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)  # requested first
+        engine.request_move(0, 2, 0, 1)  # requested second, ties on arrival
+        engine.advance_time(1000)
+        assert board.get_cell(0, 0) is None
+        assert board.get_cell(0, 1) == Piece("w", "R")
+        assert board.get_cell(0, 2) == Piece("w", "R")
+
+    def test_friendly_collision_fallback_cell_also_occupied_stays_at_own_source(self):
+        # A (row0 col0) heads for (0, 3); X (row0 col4) claims (0, 3)
+        # first, so A would normally stop at its own previous cell
+        # (0, 2). But Y (row1 col2) independently claims (0, 2) first
+        # too - so A must not overwrite Y there. It stays at its own
+        # source instead.
+        board = make_board([
+            ["wR", ".", ".", ".", "wR"],
+            [".", ".", "wR", ".", "."],
+        ])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 3)  # A: distance 3, arrives 3000
+        engine.request_move(0, 4, 0, 3)  # X: distance 1, arrives 1000
+        engine.request_move(1, 2, 0, 2)  # Y: distance 1, arrives 1000
+        engine.advance_time(3000)
+        assert board.get_cell(0, 0) == Piece("w", "R")  # A never left
+        assert board.get_cell(0, 2) == Piece("w", "R")  # Y, untouched by A
+        assert board.get_cell(0, 3) == Piece("w", "R")  # X
+        assert board.get_cell(0, 4) is None
+        assert board.get_cell(1, 2) is None
+
+    def test_friendly_collision_knight_stays_at_own_source(self):
+        # Knight has no straight-line midpoint, so a blocked knight
+        # simply stays at its source rather than landing on an
+        # arbitrary interpolated cell.
+        board = make_board([
+            ["wN", ".", ".", "."],
+            [".", ".", ".", "."],
+            [".", ".", "wR", "."],
+        ])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 2, 1)  # knight: distance 2, arrives 2000
+        engine.request_move(2, 2, 2, 1)  # rook: distance 1, arrives 1000
+        engine.advance_time(2000)
+        assert board.get_cell(0, 0) == Piece("w", "N")
+        assert board.get_cell(2, 1) == Piece("w", "R")
+        assert board.get_cell(2, 2) is None
 
     def test_no_op_when_source_piece_already_gone(self):
         # Exercises the "piece is None" early-return branch of

@@ -2,7 +2,7 @@ import subprocess
 import sys
 import textwrap
 
-from src.main import run
+from kungfu_chess.main import run
 
 
 class TestRun:
@@ -47,6 +47,24 @@ class TestRun:
             "print board",
         ])
         assert capsys.readouterr().out == ". wR\n"
+
+    def test_friendly_collision_later_mover_stops_short_end_to_end(self, capsys):
+        # wR at col 0 travels 3 cells to col 3 (arrives at 3000ms); wR at
+        # col 4 travels 1 cell to the same destination (arrives at
+        # 1000ms) and claims it first. The later mover must stop one
+        # cell short instead of landing on its friendly-occupied target.
+        run([
+            "Board:",
+            "wR . . . wR",
+            "Commands:",
+            "click 0 0",
+            "click 300 0",
+            "click 400 0",
+            "click 300 0",
+            "wait 3000",
+            "print board",
+        ])
+        assert capsys.readouterr().out == ". . wR wR .\n"
 
 
 class TestMainSubprocess:

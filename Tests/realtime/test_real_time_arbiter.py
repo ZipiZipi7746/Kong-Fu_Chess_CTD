@@ -1,4 +1,4 @@
-from src.engine.real_time_arbiter import RealTimeArbiter
+from kungfu_chess.realtime.real_time_arbiter import RealTimeArbiter
 
 
 class TestHasPendingMoveFrom:
@@ -107,3 +107,10 @@ class TestAdvance:
         arbiter.advance(300)
         arbiter.advance(400)
         assert arbiter.clock == 700
+
+    def test_arrived_motions_are_ordered_by_arrival_time_not_request_order(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_move(0, 0, 0, 3)  # requested first, arrives later (3000)
+        arbiter.schedule_move(0, 4, 0, 3)  # requested second, arrives sooner (1000)
+        arrived = arbiter.advance(3000)
+        assert [(m.from_row, m.from_col) for m in arrived] == [(0, 4), (0, 0)]
