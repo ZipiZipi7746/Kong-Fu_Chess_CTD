@@ -3,6 +3,9 @@ from dataclasses import dataclass
 
 @dataclass(frozen=True)
 class Piece:
+    """Pure data model for a single piece. Carries no rendering or
+    movement-rule logic of its own (SRP)."""
+
     color: str  # "w" or "b"
     kind: str   # "K", "Q", "R", "B", "N", "P"
 
