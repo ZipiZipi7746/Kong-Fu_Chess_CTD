@@ -1,4 +1,4 @@
-from src.controller.commands import (
+from kungfu_chess.input.commands import (
     ClickCommand,
     WaitCommand,
     JumpCommand,

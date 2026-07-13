@@ -1,4 +1,4 @@
-from src.domain.piece import Piece
+from kungfu_chess.model.piece import Piece
 
 
 class Board:

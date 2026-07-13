@@ -1,7 +1,7 @@
 import pytest
 
-from src.io.board_validator import BoardValidator
-from src.domain.exceptions import RowWidthMismatch, UnknownToken
+from kungfu_chess.io.board_validator import BoardValidator
+from kungfu_chess.model.exceptions import RowWidthMismatch, UnknownToken
 
 
 class TestValidateRowWidth:

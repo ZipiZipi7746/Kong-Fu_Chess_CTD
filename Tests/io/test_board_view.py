@@ -1,5 +1,5 @@
-from src.domain.board import Board
-from src.io.board_view import BoardRenderer
+from kungfu_chess.model.board import Board
+from kungfu_chess.io.board_view import BoardRenderer
 
 
 class TestToRows:

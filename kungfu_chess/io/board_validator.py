@@ -1,4 +1,4 @@
-from src.domain.exceptions import RowWidthMismatch, UnknownToken
+from kungfu_chess.model.exceptions import RowWidthMismatch, UnknownToken
 
 VALID_PIECES = {"K", "Q", "R", "B", "N", "P"}
 VALID_COLORS = {"w", "b"}

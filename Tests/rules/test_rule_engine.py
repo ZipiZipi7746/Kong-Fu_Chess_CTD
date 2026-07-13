@@ -1,6 +1,6 @@
-from src.domain.board import Board
-from src.domain.piece import Piece
-from src.rules.rule_engine import RuleEngine
+from kungfu_chess.model.board import Board
+from kungfu_chess.model.piece import Piece
+from kungfu_chess.rules.rule_engine import RuleEngine
 
 
 def board_from_rows(rows):

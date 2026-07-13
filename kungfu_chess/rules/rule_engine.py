@@ -1,4 +1,4 @@
-from src.rules.piece_rules import PIECE_RULES
+from kungfu_chess.rules.piece_rules import PIECE_RULES
 
 
 class RuleEngine:

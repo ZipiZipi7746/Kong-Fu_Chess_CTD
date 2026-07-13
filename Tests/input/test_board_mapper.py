@@ -1,4 +1,4 @@
-from src.controller.board_mapper import BoardMapper
+from kungfu_chess.input.board_mapper import BoardMapper
 
 
 class TestToCell:

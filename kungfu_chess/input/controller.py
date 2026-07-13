@@ -1,6 +1,6 @@
-from src.controller.board_mapper import BoardMapper
-from src.io.board_view import BoardRenderer
-from src.engine.game_engine import GameEngine
+from kungfu_chess.input.board_mapper import BoardMapper
+from kungfu_chess.io.board_view import BoardRenderer
+from kungfu_chess.engine.game_engine import GameEngine
 
 
 class GameController:

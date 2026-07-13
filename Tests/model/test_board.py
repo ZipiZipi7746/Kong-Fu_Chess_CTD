@@ -1,4 +1,4 @@
-from src.domain.board import Board
+from kungfu_chess.model.board import Board
 
 
 def make_simple_board():

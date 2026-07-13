@@ -1,6 +1,6 @@
-from src.domain.board import Board
-from src.domain.piece import Piece
-from src.rules.promotion_rule import PromotionRule
+from kungfu_chess.model.board import Board
+from kungfu_chess.model.piece import Piece
+from kungfu_chess.rules.promotion_rule import PromotionRule
 
 
 def make_board(rows=8):

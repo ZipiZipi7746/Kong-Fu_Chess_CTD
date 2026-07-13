@@ -1,5 +1,5 @@
-from src.domain.board import Board
-from src.io.board_validator import BoardValidator
+from kungfu_chess.model.board import Board
+from kungfu_chess.io.board_validator import BoardValidator
 
 
 class BoardParser:

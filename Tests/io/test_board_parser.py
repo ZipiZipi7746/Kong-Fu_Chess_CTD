@@ -4,7 +4,7 @@ import textwrap
 
 import pytest
 
-from src.io.board_parser import BoardParser
+from kungfu_chess.io.board_parser import BoardParser
 
 
 class TestParseWithInjectedLines:

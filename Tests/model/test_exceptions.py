@@ -1,4 +1,4 @@
-from src.domain.exceptions import UnknownToken, RowWidthMismatch
+from kungfu_chess.model.exceptions import UnknownToken, RowWidthMismatch
 
 
 class TestExceptionTypes:

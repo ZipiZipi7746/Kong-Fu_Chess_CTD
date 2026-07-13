@@ -1,6 +1,6 @@
 import pytest
 
-from src.rules.piece_rules import (
+from kungfu_chess.rules.piece_rules import (
     PieceRule,
     KingRule,
     RookRule,

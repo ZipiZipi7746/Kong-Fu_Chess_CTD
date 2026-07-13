@@ -1,6 +1,6 @@
-from src.io.board_parser import BoardParser
-from src.controller.commands import parse_command
-from src.controller.game_controller import GameController
+from kungfu_chess.io.board_parser import BoardParser
+from kungfu_chess.input.commands import parse_command
+from kungfu_chess.input.controller import GameController
 
 
 def run(lines=None):

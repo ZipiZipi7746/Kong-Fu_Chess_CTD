@@ -1,8 +1,8 @@
-from src.domain.board import Board
-from src.domain.piece import Piece
-from src.controller.board_mapper import BoardMapper
-from src.engine.game_engine import GameEngine
-from src.controller.game_controller import GameController
+from kungfu_chess.model.board import Board
+from kungfu_chess.model.piece import Piece
+from kungfu_chess.input.board_mapper import BoardMapper
+from kungfu_chess.engine.game_engine import GameEngine
+from kungfu_chess.input.controller import GameController
 
 
 def make_board(rows):
