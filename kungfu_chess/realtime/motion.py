@@ -18,9 +18,21 @@ class Motion:
 
         distance = max(abs(to_row - from_row), abs(to_col - from_col))
         self.arrival_time = start_time + distance * Motion.TIME_PER_CELL_MS
+        self._duration_ms = distance * Motion.TIME_PER_CELL_MS
 
     def has_arrived(self, current_time):
         return current_time >= self.arrival_time
+
+    def progress(self, current_time):
+        """0..1 fraction of the way from source to destination at
+        current_time, clamped to that range. Purely cosmetic (used by
+        the UI to interpolate a piece's on-screen position) - never
+        affects when the motion actually arrives."""
+        if self._duration_ms == 0:
+            return 1.0
+        start_time = self.arrival_time - self._duration_ms
+        elapsed = current_time - start_time
+        return max(0.0, min(1.0, elapsed / self._duration_ms))
 
     def previous_cell(self):
         """The cell one step back from the destination, along this

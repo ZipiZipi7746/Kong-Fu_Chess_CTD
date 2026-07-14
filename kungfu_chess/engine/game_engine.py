@@ -43,6 +43,24 @@ class GameEngine:
     def is_airborne(self, row, col):
         return self.arbiter.is_airborne(row, col)
 
+    def motion_progress(self, row, col):
+        """Read-only: 0..1 fraction of the way through the in-flight
+        motion from (row, col), or None if there isn't one. Purely for
+        the UI to interpolate a piece's on-screen position - never
+        affects game rules or timing."""
+        motion = self.arbiter.get_pending_motion(row, col)
+        if motion is None:
+            return None
+        return motion.progress(self.arbiter.clock)
+
+    def motion_target(self, row, col):
+        """Read-only: the destination cell of the in-flight motion from
+        (row, col), or None if there isn't one."""
+        motion = self.arbiter.get_pending_motion(row, col)
+        if motion is None:
+            return None
+        return motion.to_row, motion.to_col
+
     def request_move(self, from_row, from_col, to_row, to_col):
         """Returns one of: "game_over", "invalid", "blocked", "scheduled"."""
         if self.game_over:

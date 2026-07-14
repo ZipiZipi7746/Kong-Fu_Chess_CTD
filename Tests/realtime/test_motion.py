@@ -50,3 +50,25 @@ class TestPreviousCell:
     def test_knight_shaped_motion_has_no_midpoint_so_returns_source(self):
         motion = Motion(0, 0, 2, 1, start_time=0)
         assert motion.previous_cell() == (0, 0)
+
+
+class TestProgress:
+    def test_zero_at_start_time(self):
+        motion = Motion(0, 0, 0, 2, start_time=1000)  # 2000ms duration
+        assert motion.progress(1000) == 0.0
+
+    def test_one_at_arrival_time(self):
+        motion = Motion(0, 0, 0, 2, start_time=1000)
+        assert motion.progress(motion.arrival_time) == 1.0
+
+    def test_half_at_the_midpoint(self):
+        motion = Motion(0, 0, 0, 2, start_time=1000)  # arrives at 3000
+        assert motion.progress(2000) == 0.5
+
+    def test_clamped_to_one_past_arrival(self):
+        motion = Motion(0, 0, 0, 1, start_time=0)
+        assert motion.progress(5000) == 1.0
+
+    def test_clamped_to_zero_before_start(self):
+        motion = Motion(0, 0, 0, 1, start_time=1000)
+        assert motion.progress(0) == 0.0

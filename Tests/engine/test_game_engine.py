@@ -122,6 +122,45 @@ class TestRequestMoveWithFakes:
         assert engine.request_move(0, 0, 0, 1) == "blocked"
 
 
+class TestMotionProgress:
+    def test_none_when_no_pending_motion(self):
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        assert engine.motion_progress(0, 0) is None
+
+    def test_zero_right_after_scheduling(self):
+        board = make_board([["wR", ".", "."]])  # 2-cell move, 2000ms
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 2)
+        assert engine.motion_progress(0, 0) == 0.0
+
+    def test_half_partway_through(self):
+        board = make_board([["wR", ".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 2)
+        engine.advance_time(1000)
+        assert engine.motion_progress(0, 0) == 0.5
+
+
+class TestMotionTarget:
+    def test_none_when_no_pending_motion(self):
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        assert engine.motion_target(0, 0) is None
+
+    def test_returns_the_destination_cell(self):
+        board = make_board([["wR", ".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 2)
+        assert engine.motion_target(0, 0) == (0, 2)
+
+    def test_none_for_a_non_matching_cell(self):
+        board = make_board([["wR", ".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 2)
+        assert engine.motion_progress(1, 1) is None
+
+
 class TestRequestJump:
     def test_game_over_blocks_jump(self):
         board = make_board([["wR"]])

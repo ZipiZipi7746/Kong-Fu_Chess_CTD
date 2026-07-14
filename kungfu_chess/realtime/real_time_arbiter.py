@@ -22,6 +22,12 @@ class RealTimeArbiter:
                 return True
         return False
 
+    def get_pending_motion(self, row, col):
+        for motion in self.pending_motions:
+            if motion.from_row == row and motion.from_col == col:
+                return motion
+        return None
+
     def is_airborne(self, row, col):
         finish = self.airborne.get((row, col))
         return finish is not None and finish >= self.clock

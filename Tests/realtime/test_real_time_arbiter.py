@@ -17,6 +17,24 @@ class TestHasPendingMoveFrom:
         assert arbiter.has_pending_move_from(2, 2) is False
 
 
+class TestGetPendingMotion:
+    def test_no_pending_motion_returns_none(self):
+        arbiter = RealTimeArbiter(1000)
+        assert arbiter.get_pending_motion(0, 0) is None
+
+    def test_returns_the_matching_motion(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_move(0, 0, 1, 1)
+        motion = arbiter.get_pending_motion(0, 0)
+        assert (motion.from_row, motion.from_col) == (0, 0)
+        assert (motion.to_row, motion.to_col) == (1, 1)
+
+    def test_non_matching_cell_returns_none(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_move(0, 0, 1, 1)
+        assert arbiter.get_pending_motion(2, 2) is None
+
+
 class TestIsAirborne:
     def test_not_scheduled_is_not_airborne(self):
         arbiter = RealTimeArbiter(1000)
