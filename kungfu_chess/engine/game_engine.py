@@ -29,17 +29,22 @@ class GameEngine:
     "who clicked vs where they want to go" concern).
     """
 
-    def __init__(self, board, jump_duration_ms, rule_engine=None, arbiter=None, event_bus=None):
+    def __init__(self, board, jump_duration_ms, rule_engine=None, arbiter=None, event_bus=None,
+                 move_cooldown_ms=None, jump_cooldown_ms=None):
         """rule_engine and arbiter are optional Dependency Injection points
         (tests can supply fakes/stubs here instead of monkeypatching);
         production code omits them and gets the real collaborators.
         event_bus is optional and off by default - only a UI layer that
         wants move-resolved notifications (for a moves log, score, etc.)
-        needs to supply one; GameEngine has no idea who's listening."""
+        needs to supply one; GameEngine has no idea who's listening.
+        move_cooldown_ms/jump_cooldown_ms configure the default arbiter's
+        post-action cooldown (ignored if an arbiter is injected directly -
+        set them on that arbiter instead)."""
         self.board = board
         self.game_over = False
         self.rule_engine = rule_engine if rule_engine is not None else RuleEngine()
-        self.arbiter = arbiter if arbiter is not None else RealTimeArbiter(jump_duration_ms)
+        self.arbiter = arbiter if arbiter is not None else RealTimeArbiter(
+            jump_duration_ms, move_cooldown_ms=move_cooldown_ms, jump_cooldown_ms=jump_cooldown_ms)
         self.event_bus = event_bus
 
     def has_pending_move_from(self, row, col):
@@ -47,6 +52,9 @@ class GameEngine:
 
     def is_airborne(self, row, col):
         return self.arbiter.is_airborne(row, col)
+
+    def is_on_cooldown(self, row, col):
+        return self.arbiter.is_on_cooldown(row, col)
 
     def motion_progress(self, row, col):
         """Read-only: 0..1 fraction of the way through the in-flight
@@ -77,6 +85,7 @@ class GameEngine:
 
         if (self.arbiter.has_pending_move_from(from_row, from_col)
                 or self.arbiter.is_airborne(from_row, from_col)
+                or self.arbiter.is_on_cooldown(from_row, from_col)
                 or self.arbiter.has_opposing_color_pending(piece.color)):
             return "blocked"
 
@@ -95,7 +104,8 @@ class GameEngine:
         if piece is None:
             return False
 
-        if self.arbiter.has_pending_move_from(row, col):
+        if (self.arbiter.has_pending_move_from(row, col)
+                or self.arbiter.is_on_cooldown(row, col)):
             return False
 
         self.arbiter.schedule_jump(row, col)
@@ -144,6 +154,8 @@ class GameEngine:
             self.event_bus.publish(MoveResolvedEvent(
                 motion.from_row, motion.from_col, motion.to_row, motion.to_col,
                 piece, destination))
+
+        self.arbiter.start_move_cooldown(motion.to_row, motion.to_col)
 
         # Atomic state transition (Rule 10): destination set, then origin
         # cleared - never any in-between state.

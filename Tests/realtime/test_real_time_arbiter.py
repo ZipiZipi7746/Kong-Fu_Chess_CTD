@@ -132,3 +132,78 @@ class TestAdvance:
         arbiter.schedule_move(0, 4, 0, 3)  # requested second, arrives sooner (1000)
         arrived = arbiter.advance(3000)
         assert [(m.from_row, m.from_col) for m in arrived] == [(0, 4), (0, 0)]
+
+    def test_finished_cooldown_cell_is_cleared(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.advance(RealTimeArbiter.DEFAULT_MOVE_COOLDOWN_MS + 1)
+        assert arbiter.is_on_cooldown(0, 0) is False
+
+    def test_cooldown_cell_still_within_window_is_kept(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.advance(RealTimeArbiter.DEFAULT_MOVE_COOLDOWN_MS)
+        assert arbiter.is_on_cooldown(0, 0) is True
+
+
+class TestCooldownDefaults:
+    def test_default_move_cooldown_is_500ms(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        assert arbiter.cooldowns[(0, 0)] == 500
+
+    def test_default_jump_cooldown_is_1000ms(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_jump_cooldown(0, 0)
+        assert arbiter.cooldowns[(0, 0)] == 1000
+
+    def test_durations_are_configurable(self):
+        arbiter = RealTimeArbiter(1000, move_cooldown_ms=200, jump_cooldown_ms=300)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.start_jump_cooldown(1, 1)
+        assert arbiter.cooldowns[(0, 0)] == 200
+        assert arbiter.cooldowns[(1, 1)] == 300
+
+
+class TestIsOnCooldown:
+    def test_not_started_is_not_on_cooldown(self):
+        arbiter = RealTimeArbiter(1000)
+        assert arbiter.is_on_cooldown(0, 0) is False
+
+    def test_started_and_not_yet_finished_is_on_cooldown(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        assert arbiter.is_on_cooldown(0, 0) is True
+
+    def test_relative_to_current_clock(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.clock = 500
+        arbiter.start_move_cooldown(0, 0)
+        assert arbiter.cooldowns[(0, 0)] == 1000  # 500 + default 500ms
+        assert arbiter.is_on_cooldown(0, 0) is True
+
+    def test_exactly_at_finish_clock_is_still_on_cooldown(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.clock = 500  # == default move cooldown
+        assert arbiter.is_on_cooldown(0, 0) is True
+
+    def test_past_finish_clock_is_not_on_cooldown(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.clock = 501
+        assert arbiter.is_on_cooldown(0, 0) is False
+
+
+class TestJumpEndingStartsItsOwnCooldown:
+    def test_cooldown_begins_when_airborne_window_finishes(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_jump(0, 0)  # airborne until clock 1000
+        arbiter.advance(1001)  # airborne window just ended
+        assert arbiter.is_on_cooldown(0, 0) is True
+
+    def test_cooldown_not_started_while_still_airborne(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_jump(0, 0)
+        arbiter.advance(500)  # still airborne
+        assert arbiter.is_on_cooldown(0, 0) is False

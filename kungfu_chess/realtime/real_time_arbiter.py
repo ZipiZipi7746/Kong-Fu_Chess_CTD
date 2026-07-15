@@ -10,11 +10,19 @@ class RealTimeArbiter:
     roadmap's "RealTimeArbiter" component (Phase 6).
     """
 
-    def __init__(self, jump_duration_ms):
+    DEFAULT_MOVE_COOLDOWN_MS = 500
+    DEFAULT_JUMP_COOLDOWN_MS = 1000
+
+    def __init__(self, jump_duration_ms, move_cooldown_ms=None, jump_cooldown_ms=None):
         self.clock = 0
         self.pending_motions = []
         self.airborne = {}
+        self.cooldowns = {}
         self._jump_duration_ms = jump_duration_ms
+        self._move_cooldown_ms = (
+            move_cooldown_ms if move_cooldown_ms is not None else self.DEFAULT_MOVE_COOLDOWN_MS)
+        self._jump_cooldown_ms = (
+            jump_cooldown_ms if jump_cooldown_ms is not None else self.DEFAULT_JUMP_COOLDOWN_MS)
 
     def has_pending_move_from(self, row, col):
         for motion in self.pending_motions:
@@ -54,6 +62,16 @@ class RealTimeArbiter:
     def schedule_jump(self, row, col):
         self.airborne[(row, col)] = self.clock + self._jump_duration_ms
 
+    def is_on_cooldown(self, row, col):
+        finish = self.cooldowns.get((row, col))
+        return finish is not None and finish >= self.clock
+
+    def start_move_cooldown(self, row, col):
+        self.cooldowns[(row, col)] = self.clock + self._move_cooldown_ms
+
+    def start_jump_cooldown(self, row, col):
+        self.cooldowns[(row, col)] = self.clock + self._jump_cooldown_ms
+
     def advance(self, ms):
         """Moves virtual time forward and returns the Motions that have
         arrived (Rule 9: event-driven, not thread-blocking)."""
@@ -67,11 +85,19 @@ class RealTimeArbiter:
         for motion in arrived:
             self.pending_motions.remove(motion)
 
-        finished = [
+        finished_airborne = [
             cell for cell, finish_time in self.airborne.items()
             if finish_time < self.clock
         ]
-        for cell in finished:
+        for cell in finished_airborne:
             del self.airborne[cell]
+            self.start_jump_cooldown(*cell)
+
+        finished_cooldowns = [
+            cell for cell, finish_time in self.cooldowns.items()
+            if finish_time < self.clock
+        ]
+        for cell in finished_cooldowns:
+            del self.cooldowns[cell]
 
         return arrived

@@ -25,11 +25,12 @@ class FakeEngine:
     the controller makes without depending on real rule/timing logic."""
 
     def __init__(self, request_move_result="scheduled", request_jump_result=True,
-                 pending=False, airborne=False, game_over=False):
+                 pending=False, airborne=False, on_cooldown=False, game_over=False):
         self.request_move_result = request_move_result
         self.request_jump_result = request_jump_result
         self._pending = pending
         self._airborne = airborne
+        self._on_cooldown = on_cooldown
         self.game_over = game_over
         self.move_calls = []
         self.jump_calls = []
@@ -40,6 +41,9 @@ class FakeEngine:
 
     def is_airborne(self, row, col):
         return self._airborne
+
+    def is_on_cooldown(self, row, col):
+        return self._on_cooldown
 
     def request_move(self, from_row, from_col, to_row, to_col):
         self.move_calls.append((from_row, from_col, to_row, to_col))
@@ -88,6 +92,14 @@ class TestClickWithFakes:
         board = make_board([["wR"]])
         mapper = FakeMapper({(0, 0): (0, 0)})
         engine = FakeEngine(airborne=True)
+        controller = GameController(board, mapper=mapper, engine=engine)
+        controller.click(0, 0)
+        assert controller.selected is None
+
+    def test_click_on_piece_on_cooldown_is_not_selected(self):
+        board = make_board([["wR"]])
+        mapper = FakeMapper({(0, 0): (0, 0)})
+        engine = FakeEngine(on_cooldown=True)
         controller = GameController(board, mapper=mapper, engine=engine)
         controller.click(0, 0)
         assert controller.selected is None
@@ -218,3 +230,13 @@ class TestGameControllerDefaultCollaborators:
         controller.click(100, 0)
         controller.wait(1000)
         assert board.get_cell(0, 1) == Piece("w", "R")
+
+    def test_default_engine_uses_the_controller_cooldown_constants(self):
+        board = make_board([["wR", ".", "."]])
+        controller = GameController(board)
+        controller.click(0, 0)
+        controller.click(100, 0)
+        controller.wait(1000)  # arrives at (0, 1), cooldown starts
+        assert controller.engine.is_on_cooldown(0, 1) is True
+        controller.wait(GameController.MOVE_COOLDOWN_MS + 1)
+        assert controller.engine.is_on_cooldown(0, 1) is False

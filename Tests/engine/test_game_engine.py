@@ -26,14 +26,18 @@ class FakeArbiter:
     motion / airborne state deterministically."""
 
     def __init__(self, pending_from=None, airborne_cells=None,
-                 airborne_finish_times=None, clock=0, advance_result=None):
+                 airborne_finish_times=None, on_cooldown_cells=None,
+                 clock=0, advance_result=None):
         self._pending_from = pending_from or set()
         self._airborne_cells = airborne_cells or set()
         self._airborne_finish_times = airborne_finish_times or {}
+        self._on_cooldown_cells = on_cooldown_cells or set()
         self.clock = clock
         self._advance_result = advance_result or []
         self.scheduled_moves = []
         self.scheduled_jumps = []
+        self.move_cooldowns_started = []
+        self.jump_cooldowns_started = []
 
     def has_pending_move_from(self, row, col):
         return (row, col) in self._pending_from
@@ -43,6 +47,15 @@ class FakeArbiter:
 
     def airborne_finish_time(self, row, col):
         return self._airborne_finish_times.get((row, col))
+
+    def is_on_cooldown(self, row, col):
+        return (row, col) in self._on_cooldown_cells
+
+    def start_move_cooldown(self, row, col):
+        self.move_cooldowns_started.append((row, col))
+
+    def start_jump_cooldown(self, row, col):
+        self.jump_cooldowns_started.append((row, col))
 
     def schedule_move(self, from_row, from_col, to_row, to_col):
         self.scheduled_moves.append((from_row, from_col, to_row, to_col))
@@ -90,6 +103,59 @@ class TestRequestMoveWithRealCollaborators:
         engine.request_jump(0, 0)
         assert engine.request_move(0, 0, 0, 1) == "blocked"
 
+    def test_move_completes_and_starts_a_cooldown_at_the_destination(self):
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+        assert engine.is_on_cooldown(0, 1) is True
+
+    def test_move_from_a_cell_on_cooldown_is_blocked(self):
+        board = make_board([["wR", ".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)  # arrives at (0, 1), cooldown starts
+        assert engine.request_move(0, 1, 0, 2) == "blocked"
+
+    def test_move_is_allowed_again_once_cooldown_expires(self):
+        board = make_board([["wR", ".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)  # arrives, cooldown starts
+        engine.advance_time(engine.arbiter.DEFAULT_MOVE_COOLDOWN_MS + 1)
+        assert engine.request_move(0, 1, 0, 2) == "scheduled"
+
+    def test_friendly_collision_stop_does_not_start_a_cooldown(self):
+        # Stopping short isn't a completed move, so no cooldown.
+        board = make_board([["wR", ".", "wR"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)  # arrives first
+        engine.request_move(0, 2, 0, 1)  # ties, stays at its own source (0, 2)
+        engine.advance_time(1000)
+        assert engine.is_on_cooldown(0, 2) is False
+
+    def test_jump_completes_and_starts_a_cooldown(self):
+        board = make_board([["wR"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_jump(0, 0)
+        engine.advance_time(1001)  # airborne window ends
+        assert engine.is_on_cooldown(0, 0) is True
+
+    def test_jump_from_a_cell_on_cooldown_is_blocked(self):
+        board = make_board([["wR"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_jump(0, 0)
+        engine.advance_time(1001)  # jump cooldown starts
+        assert engine.request_jump(0, 0) is False
+
+    def test_cooldown_durations_are_configurable(self):
+        board = make_board([["wR", ".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000, move_cooldown_ms=50)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+        engine.advance_time(51)
+        assert engine.is_on_cooldown(0, 1) is False
+
 
 class TestRequestMoveWithFakes:
     def test_uses_injected_rule_engine_verdict_true(self):
@@ -117,6 +183,14 @@ class TestRequestMoveWithFakes:
     def test_blocked_via_injected_airborne_arbiter(self):
         board = make_board([["wR", "."]])
         fake_arbiter = FakeArbiter(airborne_cells={(0, 0)})
+        engine = GameEngine(
+            board, jump_duration_ms=1000,
+            rule_engine=FakeRuleEngine(verdict=True), arbiter=fake_arbiter)
+        assert engine.request_move(0, 0, 0, 1) == "blocked"
+
+    def test_blocked_via_injected_cooldown_arbiter(self):
+        board = make_board([["wR", "."]])
+        fake_arbiter = FakeArbiter(on_cooldown_cells={(0, 0)})
         engine = GameEngine(
             board, jump_duration_ms=1000,
             rule_engine=FakeRuleEngine(verdict=True), arbiter=fake_arbiter)
@@ -185,6 +259,12 @@ class TestRequestJump:
         engine = GameEngine(board, jump_duration_ms=1000)
         assert engine.request_jump(0, 0) is True
         assert engine.is_airborne(0, 0) is True
+
+    def test_cooldown_blocks_jump_via_fake_arbiter(self):
+        board = make_board([["wR"]])
+        fake_arbiter = FakeArbiter(on_cooldown_cells={(0, 0)})
+        engine = GameEngine(board, jump_duration_ms=1000, arbiter=fake_arbiter)
+        assert engine.request_jump(0, 0) is False
 
 
 class TestAdvanceTimeAndResolveMotion:

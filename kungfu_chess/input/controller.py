@@ -18,6 +18,8 @@ class GameController:
 
     CELL_SIZE = 100
     JUMP_DURATION_MS = 1000
+    MOVE_COOLDOWN_MS = 500
+    JUMP_COOLDOWN_MS = 1000
 
     def __init__(self, board, mapper=None, engine=None):
         """mapper and engine are optional Dependency Injection points
@@ -25,7 +27,9 @@ class GameController:
         production code omits them and gets the real collaborators."""
         self.board = board
         self.mapper = mapper if mapper is not None else BoardMapper(self.CELL_SIZE)
-        self.engine = engine if engine is not None else GameEngine(board, self.JUMP_DURATION_MS)
+        self.engine = engine if engine is not None else GameEngine(
+            board, self.JUMP_DURATION_MS,
+            move_cooldown_ms=self.MOVE_COOLDOWN_MS, jump_cooldown_ms=self.JUMP_COOLDOWN_MS)
         self.selected = None
 
     def click(self, x, y):
@@ -45,6 +49,8 @@ class GameController:
             if self.engine.has_pending_move_from(row, col):
                 return
             if self.engine.is_airborne(row, col):
+                return
+            if self.engine.is_on_cooldown(row, col):
                 return
             self.selected = (row, col)
             return
