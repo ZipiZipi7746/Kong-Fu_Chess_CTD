@@ -144,6 +144,26 @@ class TestClickWithFakes:
         controller.click(100, 0)
         assert engine.move_calls == [(0, 0, 0, 1)]
 
+    def test_selected_piece_captured_by_an_unrelated_motion_clears_selection_without_crashing(self):
+        # Same-color motions can run in parallel with this engine, so the
+        # piece a player selected can be captured by a completely
+        # unrelated in-flight enemy motion before their second click
+        # arrives. The stale selection must be dropped gracefully, not
+        # crash trying to read a color off a piece that's no longer there.
+        # The destination must be occupied to actually exercise the
+        # crashing line (an empty destination short-circuits before ever
+        # reading selected_piece.color).
+        board = make_board([["wR", "bN"]])
+        mapper = FakeMapper({(0, 0): (0, 0), (100, 0): (0, 1)})
+        controller = GameController(board, mapper=mapper, engine=FakeEngine())
+        controller.click(0, 0)
+        assert controller.selected == (0, 0)
+
+        board.set_cell(0, 0, None)  # the selected piece was captured elsewhere
+
+        controller.click(100, 0)  # must not raise
+        assert controller.selected is None
+
 
 class TestJumpWithFakes:
     def test_jump_does_nothing_when_game_over(self):

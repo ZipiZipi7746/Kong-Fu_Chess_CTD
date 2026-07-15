@@ -52,6 +52,14 @@ class GameController:
         selected_row, selected_col = self.selected
         selected_piece = self.board.get_cell(selected_row, selected_col)
 
+        if selected_piece is None:
+            # The selected piece is gone - captured by an unrelated
+            # in-flight motion while this click was pending. Drop the
+            # stale selection instead of acting on a piece that no
+            # longer exists.
+            self.selected = None
+            return
+
         if token is not None and token.color == selected_piece.color:
             self.selected = (row, col)
             return
