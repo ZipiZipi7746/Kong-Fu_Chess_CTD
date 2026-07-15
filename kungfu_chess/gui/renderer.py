@@ -9,3 +9,7 @@ class Renderer(ABC):
     @abstractmethod
     def draw_sprite(self, path, x, y, size):
         ...
+
+    @abstractmethod
+    def draw_text(self, text, x, y):
+        ...

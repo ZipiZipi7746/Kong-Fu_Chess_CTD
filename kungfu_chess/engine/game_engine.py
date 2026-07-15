@@ -1,3 +1,4 @@
+from kungfu_chess.engine.events import MoveResolvedEvent
 from kungfu_chess.realtime.real_time_arbiter import RealTimeArbiter
 from kungfu_chess.rules.rule_engine import RuleEngine
 from kungfu_chess.rules.promotion_rule import PromotionRule
@@ -28,14 +29,18 @@ class GameEngine:
     "who clicked vs where they want to go" concern).
     """
 
-    def __init__(self, board, jump_duration_ms, rule_engine=None, arbiter=None):
+    def __init__(self, board, jump_duration_ms, rule_engine=None, arbiter=None, event_bus=None):
         """rule_engine and arbiter are optional Dependency Injection points
         (tests can supply fakes/stubs here instead of monkeypatching);
-        production code omits them and gets the real collaborators."""
+        production code omits them and gets the real collaborators.
+        event_bus is optional and off by default - only a UI layer that
+        wants move-resolved notifications (for a moves log, score, etc.)
+        needs to supply one; GameEngine has no idea who's listening."""
         self.board = board
         self.game_over = False
         self.rule_engine = rule_engine if rule_engine is not None else RuleEngine()
         self.arbiter = arbiter if arbiter is not None else RealTimeArbiter(jump_duration_ms)
+        self.event_bus = event_bus
 
     def has_pending_move_from(self, row, col):
         return self.arbiter.has_pending_move_from(row, col)
@@ -134,6 +139,11 @@ class GameEngine:
 
         # Pawn promotion (Rule 6/8: dedicated strategy resolves it on arrival)
         piece = PromotionRule.resolve(piece, motion.to_row, self.board)
+
+        if self.event_bus is not None:
+            self.event_bus.publish(MoveResolvedEvent(
+                motion.from_row, motion.from_col, motion.to_row, motion.to_col,
+                piece, destination))
 
         # Atomic state transition (Rule 10): destination set, then origin
         # cleared - never any in-between state.

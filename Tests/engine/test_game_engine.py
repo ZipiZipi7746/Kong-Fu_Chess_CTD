@@ -1,5 +1,6 @@
 from kungfu_chess.model.board import Board
 from kungfu_chess.model.piece import Piece
+from kungfu_chess.engine.events import EventBus
 from kungfu_chess.engine.game_engine import GameEngine
 
 
@@ -324,3 +325,56 @@ class TestAdvanceTimeAndResolveMotion:
             board, jump_duration_ms=1000, arbiter=fake_arbiter)
         engine.advance_time(1000)  # must not raise, must be a no-op
         assert board.get_cell(0, 1) is None
+
+
+class TestEventPublishing:
+    def test_successful_arrival_publishes_move_resolved(self):
+        board = make_board([["wR", "."]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+
+        assert len(received) == 1
+        event = received[0]
+        assert (event.from_row, event.from_col) == (0, 0)
+        assert (event.to_row, event.to_col) == (0, 1)
+        assert event.moving_piece == Piece("w", "R")
+        assert event.captured_piece is None
+
+    def test_capture_includes_the_captured_piece(self):
+        board = make_board([["wR", "bN"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+
+        assert received[0].captured_piece == Piece("b", "N")
+
+    def test_no_event_bus_is_fine_and_publishes_nothing(self):
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)  # no event_bus
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)  # must not raise
+
+    def test_friendly_collision_stop_does_not_publish(self):
+        board = make_board([["wR", ".", "wR"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.request_move(0, 0, 0, 1)  # requested first, lands normally
+        engine.request_move(0, 2, 0, 1)  # ties, stays at its own source
+        engine.advance_time(1000)
+
+        # Only the first (successful) mover publishes - the second
+        # merely stopped in place, it didn't complete a move.
+        assert len(received) == 1
+        assert (received[0].from_row, received[0].from_col) == (0, 0)

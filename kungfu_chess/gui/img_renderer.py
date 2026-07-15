@@ -16,3 +16,8 @@ class ImgRenderer(Renderer):
         offset_x = x + (size[0] - sprite_w) // 2
         offset_y = y + (size[1] - sprite_h) // 2
         sprite.draw_on(self.canvas, offset_x, offset_y)
+
+    def draw_text(self, text, x, y, font_size=0.7, color=(255, 255, 255, 255), thickness=1):
+        if not text:
+            return
+        self.canvas.put_text(text, x, y, font_size, color, thickness)

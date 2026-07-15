@@ -14,50 +14,71 @@ transform (compute_letterbox / letterbox_screen_to_image), which is
 genuinely needed here - unlike Phase 0's screen_to_image, which turned
 out to double-correct because cv2 already maps clicks into image space
 on this backend when it does its own (undistorted) scaling.
+
+Phase 5 adds a side panel (score / moves log / player name placeholders)
+to the right of the board. The "content" being letterboxed is the whole
+board+panel canvas; clicks landing in the panel (x past the board's own
+width) are simply ignored rather than passed to the controller.
 """
 import time
 
 import cv2  # pragma: no cover
 import numpy as np  # pragma: no cover
 
+from kungfu_chess.engine.events import EventBus  # pragma: no cover
+from kungfu_chess.engine.game_engine import GameEngine  # pragma: no cover
 from kungfu_chess.gui.board_geometry import (  # pragma: no cover
     compute_letterbox,
     derive_cell_size,
     letterbox_screen_to_image,
 )
+from kungfu_chess.gui.hud import render_moves_log, render_player_names, render_score  # pragma: no cover
 from kungfu_chess.gui.img_adapter import Img  # pragma: no cover
 from kungfu_chess.gui.img_renderer import ImgRenderer  # pragma: no cover
+from kungfu_chess.gui.observers import MovesLogObserver, ScoreObserver  # pragma: no cover
 from kungfu_chess.gui.sprite_library import SpriteLibrary  # pragma: no cover
 from kungfu_chess.gui.view_model_registry import ViewModelRegistry  # pragma: no cover
 from kungfu_chess.input.board_mapper import BoardMapper  # pragma: no cover
 from kungfu_chess.input.controller import GameController  # pragma: no cover
 
 WINDOW_NAME = "Kung Fu Chess"  # pragma: no cover
+PANEL_WIDTH = 220  # pragma: no cover
 
 
 def run(board, board_image_path="assets/board.png",  # pragma: no cover
         pieces_root="assets/pieces_mine"):
     base = Img().read(board_image_path)
     image_h, image_w = base.img.shape[:2]
+    content_w = image_w + PANEL_WIDTH
 
     cell_size = derive_cell_size(image_w, image_h, board.rows, board.cols)
-    controller = GameController(board, mapper=BoardMapper(cell_size))
+
+    event_bus = EventBus()
+    moves_log = MovesLogObserver(board.rows)
+    score = ScoreObserver()
+    event_bus.subscribe(moves_log)
+    event_bus.subscribe(score)
+
+    engine = GameEngine(board, jump_duration_ms=1000, event_bus=event_bus)
+    controller = GameController(board, mapper=BoardMapper(cell_size), engine=engine)
     sprite_library = SpriteLibrary(pieces_root)
     registry = ViewModelRegistry(sprite_library)
 
     cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
-    cv2.resizeWindow(WINDOW_NAME, image_w, image_h)
+    cv2.resizeWindow(WINDOW_NAME, content_w, image_h)
 
-    window_size = {"w": image_w, "h": image_h}
+    window_size = {"w": content_w, "h": image_h}
 
     def on_mouse(event, x, y, flags, param):
         if event not in (cv2.EVENT_LBUTTONDOWN, cv2.EVENT_RBUTTONDOWN):
             return
         mapped = letterbox_screen_to_image(
-            x, y, window_size["w"], window_size["h"], image_w, image_h)
+            x, y, window_size["w"], window_size["h"], content_w, image_h)
         if mapped is None:
-            return  # click landed on a letterbox padding bar, not the board
+            return  # click landed on a letterbox padding bar
         ix, iy = mapped
+        if ix >= image_w:
+            return  # click landed on the side panel, not the board
         if event == cv2.EVENT_LBUTTONDOWN:
             controller.click(ix, iy)
         else:
@@ -73,18 +94,29 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
         if dt_ms > 0:
             controller.wait(dt_ms)
 
-        canvas = Img()
-        canvas.img = base.img.copy()
-        registry.render(board, ImgRenderer(canvas), controller.engine, image_w, image_h, dt_ms)
+        content = Img()
+        content.img = np.zeros((image_h, content_w, base.img.shape[2]), dtype=base.img.dtype)
+        content.img[:, :image_w] = base.img
+        renderer = ImgRenderer(content)
+        registry.render(board, renderer, controller.engine, image_w, image_h, dt_ms)
+
+        panel_x = image_w + 16
+        for text, x, y in render_player_names("White", "Black", panel_x, 24):
+            renderer.draw_text(text, x, y)
+        for text, x, y in render_score(score.white_score, score.black_score, panel_x, 80):
+            renderer.draw_text(text, x, y)
+        for text, x, y in render_moves_log(
+                moves_log.white_moves, moves_log.black_moves, panel_x, 140, line_height=18):
+            renderer.draw_text(text, x, y, font_size=0.4)
 
         rect = cv2.getWindowImageRect(WINDOW_NAME)
         window_size["w"], window_size["h"] = max(rect[2], 1), max(rect[3], 1)
 
         scale, offset_x, offset_y, displayed_w, displayed_h = compute_letterbox(
-            window_size["w"], window_size["h"], image_w, image_h)
+            window_size["w"], window_size["h"], content_w, image_h)
 
-        padded = np.zeros((window_size["h"], window_size["w"], canvas.img.shape[2]), dtype=canvas.img.dtype)
-        resized = cv2.resize(canvas.img, (int(displayed_w), int(displayed_h)))
+        padded = np.zeros((window_size["h"], window_size["w"], content.img.shape[2]), dtype=content.img.dtype)
+        resized = cv2.resize(content.img, (int(displayed_w), int(displayed_h)))
         x0, y0 = int(offset_x), int(offset_y)
         padded[y0:y0 + resized.shape[0], x0:x0 + resized.shape[1]] = resized
 

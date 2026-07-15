@@ -49,3 +49,25 @@ class TestImgRendererDrawSprite:
 
         assert tuple(canvas.img[0, 0][:3]) == (255, 0, 0)
         assert tuple(canvas.img[29, 29][:3]) == (255, 0, 0)
+
+
+class TestImgRendererDrawText:
+    def test_draws_something_onto_the_canvas(self):
+        canvas = Img()
+        canvas.img = np.zeros((60, 200, 4), dtype=np.uint8)  # blank/black canvas
+        renderer = ImgRenderer(canvas)
+
+        renderer.draw_text("Hello", x=10, y=30)
+
+        # Text rendering is font-dependent, so just prove *something* was
+        # actually painted where the text should be, not the exact shape.
+        assert canvas.img.any()
+
+    def test_empty_canvas_stays_blank_when_text_is_empty(self):
+        canvas = Img()
+        canvas.img = np.zeros((60, 200, 4), dtype=np.uint8)
+        renderer = ImgRenderer(canvas)
+
+        renderer.draw_text("", x=10, y=30)
+
+        assert not canvas.img.any()
