@@ -13,3 +13,7 @@ class Renderer(ABC):
     @abstractmethod
     def draw_text(self, text, x, y):
         ...
+
+    @abstractmethod
+    def draw_highlight(self, x, y, size, color):
+        ...

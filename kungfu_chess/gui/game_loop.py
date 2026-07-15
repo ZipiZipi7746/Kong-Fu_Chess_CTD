@@ -28,6 +28,7 @@ import numpy as np  # pragma: no cover
 from kungfu_chess.engine.events import EventBus  # pragma: no cover
 from kungfu_chess.engine.game_engine import GameEngine  # pragma: no cover
 from kungfu_chess.gui.board_geometry import (  # pragma: no cover
+    cell_to_pixel,
     compute_letterbox,
     derive_cell_size,
     letterbox_screen_to_image,
@@ -35,6 +36,7 @@ from kungfu_chess.gui.board_geometry import (  # pragma: no cover
 from kungfu_chess.gui.hud import render_moves_log, render_player_names, render_score  # pragma: no cover
 from kungfu_chess.gui.img_adapter import Img  # pragma: no cover
 from kungfu_chess.gui.img_renderer import ImgRenderer  # pragma: no cover
+from kungfu_chess.gui.legal_moves import legal_destinations  # pragma: no cover
 from kungfu_chess.gui.observers import MovesLogObserver, ScoreObserver  # pragma: no cover
 from kungfu_chess.gui.sprite_library import SpriteLibrary  # pragma: no cover
 from kungfu_chess.gui.view_model_registry import ViewModelRegistry  # pragma: no cover
@@ -43,6 +45,8 @@ from kungfu_chess.input.controller import GameController  # pragma: no cover
 
 WINDOW_NAME = "Kung Fu Chess"  # pragma: no cover
 PANEL_WIDTH = 220  # pragma: no cover
+SELECTED_COLOR = (0, 215, 255, 130)  # pragma: no cover
+LEGAL_MOVE_COLOR = (0, 200, 0, 100)  # pragma: no cover
 
 
 def run(board, board_image_path="assets/board.png",  # pragma: no cover
@@ -98,6 +102,22 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
         content.img = np.zeros((image_h, content_w, base.img.shape[2]), dtype=base.img.dtype)
         content.img[:, :image_w] = base.img
         renderer = ImgRenderer(content)
+
+        # Highlights are drawn before the pieces, so they show as
+        # colored squares behind them rather than covering them.
+        cell_w = image_w // board.cols
+        cell_h = image_h // board.rows
+        if controller.selected is not None:
+            sel_row, sel_col = controller.selected
+            selected_piece = board.get_cell(sel_row, sel_col)
+            if selected_piece is not None:
+                sx, sy = cell_to_pixel(sel_row, sel_col, cell_w, cell_h)
+                renderer.draw_highlight(sx, sy, (cell_w, cell_h), SELECTED_COLOR)
+                for row, col in legal_destinations(
+                        selected_piece, sel_row, sel_col, board, controller.engine.rule_engine):
+                    dx, dy = cell_to_pixel(row, col, cell_w, cell_h)
+                    renderer.draw_highlight(dx, dy, (cell_w, cell_h), LEGAL_MOVE_COLOR)
+
         registry.render(board, renderer, controller.engine, image_w, image_h, dt_ms)
 
         panel_x = image_w + 16

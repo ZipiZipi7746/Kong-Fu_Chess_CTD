@@ -71,3 +71,29 @@ class TestImgRendererDrawText:
         renderer.draw_text("", x=10, y=30)
 
         assert not canvas.img.any()
+
+
+class TestImgRendererDrawHighlight:
+    def test_fully_opaque_highlight_paints_the_exact_color(self):
+        canvas = Img()
+        canvas.img = np.zeros((60, 60, 4), dtype=np.uint8)  # black canvas
+
+        renderer = ImgRenderer(canvas)
+        renderer.draw_highlight(x=10, y=10, size=(20, 20), color=(0, 255, 0, 255))  # BGRA green
+
+        # Img.draw_on only blends the B/G/R channels onto the
+        # destination, never the destination's own alpha - so only BGR
+        # is asserted here.
+        assert tuple(int(v) for v in canvas.img[15, 15][:3]) == (0, 255, 0)
+        assert tuple(int(v) for v in canvas.img[0, 0][:3]) == (0, 0, 0)  # outside the region
+
+    def test_semi_transparent_highlight_blends_with_the_background(self):
+        canvas = Img()
+        canvas.img = np.full((60, 60, 4), (200, 200, 200, 255), dtype=np.uint8)  # solid gray
+
+        renderer = ImgRenderer(canvas)
+        renderer.draw_highlight(x=0, y=0, size=(60, 60), color=(0, 255, 0, 128))
+
+        pixel = tuple(int(v) for v in canvas.img[30, 30][:3])
+        assert pixel != (200, 200, 200)  # changed from the background
+        assert pixel != (0, 255, 0)  # but not the pure highlight color either - genuinely blended

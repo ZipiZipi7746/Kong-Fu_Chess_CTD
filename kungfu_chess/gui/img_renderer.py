@@ -1,3 +1,5 @@
+import numpy as np
+
 from kungfu_chess.gui.img_adapter import Img
 from kungfu_chess.gui.renderer import Renderer
 
@@ -21,3 +23,8 @@ class ImgRenderer(Renderer):
         if not text:
             return
         self.canvas.put_text(text, x, y, font_size, color, thickness)
+
+    def draw_highlight(self, x, y, size, color):
+        overlay = Img()
+        overlay.img = np.full((size[1], size[0], 4), color, dtype=np.uint8)
+        overlay.draw_on(self.canvas, x, y)
