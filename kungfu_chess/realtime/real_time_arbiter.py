@@ -43,21 +43,10 @@ class RealTimeArbiter:
     def airborne_finish_time(self, row, col):
         return self.airborne.get((row, col))
 
-    def schedule_move(self, from_row, from_col, to_row, to_col, color=None):
+    def schedule_move(self, from_row, from_col, to_row, to_col):
         self.pending_motions.append(
-            Motion(from_row, from_col, to_row, to_col, self.clock, color)
+            Motion(from_row, from_col, to_row, to_col, self.clock)
         )
-
-    def has_opposing_color_pending(self, color):
-        """True if any currently in-flight motion belongs to a piece of
-        the OPPOSITE color. Same-color pieces may still move in
-        parallel (the core kung-fu-chess mechanic) - only a piece of
-        the opposing color is held back until the in-flight motion
-        resolves."""
-        for motion in self.pending_motions:
-            if motion.color is not None and motion.color != color:
-                return True
-        return False
 
     def schedule_jump(self, row, col):
         self.airborne[(row, col)] = self.clock + self._jump_duration_ms

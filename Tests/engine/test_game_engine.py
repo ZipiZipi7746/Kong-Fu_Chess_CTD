@@ -103,6 +103,15 @@ class TestRequestMoveWithRealCollaborators:
         engine.request_jump(0, 0)
         assert engine.request_move(0, 0, 0, 1) == "blocked"
 
+    def test_opposing_color_can_move_while_this_colors_motion_is_pending(self):
+        # The dodge mechanic: an enemy piece must be able to react (e.g.
+        # flee a threatened capture) while a piece of the other color is
+        # still mid-flight elsewhere on the board.
+        board = make_board([["wR", ".", "."], [".", "bR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)  # white rook starts moving
+        assert engine.request_move(1, 1, 1, 2) == "scheduled"  # black rook can still act
+
     def test_move_completes_and_starts_a_cooldown_at_the_destination(self):
         board = make_board([["wR", "."]])
         engine = GameEngine(board, jump_duration_ms=1000)
@@ -265,6 +274,33 @@ class TestRequestJump:
         fake_arbiter = FakeArbiter(on_cooldown_cells={(0, 0)})
         engine = GameEngine(board, jump_duration_ms=1000, arbiter=fake_arbiter)
         assert engine.request_jump(0, 0) is False
+
+
+class TestDodgingAThreatenedCapture:
+    def test_defender_escapes_when_its_motion_resolves_first(self):
+        # wR (0,0) heads for bR (0,3) - a 3-cell trip, 3000ms. bR flees
+        # straight down to (1,3) - a 1-cell trip, 1000ms - so it's gone
+        # by the time wR arrives. No capture: wR just moves into the
+        # now-empty square, bR safely relocated.
+        board = make_board([["wR", ".", ".", "bR"], [".", ".", ".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 3)
+        engine.request_move(0, 3, 1, 3)
+        engine.advance_time(3000)
+        assert board.get_cell(0, 3) == Piece("w", "R")
+        assert board.get_cell(1, 3) == Piece("b", "R")
+        assert board.get_cell(0, 0) is None
+
+    def test_defender_is_captured_when_attacker_arrives_first(self):
+        # Same idea, but now bR's escape (3 cells straight down, 3000ms)
+        # is slower than wR's approach (1 cell, 1000ms) - wR arrives
+        # first and captures bR before it can get away.
+        board = make_board([["wR", "bR"], [".", "."], [".", "."], [".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)  # wR: 1 cell, arrives 1000
+        assert engine.request_move(0, 1, 3, 1) == "scheduled"  # bR's flee attempt genuinely started
+        engine.advance_time(1000)
+        assert board.get_cell(0, 1) == Piece("w", "R")  # captured before bR's own motion resolved
 
 
 class TestAdvanceTimeAndResolveMotion:

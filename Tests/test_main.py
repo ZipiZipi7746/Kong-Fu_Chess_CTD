@@ -66,6 +66,23 @@ class TestRun:
         ])
         assert capsys.readouterr().out == ". . wR wR .\n"
 
+    def test_threatened_piece_can_dodge_before_the_attacker_arrives(self, capsys):
+        # wR at col 0 heads for bR at col 3 (3 cells, 3000ms). bR flees
+        # straight down (1 cell, 1000ms) - well clear before wR arrives.
+        run([
+            "Board:",
+            "wR . . bR",
+            ". . . .",
+            "Commands:",
+            "click 0 0",
+            "click 300 0",
+            "click 300 0",
+            "click 300 100",
+            "wait 3000",
+            "print board",
+        ])
+        assert capsys.readouterr().out == ". . . wR\n. . . bR\n"
+
 
 class TestMainSubprocess:
     """main() itself (reading real stdin) is a one-line wrapper around

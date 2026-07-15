@@ -10,11 +10,12 @@ class GameEngine:
     request_move(...) is the single facade method for attempting a move,
     and executes checks in the required sequential order:
       1. Is the game already over?
-      2. Is there already an active motion involving this piece, or a
-         motion of the OPPOSING color anywhere on the board? (same-color
-         pieces may still move in parallel - that's the core kung-fu-
-         chess mechanic; the opposing color must wait for the in-flight
-         motion to resolve first.)
+      2. Is there already an active motion involving this piece (or is
+         it airborne, or on cooldown)? Both colors may otherwise have
+         independent motions in flight at the same time - this is what
+         lets a threatened piece dodge: it can still be given a new
+         move while an enemy motion is inbound toward it, and whichever
+         motion actually resolves first (by arrival_time) wins the race.
       3. Does the RuleEngine validate and approve the move?
       4. If approved: initialize a Motion via the RealTimeArbiter.
 
@@ -85,15 +86,14 @@ class GameEngine:
 
         if (self.arbiter.has_pending_move_from(from_row, from_col)
                 or self.arbiter.is_airborne(from_row, from_col)
-                or self.arbiter.is_on_cooldown(from_row, from_col)
-                or self.arbiter.has_opposing_color_pending(piece.color)):
+                or self.arbiter.is_on_cooldown(from_row, from_col)):
             return "blocked"
 
         if not self.rule_engine.is_legal(
                 piece, from_row, from_col, to_row, to_col, self.board):
             return "invalid"
 
-        self.arbiter.schedule_move(from_row, from_col, to_row, to_col, piece.color)
+        self.arbiter.schedule_move(from_row, from_col, to_row, to_col)
         return "scheduled"
 
     def request_jump(self, row, col):
