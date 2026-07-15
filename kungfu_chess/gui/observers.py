@@ -23,6 +23,7 @@ class MovesLogObserver:
             f"{event.moving_piece}"
             f"{algebraic(event.from_row, event.from_col, self.board_rows)}"
             f"->{algebraic(event.to_row, event.to_col, self.board_rows)}"
+            f" ({event.timestamp_ms / 1000:.1f}s)"
         )
         target = self.white_moves if event.moving_piece.color == "w" else self.black_moves
         target.append(notation)

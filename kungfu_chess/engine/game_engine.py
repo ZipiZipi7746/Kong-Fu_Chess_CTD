@@ -153,7 +153,7 @@ class GameEngine:
         if self.event_bus is not None:
             self.event_bus.publish(MoveResolvedEvent(
                 motion.from_row, motion.from_col, motion.to_row, motion.to_col,
-                piece, destination))
+                piece, destination, timestamp_ms=self.arbiter.clock))
 
         self.arbiter.start_move_cooldown(motion.to_row, motion.to_col)
 

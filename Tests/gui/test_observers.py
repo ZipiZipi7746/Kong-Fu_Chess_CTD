@@ -28,23 +28,29 @@ class TestAlgebraic:
 class TestMovesLogObserver:
     def test_white_move_recorded_in_white_list(self):
         observer = MovesLogObserver(board_rows=8)
-        event = MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P"))
+        event = MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P"), timestamp_ms=0)
         observer(event)
-        assert observer.white_moves == ["wPe2->e4"]
+        assert observer.white_moves == ["wPe2->e4 (0.0s)"]
         assert observer.black_moves == []
 
     def test_black_move_recorded_in_black_list(self):
         observer = MovesLogObserver(board_rows=8)
-        event = MoveResolvedEvent(1, 4, 3, 4, moving_piece=FakePiece("b", "P"))
+        event = MoveResolvedEvent(1, 4, 3, 4, moving_piece=FakePiece("b", "P"), timestamp_ms=0)
         observer(event)
-        assert observer.black_moves == ["bPe7->e5"]
+        assert observer.black_moves == ["bPe7->e5 (0.0s)"]
         assert observer.white_moves == []
 
     def test_moves_accumulate_in_order(self):
         observer = MovesLogObserver(board_rows=8)
-        observer(MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P")))
-        observer(MoveResolvedEvent(6, 3, 4, 3, moving_piece=FakePiece("w", "P")))
-        assert observer.white_moves == ["wPe2->e4", "wPd2->d4"]
+        observer(MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P"), timestamp_ms=0))
+        observer(MoveResolvedEvent(6, 3, 4, 3, moving_piece=FakePiece("w", "P"), timestamp_ms=0))
+        assert observer.white_moves == ["wPe2->e4 (0.0s)", "wPd2->d4 (0.0s)"]
+
+    def test_timestamp_is_formatted_as_seconds_with_one_decimal(self):
+        observer = MovesLogObserver(board_rows=8)
+        event = MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P"), timestamp_ms=4300)
+        observer(event)
+        assert observer.white_moves == ["wPe2->e4 (4.3s)"]
 
 
 class TestScoreObserver:

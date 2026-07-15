@@ -460,6 +460,7 @@ class TestEventPublishing:
         assert (event.to_row, event.to_col) == (0, 1)
         assert event.moving_piece == Piece("w", "R")
         assert event.captured_piece is None
+        assert event.timestamp_ms == 1000
 
     def test_capture_includes_the_captured_piece(self):
         board = make_board([["wR", "bN"]])

@@ -3,13 +3,15 @@ class MoveResolvedEvent:
     10's atomic arrival) - not for a friendly-collision stop or an
     enemy-airborne kill, since those aren't a completed move."""
 
-    def __init__(self, from_row, from_col, to_row, to_col, moving_piece, captured_piece=None):
+    def __init__(self, from_row, from_col, to_row, to_col, moving_piece, captured_piece=None,
+                 timestamp_ms=0):
         self.from_row = from_row
         self.from_col = from_col
         self.to_row = to_row
         self.to_col = to_col
         self.moving_piece = moving_piece
         self.captured_piece = captured_piece
+        self.timestamp_ms = timestamp_ms
 
 
 class EventBus:

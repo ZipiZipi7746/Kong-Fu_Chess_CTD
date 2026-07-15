@@ -35,3 +35,11 @@ class TestMoveResolvedEvent:
     def test_captured_piece_defaults_to_none(self):
         event = MoveResolvedEvent(0, 0, 0, 1, moving_piece="wR")
         assert event.captured_piece is None
+
+    def test_timestamp_ms_defaults_to_zero(self):
+        event = MoveResolvedEvent(0, 0, 0, 1, moving_piece="wR")
+        assert event.timestamp_ms == 0
+
+    def test_stores_timestamp_ms_when_given(self):
+        event = MoveResolvedEvent(0, 0, 0, 1, moving_piece="wR", timestamp_ms=4000)
+        assert event.timestamp_ms == 4000
