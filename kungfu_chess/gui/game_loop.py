@@ -15,10 +15,12 @@ genuinely needed here - unlike Phase 0's screen_to_image, which turned
 out to double-correct because cv2 already maps clicks into image space
 on this backend when it does its own (undistorted) scaling.
 
-Phase 5 adds a side panel (score / moves log / player name placeholders)
-to the right of the board. The "content" being letterboxed is the whole
-board+panel canvas; clicks landing in the panel (x past the board's own
-width) are simply ignored rather than passed to the controller.
+Phase 5 adds two side panels (score / moves log / player name), one per
+color, flanking the board - Black's on the left, White's on the right.
+The "content" being letterboxed is the whole
+left-panel+board+right-panel canvas; clicks landing in either panel
+(x before or past the board's own span) are simply ignored rather than
+passed to the controller.
 """
 import time
 
@@ -33,7 +35,7 @@ from kungfu_chess.gui.board_geometry import (  # pragma: no cover
     derive_cell_size,
     letterbox_screen_to_image,
 )
-from kungfu_chess.gui.hud import render_moves_log, render_player_names, render_score  # pragma: no cover
+from kungfu_chess.gui.hud import render_moves_log, render_player_name, render_score  # pragma: no cover
 from kungfu_chess.gui.img_adapter import Img  # pragma: no cover
 from kungfu_chess.gui.img_renderer import ImgRenderer  # pragma: no cover
 from kungfu_chess.gui.legal_moves import legal_destinations  # pragma: no cover
@@ -53,7 +55,8 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
         pieces_root="assets/pieces_mine"):
     base = Img().read(board_image_path)
     image_h, image_w = base.img.shape[:2]
-    content_w = image_w + PANEL_WIDTH
+    board_x = PANEL_WIDTH  # black panel occupies [0, PANEL_WIDTH); board starts here
+    content_w = PANEL_WIDTH + image_w + PANEL_WIDTH
 
     cell_size = derive_cell_size(image_w, image_h, board.rows, board.cols)
 
@@ -81,12 +84,13 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
         if mapped is None:
             return  # click landed on a letterbox padding bar
         ix, iy = mapped
-        if ix >= image_w:
-            return  # click landed on the side panel, not the board
+        if ix < board_x or ix >= board_x + image_w:
+            return  # click landed on a side panel, not the board
+        board_ix = ix - board_x
         if event == cv2.EVENT_LBUTTONDOWN:
-            controller.click(ix, iy)
+            controller.click(board_ix, iy)
         else:
-            controller.jump(ix, iy)
+            controller.jump(board_ix, iy)
 
     cv2.setMouseCallback(WINDOW_NAME, on_mouse)
 
@@ -100,8 +104,11 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
 
         content = Img()
         content.img = np.zeros((image_h, content_w, base.img.shape[2]), dtype=base.img.dtype)
-        content.img[:, :image_w] = base.img
         renderer = ImgRenderer(content)
+
+        board_canvas = Img()
+        board_canvas.img = base.img.copy()
+        board_renderer = ImgRenderer(board_canvas)
 
         # Highlights are drawn before the pieces, so they show as
         # colored squares behind them rather than covering them.
@@ -112,22 +119,25 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
             selected_piece = board.get_cell(sel_row, sel_col)
             if selected_piece is not None:
                 sx, sy = cell_to_pixel(sel_row, sel_col, cell_w, cell_h)
-                renderer.draw_highlight(sx, sy, (cell_w, cell_h), SELECTED_COLOR)
+                board_renderer.draw_highlight(sx, sy, (cell_w, cell_h), SELECTED_COLOR)
                 for row, col in legal_destinations(
                         selected_piece, sel_row, sel_col, board, controller.engine.rule_engine):
                     dx, dy = cell_to_pixel(row, col, cell_w, cell_h)
-                    renderer.draw_highlight(dx, dy, (cell_w, cell_h), LEGAL_MOVE_COLOR)
+                    board_renderer.draw_highlight(dx, dy, (cell_w, cell_h), LEGAL_MOVE_COLOR)
 
-        registry.render(board, renderer, controller.engine, image_w, image_h, dt_ms)
+        registry.render(board, board_renderer, controller.engine, image_w, image_h, dt_ms)
+        board_canvas.draw_on(content, board_x, 0)
 
-        panel_x = image_w + 16
-        for text, x, y in render_player_names("White", "Black", panel_x, 24):
-            renderer.draw_text(text, x, y)
-        for text, x, y in render_score(score.white_score, score.black_score, panel_x, 80):
-            renderer.draw_text(text, x, y)
-        for text, x, y in render_moves_log(
-                moves_log.white_moves, moves_log.black_moves, panel_x, 140, line_height=18):
-            renderer.draw_text(text, x, y, font_size=0.4)
+        black_panel_x, white_panel_x = 16, board_x + image_w + 16
+        for panel_x, name, moves, player_score in (
+                (black_panel_x, "Black", moves_log.black_moves, score.black_score),
+                (white_panel_x, "White", moves_log.white_moves, score.white_score)):
+            for text, x, y in render_player_name(name, panel_x, 24):
+                renderer.draw_text(text, x, y)
+            for text, x, y in render_score(player_score, panel_x, 60):
+                renderer.draw_text(text, x, y)
+            for text, x, y in render_moves_log(moves, panel_x, 100, line_height=18):
+                renderer.draw_text(text, x, y, font_size=0.4)
 
         rect = cv2.getWindowImageRect(WINDOW_NAME)
         window_size["w"], window_size["h"] = max(rect[2], 1), max(rect[3], 1)
