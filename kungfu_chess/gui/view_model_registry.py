@@ -48,7 +48,13 @@ class ViewModelRegistry:
                     continue
 
                 key = (row_index, col_index)
-                if key not in self._by_cell:
+                tracked = self._by_cell.get(key)
+                if tracked is None or tracked.piece_code != token:
+                    # No view model here yet, or a different piece now
+                    # occupies this cell (e.g. the one we were tracking
+                    # was captured, or relocated elsewhere via a
+                    # friendly-collision stop) - start fresh rather than
+                    # showing a stale/wrong sprite.
                     self._by_cell[key] = PieceViewModel(self.sprite_library, token)
                 view_model = self._by_cell[key]
 

@@ -114,3 +114,43 @@ class TestArrivalContinuity:
 
         assert registry.state_name_at(0, 2) == "long_rest"
         assert registry.state_name_at(0, 0) is None  # nothing left tracked at the old cell
+
+
+class TestStaleViewModelIsDiscarded:
+    def test_a_different_piece_landing_on_a_stale_cell_gets_its_own_fresh_sprite(self):
+        # wR at (0,0) is captured (vanishes from the board, no motion
+        # involved from the registry's perspective - e.g. an enemy
+        # motion resolved and overwrote it). A completely different
+        # piece, bN, later ends up on that same cell via some other,
+        # unrelated route. The stale wR view model must not be reused
+        # for bN.
+        registry = ViewModelRegistry(FakeSpriteLibrary())
+        renderer = FakeRenderer()
+
+        board_with_rook = make_board([["wR"]])
+        registry.render(board_with_rook, renderer, FakeEngine(), image_w=100, image_h=100, dt_ms=16)
+        assert renderer.calls[-1][0] == "wR/idle/1.png"
+
+        board_with_knight = make_board([["bN"]])
+        registry.render(board_with_knight, renderer, FakeEngine(), image_w=100, image_h=100, dt_ms=16)
+        assert renderer.calls[-1][0] == "bN/idle/1.png"
+
+    def test_an_emptied_cell_does_not_linger_and_corrupt_a_later_arrival(self):
+        registry = ViewModelRegistry(FakeSpriteLibrary())
+        renderer = FakeRenderer()
+
+        board = make_board([["wR", "."]])
+        registry.render(board, renderer, FakeEngine(), image_w=200, image_h=100, dt_ms=16)
+
+        # wR is captured/removed with no in-flight motion at all (e.g. an
+        # airborne kill, or any other path the registry doesn't
+        # explicitly model) - the cell just becomes empty.
+        board.set_cell(0, 0, None)
+        board.set_cell(0, 1, None)
+        registry.render(board, renderer, FakeEngine(), image_w=200, image_h=100, dt_ms=16)
+
+        # A different piece now arrives at that same cell.
+        board.set_cell(0, 0, None)
+        board_next = make_board([["bQ", "."]])
+        registry.render(board_next, renderer, FakeEngine(), image_w=200, image_h=100, dt_ms=16)
+        assert renderer.calls[-1][0] == "bQ/idle/1.png"
