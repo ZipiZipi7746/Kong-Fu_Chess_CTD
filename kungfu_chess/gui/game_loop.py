@@ -1,5 +1,5 @@
 """Real I/O only (window, mouse, timing) - # pragma: no cover throughout,
-same treatment as BoardParser._read_stdin and phase0_pixel_check.py.
+same treatment as BoardParser._read_stdin.
 
 Connects the animated (Phase 3) rendering to a live window and the
 existing GameController.click/jump/wait - without changing a single
