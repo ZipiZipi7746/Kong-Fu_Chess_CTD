@@ -319,12 +319,25 @@ class TestAdvanceTimeAndResolveMotion:
         engine.advance_time(1000)
         assert engine.game_over is True
 
+    def test_capturing_king_sets_the_winner_to_the_capturing_color(self):
+        board = make_board([["wR", "bK"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+        assert engine.winner == "w"
+
+    def test_winner_defaults_to_none(self):
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        assert engine.winner is None
+
     def test_capturing_non_king_does_not_end_game(self):
         board = make_board([["wR", "bR"]])
         engine = GameEngine(board, jump_duration_ms=1000)
         engine.request_move(0, 0, 0, 1)
         engine.advance_time(1000)
         assert engine.game_over is False
+        assert engine.winner is None
 
     def test_pawn_promotion_on_arrival(self):
         board = make_board([["."], ["wP"]])

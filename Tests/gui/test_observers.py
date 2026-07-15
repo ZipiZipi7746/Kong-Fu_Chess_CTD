@@ -30,27 +30,37 @@ class TestMovesLogObserver:
         observer = MovesLogObserver(board_rows=8)
         event = MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P"), timestamp_ms=0)
         observer(event)
-        assert observer.white_moves == ["wPe2->e4 (0.0s)"]
+        assert observer.white_moves == ["Pawn e2->e4 (0.0s)"]
         assert observer.black_moves == []
 
     def test_black_move_recorded_in_black_list(self):
         observer = MovesLogObserver(board_rows=8)
         event = MoveResolvedEvent(1, 4, 3, 4, moving_piece=FakePiece("b", "P"), timestamp_ms=0)
         observer(event)
-        assert observer.black_moves == ["bPe7->e5 (0.0s)"]
+        assert observer.black_moves == ["Pawn e7->e5 (0.0s)"]
         assert observer.white_moves == []
 
     def test_moves_accumulate_in_order(self):
         observer = MovesLogObserver(board_rows=8)
         observer(MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P"), timestamp_ms=0))
         observer(MoveResolvedEvent(6, 3, 4, 3, moving_piece=FakePiece("w", "P"), timestamp_ms=0))
-        assert observer.white_moves == ["wPe2->e4 (0.0s)", "wPd2->d4 (0.0s)"]
+        assert observer.white_moves == ["Pawn e2->e4 (0.0s)", "Pawn d2->d4 (0.0s)"]
 
     def test_timestamp_is_formatted_as_seconds_with_one_decimal(self):
         observer = MovesLogObserver(board_rows=8)
         event = MoveResolvedEvent(6, 4, 4, 4, moving_piece=FakePiece("w", "P"), timestamp_ms=4300)
         observer(event)
-        assert observer.white_moves == ["wPe2->e4 (4.3s)"]
+        assert observer.white_moves == ["Pawn e2->e4 (4.3s)"]
+
+    def test_every_piece_kind_gets_a_full_name(self):
+        observer = MovesLogObserver(board_rows=8)
+        expected = {
+            "P": "Pawn", "N": "Knight", "B": "Bishop",
+            "R": "Rook", "Q": "Queen", "K": "King",
+        }
+        for kind, name in expected.items():
+            observer(MoveResolvedEvent(0, 0, 0, 1, moving_piece=FakePiece("w", kind), timestamp_ms=0))
+        assert observer.white_moves == [f"{name} a8->b8 (0.0s)" for name in expected.values()]
 
 
 class TestScoreObserver:

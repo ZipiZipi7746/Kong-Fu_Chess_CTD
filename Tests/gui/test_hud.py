@@ -1,4 +1,4 @@
-from kungfu_chess.gui.hud import render_moves_log, render_player_name, render_score
+from kungfu_chess.gui.hud import render_game_over, render_moves_log, render_player_name, render_score
 
 
 class TestRenderScore:
@@ -27,3 +27,11 @@ class TestRenderMovesLog:
 
     def test_empty_log_produces_no_lines(self):
         assert render_moves_log([], x=0, y=0, line_height=10) == []
+
+
+class TestRenderGameOver:
+    def test_white_winner_produces_white_wins_message(self):
+        assert render_game_over("w", x=10, y=20) == [("White Wins!", 10, 20)]
+
+    def test_black_winner_produces_black_wins_message(self):
+        assert render_game_over("b", x=10, y=20) == [("Black Wins!", 10, 20)]

@@ -35,7 +35,12 @@ from kungfu_chess.gui.board_geometry import (  # pragma: no cover
     derive_cell_size,
     letterbox_screen_to_image,
 )
-from kungfu_chess.gui.hud import render_moves_log, render_player_name, render_score  # pragma: no cover
+from kungfu_chess.gui.hud import (  # pragma: no cover
+    render_game_over,
+    render_moves_log,
+    render_player_name,
+    render_score,
+)
 from kungfu_chess.gui.img_adapter import Img  # pragma: no cover
 from kungfu_chess.gui.img_renderer import ImgRenderer  # pragma: no cover
 from kungfu_chess.gui.legal_moves import legal_destinations  # pragma: no cover
@@ -49,6 +54,9 @@ WINDOW_NAME = "Kung Fu Chess"  # pragma: no cover
 PANEL_WIDTH = 220  # pragma: no cover
 SELECTED_COLOR = (0, 215, 255, 130)  # pragma: no cover
 LEGAL_MOVE_COLOR = (0, 200, 0, 100)  # pragma: no cover
+GAME_OVER_OVERLAY_COLOR = (0, 0, 0, 170)  # pragma: no cover
+GAME_OVER_TEXT_COLOR = (0, 215, 255, 255)  # pragma: no cover
+GAME_OVER_OVERLAY_HEIGHT = 80  # pragma: no cover
 
 
 def run(board, board_image_path="assets/board.png",  # pragma: no cover
@@ -138,6 +146,14 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
                 renderer.draw_text(text, x, y)
             for text, x, y in render_moves_log(moves, panel_x, 100, line_height=18):
                 renderer.draw_text(text, x, y, font_size=0.4)
+
+        if controller.engine.game_over and controller.engine.winner is not None:
+            overlay_y = image_h // 2 - GAME_OVER_OVERLAY_HEIGHT // 2
+            renderer.draw_highlight(
+                board_x, overlay_y, (image_w, GAME_OVER_OVERLAY_HEIGHT), GAME_OVER_OVERLAY_COLOR)
+            for text, x, y in render_game_over(
+                    controller.engine.winner, board_x + image_w // 2 - 110, image_h // 2 + 12):
+                renderer.draw_text(text, x, y, font_size=1.2, color=GAME_OVER_TEXT_COLOR, thickness=3)
 
         rect = cv2.getWindowImageRect(WINDOW_NAME)
         window_size["w"], window_size["h"] = max(rect[2], 1), max(rect[3], 1)

@@ -18,3 +18,10 @@ def render_player_name(name, x, y):
 def render_moves_log(moves, x, y, line_height=20, max_lines=10):
     recent = moves[-max_lines:]
     return [(text, x, y + i * line_height) for i, text in enumerate(recent)]
+
+
+_COLOR_NAMES = {"w": "White", "b": "Black"}
+
+
+def render_game_over(winner_color, x, y):
+    return [(f"{_COLOR_NAMES[winner_color]} Wins!", x, y)]

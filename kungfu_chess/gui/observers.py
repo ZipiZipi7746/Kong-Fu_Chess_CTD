@@ -1,4 +1,5 @@
 _PIECE_VALUES = {"P": 1, "N": 3, "B": 3, "R": 5, "Q": 9}
+_PIECE_NAMES = {"P": "Pawn", "N": "Knight", "B": "Bishop", "R": "Rook", "Q": "Queen", "K": "King"}
 
 
 def algebraic(row, col, board_rows):
@@ -19,8 +20,9 @@ class MovesLogObserver:
         self.black_moves = []
 
     def __call__(self, event):
+        piece_name = _PIECE_NAMES.get(event.moving_piece.kind, event.moving_piece.kind)
         notation = (
-            f"{event.moving_piece}"
+            f"{piece_name} "
             f"{algebraic(event.from_row, event.from_col, self.board_rows)}"
             f"->{algebraic(event.to_row, event.to_col, self.board_rows)}"
             f" ({event.timestamp_ms / 1000:.1f}s)"

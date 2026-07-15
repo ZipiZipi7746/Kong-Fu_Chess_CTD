@@ -43,6 +43,7 @@ class GameEngine:
         set them on that arbiter instead)."""
         self.board = board
         self.game_over = False
+        self.winner = None
         self.rule_engine = rule_engine if rule_engine is not None else RuleEngine()
         self.arbiter = arbiter if arbiter is not None else RealTimeArbiter(
             jump_duration_ms, move_cooldown_ms=move_cooldown_ms, jump_cooldown_ms=jump_cooldown_ms)
@@ -146,6 +147,7 @@ class GameEngine:
         # Game Over (Rule 11: exclusively King capture)
         if destination is not None and destination.is_king():
             self.game_over = True
+            self.winner = piece.color
 
         # Pawn promotion (Rule 6/8: dedicated strategy resolves it on arrival)
         piece = PromotionRule.resolve(piece, motion.to_row, self.board)
