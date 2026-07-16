@@ -1,3 +1,6 @@
+from kungfu_chess.realtime.progress import progress_fraction
+
+
 class Motion:
     """Represents an in-flight move: a piece traveling from one cell to
     another. Travel time scales with distance (Rule 9): crossing N cells
@@ -26,11 +29,8 @@ class Motion:
         current_time, clamped to that range. Purely cosmetic (used by
         the UI to interpolate a piece's on-screen position) - never
         affects when the motion actually arrives."""
-        if self._duration_ms == 0:
-            return 1.0
         start_time = self.arrival_time - self._duration_ms
-        elapsed = current_time - start_time
-        return max(0.0, min(1.0, elapsed / self._duration_ms))
+        return progress_fraction(start_time, self.arrival_time, current_time)
 
     def previous_cell(self):
         """The cell one step back from the destination, along this

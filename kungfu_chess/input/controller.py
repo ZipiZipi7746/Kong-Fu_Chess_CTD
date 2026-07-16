@@ -16,6 +16,14 @@ class GameController:
     need to change.
     """
 
+    # A fixed default for the text/CLI interface (main.py), which has no
+    # loaded board image to derive a size from - an abstract constant is
+    # fine here since nothing is actually drawn to scale. This does NOT
+    # conflict with the GUI's "never hardcode cell size" principle: the
+    # GUI always ignores this constant and computes its own cell size via
+    # board_geometry.derive_cell_size(), from the real loaded image and
+    # board.rows/cols - that derived value is what governs anything
+    # actually rendered on screen.
     CELL_SIZE = 100
     JUMP_DURATION_MS = 1000
     MOVE_COOLDOWN_MS = 500

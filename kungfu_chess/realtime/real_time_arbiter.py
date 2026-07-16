@@ -1,4 +1,5 @@
 from kungfu_chess.realtime.motion import Motion
+from kungfu_chess.realtime.progress import progress_fraction
 
 
 class RealTimeArbiter:
@@ -83,10 +84,7 @@ class RealTimeArbiter:
         if finish is None or finish < self.clock:
             return None
         start = self.cooldown_starts[(row, col)]
-        duration = finish - start
-        if duration <= 0:
-            return 1.0
-        return (self.clock - start) / duration
+        return progress_fraction(start, finish, self.clock)
 
     def advance(self, ms):
         """Moves virtual time forward and returns the Motions that have

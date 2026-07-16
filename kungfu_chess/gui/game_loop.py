@@ -76,6 +76,65 @@ GAME_OVER_TEXT_COLOR = (0, 215, 255, 255)  # pragma: no cover
 GAME_OVER_OVERLAY_HEIGHT = 80  # pragma: no cover
 
 
+def _draw_cell_highlights(board_renderer, board, controller, cell_w, cell_h):  # pragma: no cover
+    """Every colored square drawn behind the pieces: the sandclock-style
+    cooldown fill for any cell on cooldown, plus (if a piece is
+    selected) that cell and its legal destinations."""
+    # Sandclock-style cooldown fill: covers the whole square the
+    # instant the cooldown starts, then drains away from the top
+    # downward (like sand falling out of the top bulb) until nothing
+    # is left the instant the piece is free to act again.
+    for row in range(board.rows):
+        for col in range(board.cols):
+            progress = controller.engine.cooldown_progress(row, col)
+            if progress is None:
+                continue
+            cx, cy = cell_to_pixel(row, col, cell_w, cell_h)
+            fill_h = int(cell_h * (1 - progress))
+            if fill_h <= 0:
+                continue
+            board_renderer.draw_highlight(cx, cy + (cell_h - fill_h), (cell_w, fill_h), COOLDOWN_COLOR)
+
+    if controller.selected is not None:
+        sel_row, sel_col = controller.selected
+        selected_piece = board.get_cell(sel_row, sel_col)
+        if selected_piece is not None:
+            sx, sy = cell_to_pixel(sel_row, sel_col, cell_w, cell_h)
+            board_renderer.draw_highlight(sx, sy, (cell_w, cell_h), SELECTED_COLOR)
+            for row, col in legal_destinations(
+                    selected_piece, sel_row, sel_col, board, controller.engine.rule_engine):
+                dx, dy = cell_to_pixel(row, col, cell_w, cell_h)
+                board_renderer.draw_highlight(dx, dy, (cell_w, cell_h), LEGAL_MOVE_COLOR)
+
+
+def _draw_side_panels(renderer, board_x, image_w, moves_log, score):  # pragma: no cover
+    """Black's panel (name/score/moves log) to the left of the board,
+    White's to the right."""
+    black_panel_x, white_panel_x = 16, board_x + image_w + 16
+    for panel_x, name, moves, player_score in (
+            (black_panel_x, "Black", moves_log.black_moves, score.black_score),
+            (white_panel_x, "White", moves_log.white_moves, score.white_score)):
+        for text, x, y in render_player_name(name, panel_x, 24):
+            renderer.draw_text(text, x, y)
+        for text, x, y in render_score(player_score, panel_x, 60):
+            renderer.draw_text(text, x, y)
+        for text, x, y in render_moves_log(moves, panel_x, 100, line_height=18):
+            renderer.draw_text(text, x, y, font_size=0.4)
+
+
+def _draw_game_over_overlay(renderer, controller, board_x, image_w, image_h):  # pragma: no cover
+    """A dark banner across the board's vertical center announcing the
+    winner, once the engine reports the game over. A no-op otherwise."""
+    if not (controller.engine.game_over and controller.engine.winner is not None):
+        return
+    overlay_y = image_h // 2 - GAME_OVER_OVERLAY_HEIGHT // 2
+    renderer.draw_highlight(
+        board_x, overlay_y, (image_w, GAME_OVER_OVERLAY_HEIGHT), GAME_OVER_OVERLAY_COLOR)
+    for text, x, y in render_game_over(
+            controller.engine.winner, board_x + image_w // 2 - 110, image_h // 2 + 12):
+        renderer.draw_text(text, x, y, font_size=1.2, color=GAME_OVER_TEXT_COLOR, thickness=3)
+
+
 def run(board, board_image_path="assets/board.png",  # pragma: no cover
         pieces_root="assets/pieces_mine"):
     base = Img().read(board_image_path)
@@ -141,53 +200,14 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
         cell_w = image_w // board.cols
         cell_h = image_h // board.rows
 
-        # Sandclock-style cooldown fill: covers the whole square the
-        # instant the cooldown starts, then drains away from the top
-        # downward (like sand falling out of the top bulb) until nothing
-        # is left the instant the piece is free to act again.
-        for row in range(board.rows):
-            for col in range(board.cols):
-                progress = controller.engine.cooldown_progress(row, col)
-                if progress is None:
-                    continue
-                cx, cy = cell_to_pixel(row, col, cell_w, cell_h)
-                fill_h = int(cell_h * (1 - progress))
-                if fill_h <= 0:
-                    continue
-                board_renderer.draw_highlight(cx, cy + (cell_h - fill_h), (cell_w, fill_h), COOLDOWN_COLOR)
-
-        if controller.selected is not None:
-            sel_row, sel_col = controller.selected
-            selected_piece = board.get_cell(sel_row, sel_col)
-            if selected_piece is not None:
-                sx, sy = cell_to_pixel(sel_row, sel_col, cell_w, cell_h)
-                board_renderer.draw_highlight(sx, sy, (cell_w, cell_h), SELECTED_COLOR)
-                for row, col in legal_destinations(
-                        selected_piece, sel_row, sel_col, board, controller.engine.rule_engine):
-                    dx, dy = cell_to_pixel(row, col, cell_w, cell_h)
-                    board_renderer.draw_highlight(dx, dy, (cell_w, cell_h), LEGAL_MOVE_COLOR)
+        _draw_cell_highlights(board_renderer, board, controller, cell_w, cell_h)
 
         registry.render(board, board_renderer, controller.engine, image_w, image_h, dt_ms)
         board_canvas.draw_on(content, board_x, 0)
 
-        black_panel_x, white_panel_x = 16, board_x + image_w + 16
-        for panel_x, name, moves, player_score in (
-                (black_panel_x, "Black", moves_log.black_moves, score.black_score),
-                (white_panel_x, "White", moves_log.white_moves, score.white_score)):
-            for text, x, y in render_player_name(name, panel_x, 24):
-                renderer.draw_text(text, x, y)
-            for text, x, y in render_score(player_score, panel_x, 60):
-                renderer.draw_text(text, x, y)
-            for text, x, y in render_moves_log(moves, panel_x, 100, line_height=18):
-                renderer.draw_text(text, x, y, font_size=0.4)
+        _draw_side_panels(renderer, board_x, image_w, moves_log, score)
 
-        if controller.engine.game_over and controller.engine.winner is not None:
-            overlay_y = image_h // 2 - GAME_OVER_OVERLAY_HEIGHT // 2
-            renderer.draw_highlight(
-                board_x, overlay_y, (image_w, GAME_OVER_OVERLAY_HEIGHT), GAME_OVER_OVERLAY_COLOR)
-            for text, x, y in render_game_over(
-                    controller.engine.winner, board_x + image_w // 2 - 110, image_h // 2 + 12):
-                renderer.draw_text(text, x, y, font_size=1.2, color=GAME_OVER_TEXT_COLOR, thickness=3)
+        _draw_game_over_overlay(renderer, controller, board_x, image_w, image_h)
 
         rect = cv2.getWindowImageRect(WINDOW_NAME)
         window_size["w"], window_size["h"] = max(rect[2], 1), max(rect[3], 1)
