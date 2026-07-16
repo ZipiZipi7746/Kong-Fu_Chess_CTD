@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.game_loop</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.game_loop</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cgame_loop.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\game_loop.py</a></td></tr></table>
+    <p><span class="code">Real&nbsp;I/O&nbsp;only&nbsp;(window,&nbsp;mouse,&nbsp;timing)&nbsp;-&nbsp;#&nbsp;pragma:&nbsp;no&nbsp;cover&nbsp;throughout,<br>
+same&nbsp;treatment&nbsp;as&nbsp;BoardParser._read_stdin.<br>
+&nbsp;<br>
+Connects&nbsp;the&nbsp;animated&nbsp;(Phase&nbsp;3)&nbsp;rendering&nbsp;to&nbsp;a&nbsp;live&nbsp;window&nbsp;and&nbsp;the<br>
+existing&nbsp;GameController.click/jump/wait&nbsp;-&nbsp;without&nbsp;changing&nbsp;a&nbsp;single<br>
+line&nbsp;in&nbsp;GameController&nbsp;itself.&nbsp;Left-click&nbsp;=&nbsp;click(),&nbsp;right-click&nbsp;=<br>
+jump(),&nbsp;ESC&nbsp;=&nbsp;quit.<br>
+&nbsp;<br>
+The&nbsp;board&nbsp;is&nbsp;displayed&nbsp;letterboxed&nbsp;(aspect-ratio&nbsp;preserved,&nbsp;padded&nbsp;with<br>
+black&nbsp;bars)&nbsp;rather&nbsp;than&nbsp;stretched&nbsp;to&nbsp;fill&nbsp;the&nbsp;window&nbsp;(Phase&nbsp;4)&nbsp;-&nbsp;cv2's<br>
+own&nbsp;stretch-to-fill&nbsp;would&nbsp;otherwise&nbsp;distort&nbsp;the&nbsp;board&nbsp;on&nbsp;a&nbsp;non-uniform<br>
+resize.&nbsp;Click&nbsp;coordinates&nbsp;are&nbsp;mapped&nbsp;back&nbsp;through&nbsp;the&nbsp;same&nbsp;letterbox<br>
+transform&nbsp;(compute_letterbox&nbsp;/&nbsp;letterbox_screen_to_image),&nbsp;which&nbsp;is<br>
+genuinely&nbsp;needed&nbsp;here&nbsp;-&nbsp;unlike&nbsp;Phase&nbsp;0's&nbsp;screen_to_image,&nbsp;which&nbsp;turned<br>
+out&nbsp;to&nbsp;double-correct&nbsp;because&nbsp;cv2&nbsp;already&nbsp;maps&nbsp;clicks&nbsp;into&nbsp;image&nbsp;space<br>
+on&nbsp;this&nbsp;backend&nbsp;when&nbsp;it&nbsp;does&nbsp;its&nbsp;own&nbsp;(undistorted)&nbsp;scaling.<br>
+&nbsp;<br>
+Phase&nbsp;5&nbsp;adds&nbsp;two&nbsp;side&nbsp;panels&nbsp;(score&nbsp;/&nbsp;moves&nbsp;log&nbsp;/&nbsp;player&nbsp;name),&nbsp;one&nbsp;per<br>
+color,&nbsp;flanking&nbsp;the&nbsp;board&nbsp;-&nbsp;Black's&nbsp;on&nbsp;the&nbsp;left,&nbsp;White's&nbsp;on&nbsp;the&nbsp;right.<br>
+The&nbsp;"content"&nbsp;being&nbsp;letterboxed&nbsp;is&nbsp;the&nbsp;whole<br>
+left-panel+board+right-panel&nbsp;canvas;&nbsp;clicks&nbsp;landing&nbsp;in&nbsp;either&nbsp;panel<br>
+(x&nbsp;before&nbsp;or&nbsp;past&nbsp;the&nbsp;board's&nbsp;own&nbsp;span)&nbsp;are&nbsp;simply&nbsp;ignored&nbsp;rather&nbsp;than<br>
+passed&nbsp;to&nbsp;the&nbsp;controller.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="ctypes.html">ctypes</a><br>
+<a href="cv2.html">cv2</a><br>
+</td><td class="multicolumn"><a href="numpy.html">numpy</a><br>
+<a href="sys.html">sys</a><br>
+</td><td class="multicolumn"><a href="time.html">time</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-run"><strong>run</strong></a>(
+    board,
+    board_image_path='assets/board.png',
+    pieces_root='assets/pieces_mine'
+)</dt></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>COOLDOWN_COLOR</strong> = (0, 170, 255, 140)<br>
+<strong>GAME_OVER_OVERLAY_COLOR</strong> = (0, 0, 0, 170)<br>
+<strong>GAME_OVER_OVERLAY_HEIGHT</strong> = 80<br>
+<strong>GAME_OVER_TEXT_COLOR</strong> = (0, 215, 255, 255)<br>
+<strong>IDC_HAND</strong> = 32649<br>
+<strong>LEGAL_MOVE_COLOR</strong> = (0, 200, 0, 100)<br>
+<strong>PANEL_WIDTH</strong> = 220<br>
+<strong>SELECTED_COLOR</strong> = (0, 215, 255, 130)<br>
+<strong>WINDOW_NAME</strong> = 'Kung Fu Chess'</td></tr></table>
+</body></html>

@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.engine.game_engine</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.engine.html" class="white">engine</a>.game_engine</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cengine%5Cgame_engine.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\engine\game_engine.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.engine.game_engine.html#GameEngine">GameEngine</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="GameEngine">class <strong>GameEngine</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameEngine">GameEngine</a>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;board,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;jump_duration_ms,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rule_engine=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;arbiter=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;event_bus=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;move_cooldown_ms=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;jump_cooldown_ms=None<br>
+)<br>
+&nbsp;<br>
+Central&nbsp;orchestration&nbsp;layer&nbsp;/&nbsp;Application&nbsp;Service&nbsp;(Rule&nbsp;8).<br>
+&nbsp;<br>
+<a href="#GameEngine-request_move">request_move</a>(...)&nbsp;is&nbsp;the&nbsp;single&nbsp;facade&nbsp;method&nbsp;for&nbsp;attempting&nbsp;a&nbsp;move,<br>
+and&nbsp;executes&nbsp;checks&nbsp;in&nbsp;the&nbsp;required&nbsp;sequential&nbsp;order:<br>
+&nbsp;&nbsp;1.&nbsp;Is&nbsp;the&nbsp;game&nbsp;already&nbsp;over?<br>
+&nbsp;&nbsp;2.&nbsp;Is&nbsp;there&nbsp;already&nbsp;an&nbsp;active&nbsp;motion&nbsp;involving&nbsp;this&nbsp;piece&nbsp;(or&nbsp;is<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;it&nbsp;airborne,&nbsp;or&nbsp;on&nbsp;cooldown)?&nbsp;Both&nbsp;colors&nbsp;may&nbsp;otherwise&nbsp;have<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;independent&nbsp;motions&nbsp;in&nbsp;flight&nbsp;at&nbsp;the&nbsp;same&nbsp;time&nbsp;-&nbsp;this&nbsp;is&nbsp;what<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;lets&nbsp;a&nbsp;threatened&nbsp;piece&nbsp;dodge:&nbsp;it&nbsp;can&nbsp;still&nbsp;be&nbsp;given&nbsp;a&nbsp;new<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;move&nbsp;while&nbsp;an&nbsp;enemy&nbsp;motion&nbsp;is&nbsp;inbound&nbsp;toward&nbsp;it,&nbsp;and&nbsp;whichever<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;motion&nbsp;actually&nbsp;resolves&nbsp;first&nbsp;(by&nbsp;arrival_time)&nbsp;wins&nbsp;the&nbsp;race.<br>
+&nbsp;&nbsp;3.&nbsp;Does&nbsp;the&nbsp;RuleEngine&nbsp;validate&nbsp;and&nbsp;approve&nbsp;the&nbsp;move?<br>
+&nbsp;&nbsp;4.&nbsp;If&nbsp;approved:&nbsp;initialize&nbsp;a&nbsp;Motion&nbsp;via&nbsp;the&nbsp;RealTimeArbiter.<br>
+&nbsp;<br>
+<a href="#GameEngine-advance_time">advance_time</a>(...)&nbsp;drives&nbsp;virtual&nbsp;time&nbsp;forward,&nbsp;resolves&nbsp;arrivals<br>
+atomically&nbsp;(Rule&nbsp;10),&nbsp;resolves&nbsp;promotion&nbsp;(via&nbsp;PromotionRule)&nbsp;and<br>
+triggers&nbsp;game_over&nbsp;on&nbsp;a&nbsp;King&nbsp;capture&nbsp;(Rule&nbsp;11).<br>
+&nbsp;<br>
+Works&nbsp;purely&nbsp;in&nbsp;grid&nbsp;(row,&nbsp;col)&nbsp;terms&nbsp;-&nbsp;it&nbsp;knows&nbsp;nothing&nbsp;about<br>
+pixels;&nbsp;that&nbsp;translation&nbsp;belongs&nbsp;to&nbsp;BoardMapper.&nbsp;It&nbsp;also&nbsp;knows<br>
+nothing&nbsp;about&nbsp;click-selection&nbsp;UI&nbsp;state;&nbsp;that&nbsp;belongs&nbsp;to<br>
+GameController&nbsp;(Rule&nbsp;5:&nbsp;decouple&nbsp;validation/orchestration&nbsp;from&nbsp;the<br>
+"who&nbsp;clicked&nbsp;vs&nbsp;where&nbsp;they&nbsp;want&nbsp;to&nbsp;go"&nbsp;concern).<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="GameEngine-__init__"><strong>__init__</strong></a>(
+    self,
+    board,
+    jump_duration_ms,
+    rule_engine=None,
+    arbiter=None,
+    event_bus=None,
+    move_cooldown_ms=None,
+    jump_cooldown_ms=None
+)</dt><dd><span class="code">rule_engine&nbsp;and&nbsp;arbiter&nbsp;are&nbsp;optional&nbsp;Dependency&nbsp;Injection&nbsp;points<br>
+(tests&nbsp;can&nbsp;supply&nbsp;fakes/stubs&nbsp;here&nbsp;instead&nbsp;of&nbsp;monkeypatching);<br>
+production&nbsp;code&nbsp;omits&nbsp;them&nbsp;and&nbsp;gets&nbsp;the&nbsp;real&nbsp;collaborators.<br>
+event_bus&nbsp;is&nbsp;optional&nbsp;and&nbsp;off&nbsp;by&nbsp;default&nbsp;-&nbsp;only&nbsp;a&nbsp;UI&nbsp;layer&nbsp;that<br>
+wants&nbsp;move-resolved&nbsp;notifications&nbsp;(for&nbsp;a&nbsp;moves&nbsp;log,&nbsp;score,&nbsp;etc.)<br>
+needs&nbsp;to&nbsp;supply&nbsp;one;&nbsp;<a href="#GameEngine">GameEngine</a>&nbsp;has&nbsp;no&nbsp;idea&nbsp;who's&nbsp;listening.<br>
+move_cooldown_ms/jump_cooldown_ms&nbsp;configure&nbsp;the&nbsp;default&nbsp;arbiter's<br>
+post-action&nbsp;cooldown&nbsp;(ignored&nbsp;if&nbsp;an&nbsp;arbiter&nbsp;is&nbsp;injected&nbsp;directly&nbsp;-<br>
+set&nbsp;them&nbsp;on&nbsp;that&nbsp;arbiter&nbsp;instead).</span></dd></dl>
+
+<dl><dt><a name="GameEngine-advance_time"><strong>advance_time</strong></a>(self, ms)</dt></dl>
+
+<dl><dt><a name="GameEngine-cooldown_progress"><strong>cooldown_progress</strong></a>(self, row, col)</dt><dd><span class="code">Read-only:&nbsp;0..1&nbsp;fraction&nbsp;of&nbsp;the&nbsp;way&nbsp;through&nbsp;the&nbsp;cooldown&nbsp;at<br>
+(row,&nbsp;col),&nbsp;or&nbsp;None&nbsp;if&nbsp;it&nbsp;isn't&nbsp;on&nbsp;cooldown.&nbsp;Purely&nbsp;for&nbsp;the&nbsp;UI<br>
+to&nbsp;draw&nbsp;a&nbsp;sandclock-style&nbsp;fill&nbsp;-&nbsp;never&nbsp;affects&nbsp;game&nbsp;rules.</span></dd></dl>
+
+<dl><dt><a name="GameEngine-has_pending_move_from"><strong>has_pending_move_from</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="GameEngine-is_airborne"><strong>is_airborne</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="GameEngine-is_on_cooldown"><strong>is_on_cooldown</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="GameEngine-motion_progress"><strong>motion_progress</strong></a>(self, row, col)</dt><dd><span class="code">Read-only:&nbsp;0..1&nbsp;fraction&nbsp;of&nbsp;the&nbsp;way&nbsp;through&nbsp;the&nbsp;in-flight<br>
+motion&nbsp;from&nbsp;(row,&nbsp;col),&nbsp;or&nbsp;None&nbsp;if&nbsp;there&nbsp;isn't&nbsp;one.&nbsp;Purely&nbsp;for<br>
+the&nbsp;UI&nbsp;to&nbsp;interpolate&nbsp;a&nbsp;piece's&nbsp;on-screen&nbsp;position&nbsp;-&nbsp;never<br>
+affects&nbsp;game&nbsp;rules&nbsp;or&nbsp;timing.</span></dd></dl>
+
+<dl><dt><a name="GameEngine-motion_target"><strong>motion_target</strong></a>(self, row, col)</dt><dd><span class="code">Read-only:&nbsp;the&nbsp;destination&nbsp;cell&nbsp;of&nbsp;the&nbsp;in-flight&nbsp;motion&nbsp;from<br>
+(row,&nbsp;col),&nbsp;or&nbsp;None&nbsp;if&nbsp;there&nbsp;isn't&nbsp;one.</span></dd></dl>
+
+<dl><dt><a name="GameEngine-request_jump"><strong>request_jump</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="GameEngine-request_move"><strong>request_move</strong></a>(self, from_row, from_col, to_row, to_col)</dt><dd><span class="code">Returns&nbsp;one&nbsp;of:&nbsp;"game_over",&nbsp;"invalid",&nbsp;"blocked",&nbsp;"scheduled".</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

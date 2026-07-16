@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.rendering.img_adapter</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.rendering.html" class="white">rendering</a>.img_adapter</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Crendering%5Cimg_adapter.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\rendering\img_adapter.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="cv2.html">cv2</a><br>
+</td><td class="multicolumn"><a href="numpy.html">numpy</a><br>
+</td><td class="multicolumn"><a href="pathlib.html">pathlib</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.gui.rendering.img_adapter.html#Img">Img</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="Img">class <strong>Img</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor"><span class="code">&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="Img-__init__"><strong>__init__</strong></a>(self)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="Img-draw_on"><strong>draw_on</strong></a>(self, other_img, x, y)</dt></dl>
+
+<dl><dt><a name="Img-put_text"><strong>put_text</strong></a>(self, txt, x, y, font_size, color=(255, 255, 255, 255), thickness=1)</dt></dl>
+
+<dl><dt><a name="Img-read"><strong>read</strong></a>(
+    self,
+    path: str | pathlib.Path,
+    size: tuple[int, int] | None = None,
+    keep_aspect: bool = False,
+    interpolation: int = 3
+) -&gt; 'Img'</dt><dd><span class="code">Load&nbsp;`path`&nbsp;into&nbsp;self.<strong>img</strong>&nbsp;and&nbsp;**optionally&nbsp;resize**.<br>
+&nbsp;<br>
+Parameters<br>
+----------<br>
+path&nbsp;:&nbsp;str&nbsp;|&nbsp;Path<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Image&nbsp;file&nbsp;to&nbsp;load.<br>
+size&nbsp;:&nbsp;(width,&nbsp;height)&nbsp;|&nbsp;None<br>
+&nbsp;&nbsp;&nbsp;&nbsp;Target&nbsp;size&nbsp;in&nbsp;pixels.&nbsp;&nbsp;If&nbsp;None,&nbsp;keep&nbsp;original.<br>
+keep_aspect&nbsp;:&nbsp;bool<br>
+&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;False&nbsp;&nbsp;–&nbsp;resize&nbsp;exactly&nbsp;to&nbsp;`size`<br>
+&nbsp;&nbsp;&nbsp;&nbsp;•&nbsp;True&nbsp;&nbsp;&nbsp;–&nbsp;shrink&nbsp;so&nbsp;the&nbsp;*longer*&nbsp;side&nbsp;fits&nbsp;`size`&nbsp;while<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;preserving&nbsp;aspect&nbsp;ratio&nbsp;(no&nbsp;cropping).<br>
+interpolation&nbsp;:&nbsp;OpenCV&nbsp;flag<br>
+&nbsp;&nbsp;&nbsp;&nbsp;E.g.&nbsp;&nbsp;`cv2.INTER_AREA`&nbsp;for&nbsp;shrink,&nbsp;`cv2.INTER_LINEAR`&nbsp;for&nbsp;enlarge.<br>
+&nbsp;<br>
+Returns<br>
+-------<br>
+<a href="#Img">Img</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;`self`,&nbsp;so&nbsp;you&nbsp;can&nbsp;chain:&nbsp;&nbsp;`sprite&nbsp;=&nbsp;<a href="#Img">Img</a>().<a href="#Img-read">read</a>("foo.png",&nbsp;(64,64))`</span></dd></dl>
+
+<dl><dt><a name="Img-show"><strong>show</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

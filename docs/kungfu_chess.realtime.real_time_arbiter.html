@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.realtime.real_time_arbiter</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.realtime.html" class="white">realtime</a>.real_time_arbiter</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Crealtime%5Creal_time_arbiter.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\realtime\real_time_arbiter.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.realtime.real_time_arbiter.html#RealTimeArbiter">RealTimeArbiter</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="RealTimeArbiter">class <strong>RealTimeArbiter</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#RealTimeArbiter">RealTimeArbiter</a>(jump_duration_ms,&nbsp;move_cooldown_ms=None,&nbsp;jump_cooldown_ms=None)<br>
+&nbsp;<br>
+Owns&nbsp;deterministic,&nbsp;virtual-time&nbsp;bookkeeping&nbsp;(Rule&nbsp;9)&nbsp;for<br>
+in-flight&nbsp;Motions&nbsp;and&nbsp;airborne&nbsp;(jumping)&nbsp;pieces.&nbsp;Time&nbsp;only&nbsp;ever<br>
+advances&nbsp;via&nbsp;explicit&nbsp;<a href="#RealTimeArbiter-advance">advance</a>(ms)&nbsp;calls&nbsp;-&nbsp;never&nbsp;real&nbsp;clocks&nbsp;or<br>
+blocking&nbsp;sleeps&nbsp;-&nbsp;so&nbsp;simultaneous&nbsp;arrivals&nbsp;resolve&nbsp;deterministically<br>
+and&nbsp;repeatably.&nbsp;Renamed&nbsp;from&nbsp;the&nbsp;original&nbsp;MoveScheduler&nbsp;to&nbsp;match&nbsp;the<br>
+roadmap's&nbsp;"<a href="#RealTimeArbiter">RealTimeArbiter</a>"&nbsp;component&nbsp;(Phase&nbsp;6).<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="RealTimeArbiter-__init__"><strong>__init__</strong></a>(self, jump_duration_ms, move_cooldown_ms=None, jump_cooldown_ms=None)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="RealTimeArbiter-advance"><strong>advance</strong></a>(self, ms)</dt><dd><span class="code">Moves&nbsp;virtual&nbsp;time&nbsp;forward&nbsp;and&nbsp;returns&nbsp;the&nbsp;Motions&nbsp;that&nbsp;have<br>
+arrived&nbsp;(Rule&nbsp;9:&nbsp;event-driven,&nbsp;not&nbsp;thread-blocking).</span></dd></dl>
+
+<dl><dt><a name="RealTimeArbiter-airborne_finish_time"><strong>airborne_finish_time</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-cancel_pending_move_from"><strong>cancel_pending_move_from</strong></a>(self, row, col)</dt><dd><span class="code">Drops&nbsp;any&nbsp;still&nbsp;in-flight&nbsp;motion&nbsp;whose&nbsp;source&nbsp;is&nbsp;(row,&nbsp;col)&nbsp;-<br>
+used&nbsp;when&nbsp;the&nbsp;piece&nbsp;there&nbsp;is&nbsp;captured,&nbsp;so&nbsp;its&nbsp;own&nbsp;outgoing<br>
+motion&nbsp;(already&nbsp;scheduled&nbsp;but&nbsp;not&nbsp;yet&nbsp;arrived)&nbsp;can&nbsp;never&nbsp;later<br>
+resolve&nbsp;against&nbsp;whatever&nbsp;piece&nbsp;now&nbsp;occupies&nbsp;that&nbsp;cell.</span></dd></dl>
+
+<dl><dt><a name="RealTimeArbiter-cooldown_progress"><strong>cooldown_progress</strong></a>(self, row, col)</dt><dd><span class="code">0..1&nbsp;fraction&nbsp;of&nbsp;the&nbsp;way&nbsp;through&nbsp;the&nbsp;cooldown&nbsp;at&nbsp;(row,&nbsp;col)&nbsp;-<br>
+0&nbsp;the&nbsp;instant&nbsp;it&nbsp;started,&nbsp;1&nbsp;the&nbsp;instant&nbsp;it&nbsp;finishes&nbsp;-&nbsp;or&nbsp;None&nbsp;if<br>
+the&nbsp;cell&nbsp;isn't&nbsp;on&nbsp;cooldown.&nbsp;Purely&nbsp;for&nbsp;the&nbsp;UI&nbsp;(a&nbsp;sandclock-style<br>
+fill);&nbsp;never&nbsp;affects&nbsp;game&nbsp;rules&nbsp;or&nbsp;timing.</span></dd></dl>
+
+<dl><dt><a name="RealTimeArbiter-get_pending_motion"><strong>get_pending_motion</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-has_pending_move_from"><strong>has_pending_move_from</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-is_airborne"><strong>is_airborne</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-is_on_cooldown"><strong>is_on_cooldown</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-schedule_jump"><strong>schedule_jump</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-schedule_move"><strong>schedule_move</strong></a>(self, from_row, from_col, to_row, to_col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-start_jump_cooldown"><strong>start_jump_cooldown</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="RealTimeArbiter-start_move_cooldown"><strong>start_move_cooldown</strong></a>(self, row, col)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>DEFAULT_JUMP_COOLDOWN_MS</strong> = 1000</dl>
+
+<dl><dt><strong>DEFAULT_MOVE_COOLDOWN_MS</strong> = 500</dl>
+
+</td></tr></table></td></tr></table>
+</body></html>

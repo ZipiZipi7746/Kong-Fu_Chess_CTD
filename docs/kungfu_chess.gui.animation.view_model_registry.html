@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.animation.view_model_registry</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.animation.html" class="white">animation</a>.view_model_registry</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Canimation%5Cview_model_registry.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\animation\view_model_registry.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.gui.animation.view_model_registry.html#ViewModelRegistry">ViewModelRegistry</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="ViewModelRegistry">class <strong>ViewModelRegistry</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#ViewModelRegistry">ViewModelRegistry</a>(sprite_library)<br>
+&nbsp;<br>
+Owns&nbsp;PieceViewModels&nbsp;keyed&nbsp;by&nbsp;board&nbsp;cell,&nbsp;across&nbsp;frames.<br>
+&nbsp;<br>
+Pieces&nbsp;have&nbsp;no&nbsp;stable&nbsp;identity&nbsp;in&nbsp;the&nbsp;model,&nbsp;and&nbsp;Board&nbsp;only&nbsp;updates<br>
+a&nbsp;cell's&nbsp;occupancy&nbsp;on&nbsp;arrival&nbsp;-&nbsp;so&nbsp;a&nbsp;moving&nbsp;piece's&nbsp;view&nbsp;model&nbsp;lives<br>
+at&nbsp;its&nbsp;*source*&nbsp;cell&nbsp;the&nbsp;whole&nbsp;time&nbsp;it's&nbsp;in&nbsp;flight&nbsp;(matching&nbsp;how<br>
+Board&nbsp;itself&nbsp;still&nbsp;reports&nbsp;it&nbsp;there).&nbsp;The&nbsp;instant&nbsp;the&nbsp;motion<br>
+resolves,&nbsp;this&nbsp;relocates&nbsp;that&nbsp;same&nbsp;view&nbsp;model&nbsp;to&nbsp;the&nbsp;destination<br>
+cell&nbsp;instead&nbsp;of&nbsp;creating&nbsp;a&nbsp;fresh&nbsp;one&nbsp;-&nbsp;so&nbsp;its&nbsp;already-in-progress<br>
+move&nbsp;-&gt;&nbsp;long_rest&nbsp;transition&nbsp;carries&nbsp;over&nbsp;rather&nbsp;than&nbsp;restarting&nbsp;at<br>
+idle.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="ViewModelRegistry-__init__"><strong>__init__</strong></a>(self, sprite_library)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="ViewModelRegistry-render"><strong>render</strong></a>(self, board, renderer, engine, image_w, image_h, dt_ms)</dt></dl>
+
+<dl><dt><a name="ViewModelRegistry-state_name_at"><strong>state_name_at</strong></a>(self, row, col)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

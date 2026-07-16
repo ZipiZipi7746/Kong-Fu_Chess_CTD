@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.realtime.motion</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.realtime.html" class="white">realtime</a>.motion</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Crealtime%5Cmotion.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\realtime\motion.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.realtime.motion.html#Motion">Motion</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="Motion">class <strong>Motion</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#Motion">Motion</a>(from_row,&nbsp;from_col,&nbsp;to_row,&nbsp;to_col,&nbsp;start_time)<br>
+&nbsp;<br>
+Represents&nbsp;an&nbsp;in-flight&nbsp;move:&nbsp;a&nbsp;piece&nbsp;traveling&nbsp;from&nbsp;one&nbsp;cell&nbsp;to<br>
+another.&nbsp;Travel&nbsp;time&nbsp;scales&nbsp;with&nbsp;distance&nbsp;(Rule&nbsp;9):&nbsp;crossing&nbsp;N&nbsp;cells<br>
+takes&nbsp;N&nbsp;*&nbsp;TIME_PER_CELL_MS.&nbsp;Renamed&nbsp;from&nbsp;the&nbsp;original&nbsp;MoveRequest&nbsp;to<br>
+match&nbsp;the&nbsp;roadmap's&nbsp;"<a href="#Motion">Motion</a>"&nbsp;terminology&nbsp;(Rule&nbsp;8:&nbsp;GameEngine<br>
+"initializes&nbsp;a&nbsp;<a href="#Motion">Motion</a>").<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="Motion-__init__"><strong>__init__</strong></a>(self, from_row, from_col, to_row, to_col, start_time)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="Motion-has_arrived"><strong>has_arrived</strong></a>(self, current_time)</dt></dl>
+
+<dl><dt><a name="Motion-previous_cell"><strong>previous_cell</strong></a>(self)</dt><dd><span class="code">The&nbsp;cell&nbsp;one&nbsp;step&nbsp;back&nbsp;from&nbsp;the&nbsp;destination,&nbsp;along&nbsp;this<br>
+motion's&nbsp;own&nbsp;straight-line&nbsp;path.&nbsp;Used&nbsp;to&nbsp;resolve&nbsp;friendly<br>
+collisions:&nbsp;a&nbsp;piece&nbsp;that&nbsp;would&nbsp;arrive&nbsp;on&nbsp;a&nbsp;friendly-occupied<br>
+square&nbsp;stops&nbsp;here&nbsp;instead.&nbsp;A&nbsp;non-straight-line&nbsp;motion&nbsp;(the<br>
+Knight's&nbsp;L-shaped&nbsp;jump)&nbsp;has&nbsp;no&nbsp;meaningful&nbsp;midpoint,&nbsp;so&nbsp;it<br>
+simply&nbsp;returns&nbsp;the&nbsp;source&nbsp;cell.</span></dd></dl>
+
+<dl><dt><a name="Motion-progress"><strong>progress</strong></a>(self, current_time)</dt><dd><span class="code">0..1&nbsp;fraction&nbsp;of&nbsp;the&nbsp;way&nbsp;from&nbsp;source&nbsp;to&nbsp;destination&nbsp;at<br>
+current_time,&nbsp;clamped&nbsp;to&nbsp;that&nbsp;range.&nbsp;Purely&nbsp;cosmetic&nbsp;(used&nbsp;by<br>
+the&nbsp;UI&nbsp;to&nbsp;interpolate&nbsp;a&nbsp;piece's&nbsp;on-screen&nbsp;position)&nbsp;-&nbsp;never<br>
+affects&nbsp;when&nbsp;the&nbsp;motion&nbsp;actually&nbsp;arrives.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>TIME_PER_CELL_MS</strong> = 1000</dl>
+
+</td></tr></table></td></tr></table>
+</body></html>

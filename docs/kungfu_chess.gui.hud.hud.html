@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.hud.hud</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.hud.html" class="white">hud</a>.hud</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Chud%5Chud.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\hud\hud.py</a></td></tr></table>
+    <p><span class="code">Pure&nbsp;text&nbsp;layout:&nbsp;each&nbsp;function&nbsp;returns&nbsp;what&nbsp;to&nbsp;draw&nbsp;and&nbsp;where&nbsp;-<br>
+(text,&nbsp;x,&nbsp;y)&nbsp;tuples&nbsp;-&nbsp;never&nbsp;draws&nbsp;anything&nbsp;itself.&nbsp;Only&nbsp;ImgRenderer<br>
+actually&nbsp;calls&nbsp;put_text.<br>
+&nbsp;<br>
+Single-color,&nbsp;not&nbsp;paired&nbsp;white/black&nbsp;-&nbsp;each&nbsp;side&nbsp;panel&nbsp;(left/right&nbsp;of<br>
+the&nbsp;board)&nbsp;shows&nbsp;exactly&nbsp;one&nbsp;player's&nbsp;name,&nbsp;score&nbsp;and&nbsp;moves&nbsp;log,&nbsp;so<br>
+the&nbsp;caller&nbsp;invokes&nbsp;these&nbsp;once&nbsp;per&nbsp;panel&nbsp;with&nbsp;that&nbsp;panel's&nbsp;own&nbsp;x/y.</span></p>
+<p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-render_game_over"><strong>render_game_over</strong></a>(winner_color, x, y)</dt></dl>
+ <dl><dt><a name="-render_moves_log"><strong>render_moves_log</strong></a>(moves, x, y, line_height=20, max_lines=10)</dt></dl>
+ <dl><dt><a name="-render_player_name"><strong>render_player_name</strong></a>(name, x, y)</dt></dl>
+ <dl><dt><a name="-render_score"><strong>render_score</strong></a>(score, x, y)</dt></dl>
+</td></tr></table>
+</body></html>

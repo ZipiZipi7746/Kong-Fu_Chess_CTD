@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.geometry.board_geometry</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.geometry.html" class="white">geometry</a>.board_geometry</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cgeometry%5Cboard_geometry.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\geometry\board_geometry.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-cell_to_pixel"><strong>cell_to_pixel</strong></a>(row, col, cell_w, cell_h)</dt><dd><span class="code">The&nbsp;inverse&nbsp;of&nbsp;BoardMapper.to_cell:&nbsp;the&nbsp;top-left&nbsp;pixel&nbsp;of&nbsp;a&nbsp;board<br>
+cell.&nbsp;cell_w/cell_h&nbsp;are&nbsp;always&nbsp;derived&nbsp;by&nbsp;the&nbsp;caller&nbsp;from&nbsp;the&nbsp;actual<br>
+loaded&nbsp;image&nbsp;size&nbsp;and&nbsp;board&nbsp;shape&nbsp;-&nbsp;never&nbsp;hardcoded&nbsp;here.</span></dd></dl>
+ <dl><dt><a name="-compute_letterbox"><strong>compute_letterbox</strong></a>(window_w, window_h, image_w, image_h)</dt><dd><span class="code">The&nbsp;scale&nbsp;and&nbsp;centering&nbsp;offset&nbsp;to&nbsp;fit&nbsp;image_w&nbsp;x&nbsp;image_h&nbsp;inside<br>
+window_w&nbsp;x&nbsp;window_h&nbsp;while&nbsp;preserving&nbsp;its&nbsp;aspect&nbsp;ratio&nbsp;(letterboxed/<br>
+pillarboxed,&nbsp;never&nbsp;stretched).&nbsp;Returns<br>
+(scale,&nbsp;offset_x,&nbsp;offset_y,&nbsp;displayed_w,&nbsp;displayed_h).</span></dd></dl>
+ <dl><dt><a name="-derive_cell_size"><strong>derive_cell_size</strong></a>(image_w, image_h, rows, cols)</dt><dd><span class="code">BoardMapper&nbsp;only&nbsp;accepts&nbsp;a&nbsp;single&nbsp;cell_size,&nbsp;not&nbsp;independent<br>
+width/height,&nbsp;so&nbsp;for&nbsp;a&nbsp;non-square&nbsp;image&nbsp;this&nbsp;picks&nbsp;the&nbsp;smaller&nbsp;of<br>
+the&nbsp;two&nbsp;axis-derived&nbsp;sizes&nbsp;-&nbsp;guaranteeing&nbsp;every&nbsp;click&nbsp;inside&nbsp;the<br>
+visible&nbsp;board&nbsp;still&nbsp;maps&nbsp;to&nbsp;a&nbsp;valid,&nbsp;in-bounds&nbsp;cell.</span></dd></dl>
+ <dl><dt><a name="-letterbox_screen_to_image"><strong>letterbox_screen_to_image</strong></a>(
+    x_screen,
+    y_screen,
+    window_w,
+    window_h,
+    image_w,
+    image_h
+)</dt><dd><span class="code">Inverts&nbsp;compute_letterbox:&nbsp;maps&nbsp;a&nbsp;window-space&nbsp;coordinate&nbsp;back&nbsp;to<br>
+the&nbsp;original&nbsp;image's&nbsp;pixel&nbsp;space,&nbsp;or&nbsp;None&nbsp;if&nbsp;the&nbsp;point&nbsp;falls&nbsp;in&nbsp;the<br>
+letterbox&nbsp;padding&nbsp;rather&nbsp;than&nbsp;on&nbsp;the&nbsp;displayed&nbsp;image&nbsp;itself.</span></dd></dl>
+</td></tr></table>
+</body></html>

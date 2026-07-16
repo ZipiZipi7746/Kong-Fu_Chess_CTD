@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.animation.piece_view_model</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.animation.html" class="white">animation</a>.piece_view_model</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Canimation%5Cpiece_view_model.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\animation\piece_view_model.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.gui.animation.piece_view_model.html#PieceViewModel">PieceViewModel</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="PieceViewModel">class <strong>PieceViewModel</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#PieceViewModel">PieceViewModel</a>(sprite_library,&nbsp;piece_code)<br>
+&nbsp;<br>
+Tracks&nbsp;one&nbsp;piece's&nbsp;animation&nbsp;state&nbsp;(idle/move/jump/short_rest/<br>
+long_rest)&nbsp;across&nbsp;frames.&nbsp;Queries&nbsp;the&nbsp;engine&nbsp;only&nbsp;through&nbsp;booleans<br>
+the&nbsp;caller&nbsp;already&nbsp;has&nbsp;(has_pending_move,&nbsp;is_airborne)&nbsp;-&nbsp;it&nbsp;never<br>
+talks&nbsp;to&nbsp;GameEngine&nbsp;directly,&nbsp;keeping&nbsp;it&nbsp;trivially&nbsp;testable&nbsp;with&nbsp;a<br>
+fake&nbsp;SpriteLibrary&nbsp;and&nbsp;no&nbsp;real&nbsp;engine&nbsp;at&nbsp;all.<br>
+&nbsp;<br>
+Transition&nbsp;rule:<br>
+&nbsp;&nbsp;1.&nbsp;If&nbsp;the&nbsp;engine&nbsp;reports&nbsp;an&nbsp;active&nbsp;move&nbsp;or&nbsp;jump,&nbsp;that&nbsp;state&nbsp;wins<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;immediately,&nbsp;resetting&nbsp;its&nbsp;animation&nbsp;clock.<br>
+&nbsp;&nbsp;2.&nbsp;Otherwise,&nbsp;if&nbsp;we&nbsp;just&nbsp;came&nbsp;from&nbsp;a&nbsp;game-driven&nbsp;state&nbsp;(move/jump)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ending,&nbsp;hand&nbsp;off&nbsp;to&nbsp;that&nbsp;state's&nbsp;own&nbsp;next_state_when_finished.<br>
+&nbsp;&nbsp;3.&nbsp;Otherwise,&nbsp;if&nbsp;the&nbsp;current&nbsp;(resting)&nbsp;state's&nbsp;own&nbsp;animation&nbsp;has<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;finished,&nbsp;hand&nbsp;off&nbsp;to&nbsp;its&nbsp;next_state_when_finished.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="PieceViewModel-__init__"><strong>__init__</strong></a>(self, sprite_library, piece_code)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="PieceViewModel-update"><strong>update</strong></a>(self, dt_ms, has_pending_move, is_airborne)</dt></dl>
+
+<hr>
+Readonly properties defined here:<br>
+<dl><dt><strong>current_frame_path</strong></dt>
+</dl>
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

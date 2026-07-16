@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.rules.rule_engine</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.rules.html" class="white">rules</a>.rule_engine</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Crules%5Crule_engine.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\rules\rule_engine.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.rules.rule_engine.html#RuleEngine">RuleEngine</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="RuleEngine">class <strong>RuleEngine</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code">The&nbsp;Validation&nbsp;Service&nbsp;(Rule&nbsp;7).&nbsp;Checks&nbsp;whether&nbsp;a&nbsp;specific&nbsp;piece<br>
+can&nbsp;legally&nbsp;move&nbsp;to&nbsp;the&nbsp;requested&nbsp;target&nbsp;cell,&nbsp;based&nbsp;on:<br>
+-&nbsp;piece&nbsp;movement&nbsp;shape&nbsp;(delegated&nbsp;to&nbsp;Strategy-pattern&nbsp;PieceRules)<br>
+-&nbsp;path&nbsp;blocking&nbsp;for&nbsp;sliding&nbsp;pieces&nbsp;(Rook,&nbsp;Bishop,&nbsp;Queen)<br>
+-&nbsp;capture&nbsp;rules&nbsp;(cannot&nbsp;capture&nbsp;own&nbsp;color)<br>
+-&nbsp;pawn-specific&nbsp;direction/forward/diagonal-capture&nbsp;rules<br>
+&nbsp;<br>
+Still&nbsp;does&nbsp;NOT&nbsp;check&nbsp;turn&nbsp;order&nbsp;or&nbsp;check/checkmate&nbsp;(Rule&nbsp;11:&nbsp;game<br>
+over&nbsp;is&nbsp;exclusively&nbsp;King&nbsp;capture,&nbsp;there&nbsp;is&nbsp;no&nbsp;check/checkmate&nbsp;in<br>
+this&nbsp;game).<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="RuleEngine-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>PIECE_RULES</strong> = {'B': &lt;kungfu_chess.rules.piece_rules.BishopRule object&gt;, 'K': &lt;kungfu_chess.rules.piece_rules.KingRule object&gt;, 'N': &lt;kungfu_chess.rules.piece_rules.KnightRule object&gt;, 'Q': &lt;kungfu_chess.rules.piece_rules.QueenRule object&gt;, 'R': &lt;kungfu_chess.rules.piece_rules.RookRule object&gt;}</td></tr></table>
+</body></html>

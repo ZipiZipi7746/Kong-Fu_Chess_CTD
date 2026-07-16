@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Kong-Fu Chess &mdash; API Docs</title>
+<style>
+  body { font-family: -apple-system, Segoe UI, Arial, sans-serif; max-width: 760px; margin: 2rem auto; padding: 0 1rem; color: #1a1a1a; }
+  h1 { margin-bottom: 0.25rem; }
+  .sub { color: #666; margin-top: 0; }
+  section { margin: 1.75rem 0; }
+  h2 { font-size: 1.05rem; text-transform: uppercase; letter-spacing: 0.04em; color: #444; border-bottom: 1px solid #ddd; padding-bottom: 0.25rem; }
+  ul { list-style: none; padding-left: 0; }
+  li { margin: 0.35rem 0; }
+  a { color: #0b5fff; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  code { background: #f3f3f3; padding: 0.1rem 0.35rem; border-radius: 3px; font-size: 0.92em; }
+</style>
+</head>
+<body>
+<h1>Kong-Fu Chess</h1>
+<p class="sub">Module documentation, generated with <code>pydoc</code>.</p>
+
+<section>
+  <h2>Model (pure data)</h2>
+  <ul>
+    <li><a href="kungfu_chess.model.html">kungfu_chess.model</a></li>
+    <li><a href="kungfu_chess.model.board.html">kungfu_chess.model.board</a> &mdash; <code>Board</code></li>
+    <li><a href="kungfu_chess.model.piece.html">kungfu_chess.model.piece</a> &mdash; <code>Piece</code></li>
+    <li><a href="kungfu_chess.model.exceptions.html">kungfu_chess.model.exceptions</a></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Rules (movement strategies)</h2>
+  <ul>
+    <li><a href="kungfu_chess.rules.html">kungfu_chess.rules</a></li>
+    <li><a href="kungfu_chess.rules.piece_rules.html">kungfu_chess.rules.piece_rules</a></li>
+    <li><a href="kungfu_chess.rules.rule_engine.html">kungfu_chess.rules.rule_engine</a> &mdash; <code>RuleEngine</code></li>
+    <li><a href="kungfu_chess.rules.promotion_rule.html">kungfu_chess.rules.promotion_rule</a> &mdash; <code>PromotionRule</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Realtime (virtual clock, motions, cooldowns)</h2>
+  <ul>
+    <li><a href="kungfu_chess.realtime.html">kungfu_chess.realtime</a></li>
+    <li><a href="kungfu_chess.realtime.motion.html">kungfu_chess.realtime.motion</a> &mdash; <code>Motion</code></li>
+    <li><a href="kungfu_chess.realtime.real_time_arbiter.html">kungfu_chess.realtime.real_time_arbiter</a> &mdash; <code>RealTimeArbiter</code></li>
+    <li><a href="kungfu_chess.realtime.progress.html">kungfu_chess.realtime.progress</a> &mdash; <code>progress_fraction</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Engine (orchestration)</h2>
+  <ul>
+    <li><a href="kungfu_chess.engine.html">kungfu_chess.engine</a></li>
+    <li><a href="kungfu_chess.engine.game_engine.html">kungfu_chess.engine.game_engine</a> &mdash; <code>GameEngine</code></li>
+    <li><a href="kungfu_chess.engine.events.html">kungfu_chess.engine.events</a> &mdash; <code>MoveResolvedEvent</code>, <code>EventBus</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Input (pixel / command boundary)</h2>
+  <ul>
+    <li><a href="kungfu_chess.input.html">kungfu_chess.input</a></li>
+    <li><a href="kungfu_chess.input.board_mapper.html">kungfu_chess.input.board_mapper</a> &mdash; <code>BoardMapper</code></li>
+    <li><a href="kungfu_chess.input.commands.html">kungfu_chess.input.commands</a></li>
+    <li><a href="kungfu_chess.input.controller.html">kungfu_chess.input.controller</a> &mdash; <code>GameController</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>IO (text DSL parsing / rendering)</h2>
+  <ul>
+    <li><a href="kungfu_chess.io.html">kungfu_chess.io</a></li>
+    <li><a href="kungfu_chess.io.board_parser.html">kungfu_chess.io.board_parser</a> &mdash; <code>BoardParser</code></li>
+    <li><a href="kungfu_chess.io.board_validator.html">kungfu_chess.io.board_validator</a> &mdash; <code>BoardValidator</code></li>
+    <li><a href="kungfu_chess.io.board_view.html">kungfu_chess.io.board_view</a> &mdash; <code>BoardRenderer</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>GUI (graphical layer, on top of everything above)</h2>
+  <ul>
+    <li><a href="kungfu_chess.gui.html">kungfu_chess.gui</a></li>
+    <li><a href="kungfu_chess.gui.rendering.html">kungfu_chess.gui.rendering</a></li>
+    <li><a href="kungfu_chess.gui.rendering.img_adapter.html">kungfu_chess.gui.rendering.img_adapter</a> &mdash; <code>Img</code> (given, unmodified)</li>
+    <li><a href="kungfu_chess.gui.rendering.renderer.html">kungfu_chess.gui.rendering.renderer</a> &mdash; <code>Renderer</code></li>
+    <li><a href="kungfu_chess.gui.rendering.img_renderer.html">kungfu_chess.gui.rendering.img_renderer</a> &mdash; <code>ImgRenderer</code></li>
+    <li><a href="kungfu_chess.gui.geometry.html">kungfu_chess.gui.geometry</a></li>
+    <li><a href="kungfu_chess.gui.geometry.board_geometry.html">kungfu_chess.gui.geometry.board_geometry</a></li>
+    <li><a href="kungfu_chess.gui.geometry.legal_moves.html">kungfu_chess.gui.geometry.legal_moves</a></li>
+    <li><a href="kungfu_chess.gui.animation.html">kungfu_chess.gui.animation</a></li>
+    <li><a href="kungfu_chess.gui.animation.sprite_library.html">kungfu_chess.gui.animation.sprite_library</a> &mdash; <code>SpriteLibrary</code></li>
+    <li><a href="kungfu_chess.gui.animation.sprite_state.html">kungfu_chess.gui.animation.sprite_state</a> &mdash; <code>SpriteState</code></li>
+    <li><a href="kungfu_chess.gui.animation.piece_view_model.html">kungfu_chess.gui.animation.piece_view_model</a> &mdash; <code>PieceViewModel</code></li>
+    <li><a href="kungfu_chess.gui.animation.view_model_registry.html">kungfu_chess.gui.animation.view_model_registry</a> &mdash; <code>ViewModelRegistry</code></li>
+    <li><a href="kungfu_chess.gui.hud.html">kungfu_chess.gui.hud</a></li>
+    <li><a href="kungfu_chess.gui.hud.observers.html">kungfu_chess.gui.hud.observers</a> &mdash; <code>MovesLogObserver</code>, <code>ScoreObserver</code></li>
+    <li><a href="kungfu_chess.gui.hud.hud.html">kungfu_chess.gui.hud.hud</a></li>
+    <li><a href="kungfu_chess.gui.game_loop.html">kungfu_chess.gui.game_loop</a> &mdash; real I/O, not unit tested</li>
+    <li><a href="kungfu_chess.gui.gui_main.html">kungfu_chess.gui.gui_main</a> &mdash; entrypoint</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Entry point</h2>
+  <ul>
+    <li><a href="kungfu_chess.main.html">kungfu_chess.main</a> &mdash; text-DSL entrypoint</li>
+    <li><a href="kungfu_chess.gui.gui_main.html">kungfu_chess.gui.gui_main</a> &mdash; graphical entrypoint</li>
+  </ul>
+</section>
+</body>
+</html>
