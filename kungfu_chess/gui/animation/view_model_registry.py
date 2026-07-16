@@ -1,5 +1,5 @@
-from kungfu_chess.gui.board_geometry import cell_to_pixel
-from kungfu_chess.gui.piece_view_model import PieceViewModel
+from kungfu_chess.gui.geometry.board_geometry import cell_to_pixel
+from kungfu_chess.gui.animation.piece_view_model import PieceViewModel
 from kungfu_chess.io.board_view import BoardRenderer
 
 

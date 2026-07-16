@@ -1,6 +1,6 @@
 from kungfu_chess.model.board import Board
 from kungfu_chess.model.piece import Piece
-from kungfu_chess.gui.legal_moves import legal_destinations
+from kungfu_chess.gui.geometry.legal_moves import legal_destinations
 
 
 def make_board(rows):

@@ -1,4 +1,4 @@
-from kungfu_chess.gui.piece_view_model import PieceViewModel
+from kungfu_chess.gui.animation.piece_view_model import PieceViewModel
 
 
 CONFIGS = {

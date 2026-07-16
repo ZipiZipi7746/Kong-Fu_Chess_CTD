@@ -1,4 +1,4 @@
-from kungfu_chess.gui.sprite_state import SpriteState
+from kungfu_chess.gui.animation.sprite_state import SpriteState
 
 _GAME_DRIVEN_STATES = ("move", "jump")
 

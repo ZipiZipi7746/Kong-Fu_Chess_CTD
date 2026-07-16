@@ -35,6 +35,29 @@ class TestGetPendingMotion:
         assert arbiter.get_pending_motion(2, 2) is None
 
 
+class TestCancelPendingMoveFrom:
+    def test_removes_the_matching_motion(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_move(0, 0, 1, 1)
+        arbiter.cancel_pending_move_from(0, 0)
+        assert arbiter.get_pending_motion(0, 0) is None
+        assert arbiter.pending_motions == []
+
+    def test_leaves_non_matching_motions_alone(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_move(0, 0, 1, 1)
+        arbiter.schedule_move(2, 2, 3, 3)
+        arbiter.cancel_pending_move_from(0, 0)
+        assert arbiter.get_pending_motion(0, 0) is None
+        assert arbiter.get_pending_motion(2, 2) is not None
+
+    def test_no_matching_motion_is_a_noop(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.schedule_move(0, 0, 1, 1)
+        arbiter.cancel_pending_move_from(5, 5)
+        assert arbiter.get_pending_motion(0, 0) is not None
+
+
 class TestIsAirborne:
     def test_not_scheduled_is_not_airborne(self):
         arbiter = RealTimeArbiter(1000)
@@ -207,3 +230,44 @@ class TestJumpEndingStartsItsOwnCooldown:
         arbiter.schedule_jump(0, 0)
         arbiter.advance(500)  # still airborne
         assert arbiter.is_on_cooldown(0, 0) is False
+
+
+class TestCooldownProgress:
+    def test_none_when_not_on_cooldown(self):
+        arbiter = RealTimeArbiter(1000)
+        assert arbiter.cooldown_progress(0, 0) is None
+
+    def test_zero_at_the_instant_it_starts(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        assert arbiter.cooldown_progress(0, 0) == 0.0
+
+    def test_half_way_through_the_default_move_cooldown(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.clock = 250  # half of the default 500ms
+        assert arbiter.cooldown_progress(0, 0) == 0.5
+
+    def test_one_at_the_instant_it_finishes(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.clock = 500
+        assert arbiter.cooldown_progress(0, 0) == 1.0
+
+    def test_none_once_past_the_finish_clock(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.clock = 501
+        assert arbiter.cooldown_progress(0, 0) is None
+
+    def test_relative_to_the_clock_when_it_started(self):
+        arbiter = RealTimeArbiter(1000)
+        arbiter.clock = 500
+        arbiter.start_move_cooldown(0, 0)
+        arbiter.clock = 750  # half of the default 500ms past the start
+        assert arbiter.cooldown_progress(0, 0) == 0.5
+
+    def test_zero_duration_cooldown_is_immediately_complete(self):
+        arbiter = RealTimeArbiter(1000, move_cooldown_ms=0)
+        arbiter.start_move_cooldown(0, 0)
+        assert arbiter.cooldown_progress(0, 0) == 1.0

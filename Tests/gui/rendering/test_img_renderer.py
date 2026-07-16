@@ -1,8 +1,8 @@
 import cv2
 import numpy as np
 
-from kungfu_chess.gui.img_adapter import Img
-from kungfu_chess.gui.img_renderer import ImgRenderer
+from kungfu_chess.gui.rendering.img_adapter import Img
+from kungfu_chess.gui.rendering.img_renderer import ImgRenderer
 
 
 def make_solid_png(path, width, height, bgr_color):

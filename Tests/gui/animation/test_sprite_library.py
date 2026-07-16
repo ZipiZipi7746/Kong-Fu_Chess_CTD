@@ -1,6 +1,6 @@
 import json
 
-from kungfu_chess.gui.sprite_library import SpriteLibrary, sprite_path
+from kungfu_chess.gui.animation.sprite_library import SpriteLibrary, sprite_path
 
 
 class TestSpritePath:

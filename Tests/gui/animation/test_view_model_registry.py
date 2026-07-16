@@ -1,5 +1,5 @@
 from kungfu_chess.model.board import Board
-from kungfu_chess.gui.view_model_registry import ViewModelRegistry
+from kungfu_chess.gui.animation.view_model_registry import ViewModelRegistry
 
 
 CONFIGS = {

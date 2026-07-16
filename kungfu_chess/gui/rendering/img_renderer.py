@@ -1,7 +1,7 @@
 import numpy as np
 
-from kungfu_chess.gui.img_adapter import Img
-from kungfu_chess.gui.renderer import Renderer
+from kungfu_chess.gui.rendering.img_adapter import Img
+from kungfu_chess.gui.rendering.renderer import Renderer
 
 
 class ImgRenderer(Renderer):

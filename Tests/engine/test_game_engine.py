@@ -119,6 +119,19 @@ class TestRequestMoveWithRealCollaborators:
         engine.advance_time(1000)
         assert engine.is_on_cooldown(0, 1) is True
 
+    def test_cooldown_progress_rises_toward_one_then_clears(self):
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)  # arrives at (0, 1), cooldown starts
+        assert engine.cooldown_progress(0, 1) == 0.0
+        engine.advance_time(engine.arbiter.DEFAULT_MOVE_COOLDOWN_MS // 2)
+        assert engine.cooldown_progress(0, 1) == 0.5
+        engine.advance_time(engine.arbiter.DEFAULT_MOVE_COOLDOWN_MS // 2)
+        assert engine.cooldown_progress(0, 1) == 1.0
+        engine.advance_time(1)
+        assert engine.cooldown_progress(0, 1) is None
+
     def test_move_from_a_cell_on_cooldown_is_blocked(self):
         board = make_board([["wR", ".", "."]])
         engine = GameEngine(board, jump_duration_ms=1000)
@@ -301,6 +314,22 @@ class TestDodgingAThreatenedCapture:
         assert engine.request_move(0, 1, 3, 1) == "scheduled"  # bR's flee attempt genuinely started
         engine.advance_time(1000)
         assert board.get_cell(0, 1) == Piece("w", "R")  # captured before bR's own motion resolved
+
+    def test_captured_pieces_own_pending_motion_does_not_survive_it(self):
+        # bR was captured mid-flight (see the test above) while its own
+        # flee-motion was still scheduled and hadn't arrived yet. Once
+        # captured, that stale motion must not still fire later and
+        # relocate whatever piece now sits on bR's old square - the
+        # capturing wR must stay exactly where it captured, never
+        # teleporting to bR's would-have-been destination.
+        board = make_board([["wR", "bR"], [".", "."], [".", "."], [".", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)  # wR: 1 cell, arrives 1000
+        engine.request_move(0, 1, 3, 1)  # bR's flee attempt, would arrive 3000
+        engine.advance_time(1000)  # wR captures bR at (0, 1)
+        engine.advance_time(2000)  # clock 3000: bR's flee-motion would have arrived
+        assert board.get_cell(0, 1) == Piece("w", "R")  # wR never left
+        assert board.get_cell(3, 1) is None  # nothing teleported here
 
 
 class TestAdvanceTimeAndResolveMotion:

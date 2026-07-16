@@ -18,6 +18,7 @@ class RealTimeArbiter:
         self.pending_motions = []
         self.airborne = {}
         self.cooldowns = {}
+        self.cooldown_starts = {}
         self._jump_duration_ms = jump_duration_ms
         self._move_cooldown_ms = (
             move_cooldown_ms if move_cooldown_ms is not None else self.DEFAULT_MOVE_COOLDOWN_MS)
@@ -35,6 +36,16 @@ class RealTimeArbiter:
             if motion.from_row == row and motion.from_col == col:
                 return motion
         return None
+
+    def cancel_pending_move_from(self, row, col):
+        """Drops any still in-flight motion whose source is (row, col) -
+        used when the piece there is captured, so its own outgoing
+        motion (already scheduled but not yet arrived) can never later
+        resolve against whatever piece now occupies that cell."""
+        self.pending_motions = [
+            motion for motion in self.pending_motions
+            if not (motion.from_row == row and motion.from_col == col)
+        ]
 
     def is_airborne(self, row, col):
         finish = self.airborne.get((row, col))
@@ -56,10 +67,26 @@ class RealTimeArbiter:
         return finish is not None and finish >= self.clock
 
     def start_move_cooldown(self, row, col):
+        self.cooldown_starts[(row, col)] = self.clock
         self.cooldowns[(row, col)] = self.clock + self._move_cooldown_ms
 
     def start_jump_cooldown(self, row, col):
+        self.cooldown_starts[(row, col)] = self.clock
         self.cooldowns[(row, col)] = self.clock + self._jump_cooldown_ms
+
+    def cooldown_progress(self, row, col):
+        """0..1 fraction of the way through the cooldown at (row, col) -
+        0 the instant it started, 1 the instant it finishes - or None if
+        the cell isn't on cooldown. Purely for the UI (a sandclock-style
+        fill); never affects game rules or timing."""
+        finish = self.cooldowns.get((row, col))
+        if finish is None or finish < self.clock:
+            return None
+        start = self.cooldown_starts[(row, col)]
+        duration = finish - start
+        if duration <= 0:
+            return 1.0
+        return (self.clock - start) / duration
 
     def advance(self, ms):
         """Moves virtual time forward and returns the Motions that have
@@ -88,5 +115,6 @@ class RealTimeArbiter:
         ]
         for cell in finished_cooldowns:
             del self.cooldowns[cell]
+            del self.cooldown_starts[cell]
 
         return arrived

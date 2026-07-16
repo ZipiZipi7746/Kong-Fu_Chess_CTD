@@ -22,6 +22,8 @@ left-panel+board+right-panel canvas; clicks landing in either panel
 (x before or past the board's own span) are simply ignored rather than
 passed to the controller.
 """
+import ctypes
+import sys
 import time
 
 import cv2  # pragma: no cover
@@ -29,31 +31,46 @@ import numpy as np  # pragma: no cover
 
 from kungfu_chess.engine.events import EventBus  # pragma: no cover
 from kungfu_chess.engine.game_engine import GameEngine  # pragma: no cover
-from kungfu_chess.gui.board_geometry import (  # pragma: no cover
+from kungfu_chess.gui.geometry.board_geometry import (  # pragma: no cover
     cell_to_pixel,
     compute_letterbox,
     derive_cell_size,
     letterbox_screen_to_image,
 )
-from kungfu_chess.gui.hud import (  # pragma: no cover
+from kungfu_chess.gui.hud.hud import (  # pragma: no cover
     render_game_over,
     render_moves_log,
     render_player_name,
     render_score,
 )
-from kungfu_chess.gui.img_adapter import Img  # pragma: no cover
-from kungfu_chess.gui.img_renderer import ImgRenderer  # pragma: no cover
-from kungfu_chess.gui.legal_moves import legal_destinations  # pragma: no cover
-from kungfu_chess.gui.observers import MovesLogObserver, ScoreObserver  # pragma: no cover
-from kungfu_chess.gui.sprite_library import SpriteLibrary  # pragma: no cover
-from kungfu_chess.gui.view_model_registry import ViewModelRegistry  # pragma: no cover
+from kungfu_chess.gui.rendering.img_adapter import Img  # pragma: no cover
+from kungfu_chess.gui.rendering.img_renderer import ImgRenderer  # pragma: no cover
+from kungfu_chess.gui.geometry.legal_moves import legal_destinations  # pragma: no cover
+from kungfu_chess.gui.hud.observers import MovesLogObserver, ScoreObserver  # pragma: no cover
+from kungfu_chess.gui.animation.sprite_library import SpriteLibrary  # pragma: no cover
+from kungfu_chess.gui.animation.view_model_registry import ViewModelRegistry  # pragma: no cover
 from kungfu_chess.input.board_mapper import BoardMapper  # pragma: no cover
 from kungfu_chess.input.controller import GameController  # pragma: no cover
+
+IDC_HAND = 32649  # pragma: no cover
+
+
+def _use_hand_cursor():  # pragma: no cover
+    """cv2's own Win32 window class registers a crosshair cursor; forcing
+    a hand cursor on every mouse event (rather than once at startup)
+    is what makes it stick instead of flipping back to the crosshair
+    on the next move. Windows-only - a harmless no-op elsewhere."""
+    if sys.platform != "win32":
+        return
+    hand = ctypes.windll.user32.LoadCursorW(None, IDC_HAND)
+    ctypes.windll.user32.SetCursor(hand)
+
 
 WINDOW_NAME = "Kung Fu Chess"  # pragma: no cover
 PANEL_WIDTH = 220  # pragma: no cover
 SELECTED_COLOR = (0, 215, 255, 130)  # pragma: no cover
 LEGAL_MOVE_COLOR = (0, 200, 0, 100)  # pragma: no cover
+COOLDOWN_COLOR = (0, 170, 255, 140)  # pragma: no cover
 GAME_OVER_OVERLAY_COLOR = (0, 0, 0, 170)  # pragma: no cover
 GAME_OVER_TEXT_COLOR = (0, 215, 255, 255)  # pragma: no cover
 GAME_OVER_OVERLAY_HEIGHT = 80  # pragma: no cover
@@ -85,6 +102,7 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
     window_size = {"w": content_w, "h": image_h}
 
     def on_mouse(event, x, y, flags, param):
+        _use_hand_cursor()
         if event not in (cv2.EVENT_LBUTTONDOWN, cv2.EVENT_RBUTTONDOWN):
             return
         mapped = letterbox_screen_to_image(
@@ -122,6 +140,22 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
         # colored squares behind them rather than covering them.
         cell_w = image_w // board.cols
         cell_h = image_h // board.rows
+
+        # Sandclock-style cooldown fill: covers the whole square the
+        # instant the cooldown starts, then drains away from the top
+        # downward (like sand falling out of the top bulb) until nothing
+        # is left the instant the piece is free to act again.
+        for row in range(board.rows):
+            for col in range(board.cols):
+                progress = controller.engine.cooldown_progress(row, col)
+                if progress is None:
+                    continue
+                cx, cy = cell_to_pixel(row, col, cell_w, cell_h)
+                fill_h = int(cell_h * (1 - progress))
+                if fill_h <= 0:
+                    continue
+                board_renderer.draw_highlight(cx, cy + (cell_h - fill_h), (cell_w, fill_h), COOLDOWN_COLOR)
+
         if controller.selected is not None:
             sel_row, sel_col = controller.selected
             selected_piece = board.get_cell(sel_row, sel_col)

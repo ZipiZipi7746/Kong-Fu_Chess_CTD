@@ -1,4 +1,4 @@
-from kungfu_chess.gui.hud import render_game_over, render_moves_log, render_player_name, render_score
+from kungfu_chess.gui.hud.hud import render_game_over, render_moves_log, render_player_name, render_score
 
 
 class TestRenderScore:

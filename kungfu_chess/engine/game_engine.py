@@ -58,6 +58,12 @@ class GameEngine:
     def is_on_cooldown(self, row, col):
         return self.arbiter.is_on_cooldown(row, col)
 
+    def cooldown_progress(self, row, col):
+        """Read-only: 0..1 fraction of the way through the cooldown at
+        (row, col), or None if it isn't on cooldown. Purely for the UI
+        to draw a sandclock-style fill - never affects game rules."""
+        return self.arbiter.cooldown_progress(row, col)
+
     def motion_progress(self, row, col):
         """Read-only: 0..1 fraction of the way through the in-flight
         motion from (row, col), or None if there isn't one. Purely for
@@ -143,6 +149,14 @@ class GameEngine:
         if finish_time is not None and finish_time >= self.arbiter.clock:
             self.board.set_cell(motion.from_row, motion.from_col, None)
             return
+
+        # A captured piece's own still-in-flight outgoing motion (if it
+        # had one scheduled) must not survive it - otherwise that stale
+        # motion would later resolve against whatever piece now occupies
+        # its old square, teleporting the capturer to a destination it
+        # never asked for.
+        if destination is not None:
+            self.arbiter.cancel_pending_move_from(motion.to_row, motion.to_col)
 
         # Game Over (Rule 11: exclusively King capture)
         if destination is not None and destination.is_king():

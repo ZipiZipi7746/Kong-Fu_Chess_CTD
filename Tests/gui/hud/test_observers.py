@@ -1,5 +1,5 @@
 from kungfu_chess.engine.events import MoveResolvedEvent
-from kungfu_chess.gui.observers import MovesLogObserver, ScoreObserver, algebraic
+from kungfu_chess.gui.hud.observers import MovesLogObserver, ScoreObserver, algebraic
 
 
 class FakePiece:

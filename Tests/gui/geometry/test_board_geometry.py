@@ -1,4 +1,4 @@
-from kungfu_chess.gui.board_geometry import (
+from kungfu_chess.gui.geometry.board_geometry import (
     cell_to_pixel,
     compute_letterbox,
     derive_cell_size,
