@@ -29,6 +29,15 @@ class PrintBoardCommand:
         game.print_board()
 
 
+# TODO(design): parse_command is a fixed if/elif chain over four known
+# commands. If the command set grows significantly (many more verbs, or
+# third-party/plugin commands), a registry or factory keyed by the first
+# token would let new commands be added without editing this function
+# (Command Pattern already used for execution; Factory/Registry Pattern,
+# Open/Closed). The current form is intentionally kept simple because the
+# command set is small, fixed, and unlikely to grow without a matching
+# GameController capability to go with it - a registry would be
+# indirection without a present benefit.
 def parse_command(line):
     """Parses one command line into a Command, or None if unrecognized."""
     parts = line.split()

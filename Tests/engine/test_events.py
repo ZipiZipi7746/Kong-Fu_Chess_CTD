@@ -2,6 +2,12 @@ from kungfu_chess.engine.events import EventBus, MoveResolvedEvent
 
 
 class TestEventBus:
+    # TODO(test): If EventBus grows an explicit listener Protocol (see
+    # the TODO in events.py), a contract test asserting that any object
+    # satisfying that protocol - not just a bare callable/list.append -
+    # can be subscribed and receives published events would guard the
+    # new interface without hard-coding a single observer implementation.
+
     def test_publish_with_no_subscribers_does_nothing(self):
         bus = EventBus()
         bus.publish("anything")  # must not raise

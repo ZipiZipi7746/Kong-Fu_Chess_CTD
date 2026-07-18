@@ -5,6 +5,19 @@ class PieceRule:
     RuleEngine.
     """
 
+    # TODO(design): matches() only receives (dr, dc) - a delta-only
+    # contract. That's why Pawn can't implement this Strategy today: its
+    # legality depends on color, absolute from/to position and board
+    # occupancy, not just the shape of the move (see RuleEngine's
+    # _pawn_is_legal special case). Widening the contract to something
+    # like matches(piece, from_row, from_col, to_row, to_col, board)
+    # would let PawnRule (and any future context-sensitive piece) satisfy
+    # the same Strategy interface as everyone else - removing the
+    # type-specific branch in RuleEngine and keeping it Open/Closed for
+    # new piece kinds (Liskov Substitution: every PieceRule truly
+    # interchangeable). Deferred because today's five rules are pure
+    # functions of the delta, and widening the signature only pays off
+    # once Pawn (or a future piece) needs to join the same abstraction.
     def matches(self, dr, dc):
         raise NotImplementedError
 

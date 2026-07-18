@@ -10,6 +10,13 @@ class TestParse:
         assert piece.color == "w"
         assert piece.kind == "P"
 
+    # TODO(test): If parse()/__str__ are extracted into an injectable
+    # PieceCodec (see the TODO on Piece), a round-trip contract test -
+    # codec.decode(codec.encode(piece)) == piece for every (color, kind)
+    # combination, run against each codec implementation - would replace
+    # today's parse/str-specific tests and guarantee any future codec
+    # (e.g. binary) honors the same contract as the text one.
+
 
 class TestIsSameColor:
     def test_same_color_returns_true(self):

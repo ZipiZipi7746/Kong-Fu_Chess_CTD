@@ -34,6 +34,15 @@ class TestInit:
 
 
 class TestIsInside:
+    # TODO(test): get_cell/set_cell currently rely entirely on callers
+    # checking is_inside first (see the TODO in board.py) - there is no
+    # test here today for what get_cell/set_cell themselves do with an
+    # out-of-range (row, col) (currently: a plain IndexError from the
+    # underlying list, uncontrolled). If/when a validated accessor with
+    # an explicit domain exception is introduced, boundary tests
+    # asserting that exact exception (rather than today's incidental
+    # IndexError) belong here.
+
     def test_inside_bounds_true(self):
         board = make_simple_board()
         assert board.is_inside(0, 0) is True

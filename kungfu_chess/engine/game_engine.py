@@ -42,6 +42,16 @@ class GameEngine:
         post-action cooldown (ignored if an arbiter is injected directly -
         set them on that arbiter instead)."""
         self.board = board
+        # TODO(design): Game lifecycle is represented as two plain
+        # fields, checked with simple guard clauses in request_move/
+        # request_jump. This is intentionally simple and sufficient today
+        # - there is exactly one end condition (King capture, Rule 11)
+        # and no other phase (no pause, no check/checkmate, no replay
+        # state). A State Pattern / explicit finite-state machine would
+        # only be justified if more phases or richer phase-dependent
+        # branching are introduced later; forcing one on today's two
+        # fields would be a pattern applied for its own sake, not because
+        # the branching here needs it.
         self.game_over = False
         self.winner = None
         self.rule_engine = rule_engine if rule_engine is not None else RuleEngine()

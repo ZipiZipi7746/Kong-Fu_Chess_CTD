@@ -19,6 +19,17 @@ class EventBus:
     (a moves-log, a score tracker, a sound effect later) subscribes.
     GameEngine has zero knowledge of who's listening or why."""
 
+    # TODO(design): subscribe() accepts anything callable - a plain
+    # function or a class with __call__, per the current subscribers
+    # (MovesLogObserver, ScoreObserver). That's appropriate for this
+    # small, fixed set of listeners. If the number/variety of subscriber
+    # types grows, an explicit listener Protocol/interface (e.g.
+    # requiring an on_move_resolved(event) method rather than "any
+    # callable") would make the contract discoverable and statically
+    # checkable (Observer Pattern, Publish-Subscribe, Dependency
+    # Inversion against an explicit port). Not introduced now: "anything
+    # callable" is simple, already testable with a plain list.append, and
+    # a typed protocol would be overengineering for two subscribers.
     def __init__(self):
         self._subscribers = []
 

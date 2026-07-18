@@ -8,6 +8,16 @@ class PromotionRule:
     upon Motion arrival (Rule 8).
     """
 
+    # TODO(design): The promotion target ("Q") is hardcoded here, and the
+    # promotion rows are standard-chess assumptions (row 0 for White, the
+    # last row for Black). Injecting the promotion kind/rows (or sourcing
+    # them from a future PieceDefinition registry, see the TODO on
+    # Piece.kind) would let a variant configure "promote to Queen only"
+    # vs. player-choice promotion, or a differently-shaped board, without
+    # editing this class (Strategy Pattern, configuration over hard
+    # coding, Open/Closed). Left hardcoded for this iteration: standard
+    # chess promotion is the only rule this project needs right now, and
+    # configurability would be speculative until a variant requires it.
     @staticmethod
     def resolve(piece, to_row, board):
         if piece.color == "w" and piece.is_pawn() and to_row == 0:

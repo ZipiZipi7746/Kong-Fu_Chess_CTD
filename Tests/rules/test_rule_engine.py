@@ -7,6 +7,13 @@ def board_from_rows(rows):
     return Board(rows)
 
 
+# TODO(test): If PIECE_RULES is ever injected through RuleEngine's
+# constructor instead of imported as a module global (see the TODO in
+# rule_engine.py), a test constructing RuleEngine(rule_registry={...a
+# minimal fake...}) and asserting is_legal() consults the injected
+# registry rather than the real PIECE_RULES would prove that seam
+# actually works, the same way GameEngine's injected-arbiter/rule_engine
+# tests do today.
 class TestIsLegalGeneral:
     def test_same_from_and_to_cell_is_illegal(self):
         board = board_from_rows([["wR", "."], [".", "."]])

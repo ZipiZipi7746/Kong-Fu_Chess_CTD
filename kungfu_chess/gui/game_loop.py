@@ -137,6 +137,17 @@ def _draw_game_over_overlay(renderer, controller, board_x, image_w, image_h):  #
 
 def run(board, board_image_path="assets/board.png",  # pragma: no cover
         pieces_root="assets/pieces_mine"):
+    # TODO(design): Object construction (Img, EventBus, observers,
+    # GameEngine, GameController, SpriteLibrary, ViewModelRegistry) and
+    # the cv2 window/event-loop setup below all happen inline in this one
+    # function, ahead of the while-loop that then runs them. As the
+    # project grows, splitting "build the dependency graph" out into its
+    # own composition function (a Composition Root) would separate
+    # construction from use and make this function's own job - running
+    # the loop - clearer. Not moved now: run() is already the file's
+    # single documented entry point (see the module docstring) and this
+    # is straight-line setup code, not scattered construction; splitting
+    # it would be reorganization without a present readability problem.
     base = Img().read(board_image_path)
     image_h, image_w = base.img.shape[:2]
     board_x = PANEL_WIDTH  # black panel occupies [0, PANEL_WIDTH); board starts here
@@ -179,6 +190,17 @@ def run(board, board_image_path="assets/board.png",  # pragma: no cover
 
     cv2.setMouseCallback(WINDOW_NAME, on_mouse)
 
+    # TODO(design): The frame clock reads the real wall clock
+    # (time.perf_counter) directly, so the render loop itself can't be
+    # driven deterministically in a test. Note this is purely a GUI-loop
+    # concern: the domain engine already receives only a dt_ms integer
+    # (via controller.wait) and never touches real time itself (Rule 9 -
+    # GameEngine/RealTimeArbiter are already fully deterministic and
+    # injectable). An injectable clock here (a Test Double at this one
+    # Hexagonal-Architecture boundary) would only help test this loop's
+    # own frame-timing glue, which is why it hasn't been needed: this
+    # file is real I/O by design and excluded from coverage, same as
+    # BoardParser._read_stdin.
     last_time = time.perf_counter()
     while True:
         now = time.perf_counter()

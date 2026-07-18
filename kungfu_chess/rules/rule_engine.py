@@ -1,3 +1,13 @@
+# TODO(design): PIECE_RULES is imported as a module-level global rather
+# than injected through RuleEngine's constructor. Accepting it as an
+# optional constructor parameter (defaulting to this same PIECE_RULES,
+# matching the DI style already used by GameEngine/GameController
+# elsewhere in this codebase) would apply Dependency Injection and the
+# Dependency Inversion Principle: alternative or user-defined rule sets
+# could be swapped in without editing RuleEngine, and tests could inject
+# a minimal fake registry instead of depending on the real one. Deferred
+# because there is currently exactly one rule set and no requirement yet
+# for variants or custom pieces - injecting it now would be speculative.
 from kungfu_chess.rules.piece_rules import PIECE_RULES
 
 
@@ -14,12 +24,32 @@ class RuleEngine:
     this game).
     """
 
+    # TODO(design): This classification lives here rather than on the
+    # rule objects themselves, so RuleEngine must know which kinds slide
+    # in addition to asking their PieceRule for shape. A
+    # requires_clear_path flag (or a path-validation method) on PieceRule
+    # would let each rule own its full movement contract - matching
+    # Information Expert (the rule already knows its own movement style)
+    # and Single Responsibility (RuleEngine would no longer need a
+    # separate, manually-maintained piece-kind classification to stay in
+    # sync with PIECE_RULES). Deferred: only three of five rules slide,
+    # and the current set/lookup is a single line, so the duplication
+    # cost is still low.
     _SLIDING_PIECES = {"R", "B", "Q"}
 
     def is_legal(self, piece, from_row, from_col, to_row, to_col, board):
         if from_row == to_row and from_col == to_col:
             return False
 
+        # TODO(design): Pawn is special-cased here instead of going
+        # through PIECE_RULES like every other kind, because its
+        # legality depends on color/direction/capture-vs-empty-square,
+        # which the current PieceRule.matches(dr, dc) contract can't
+        # express (see the TODO on PieceRule.matches). Once that contract
+        # is widened, a PawnRule could replace this branch entirely,
+        # letting RuleEngine treat all six kinds uniformly (Strategy
+        # Pattern, Open/Closed). Not changed now: pawns work correctly
+        # today, and this is a one-branch special case, not a bug.
         if piece.kind == "P":
             return self._pawn_is_legal(
                 piece.color, from_row, from_col, to_row, to_col, board)

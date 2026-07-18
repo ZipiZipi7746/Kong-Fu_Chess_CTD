@@ -16,6 +16,15 @@ class TestPieceRuleBase:
         with pytest.raises(NotImplementedError):
             PieceRule().matches(1, 1)
 
+    # TODO(test): If PieceRule.matches() is widened to a full-context
+    # signature (see the TODO in piece_rules.py) and Pawn joins this
+    # Strategy family as PawnRule, a shared parametrized contract test
+    # (iterating PIECE_RULES.values() plus PawnRule, asserting each
+    # returns a bool and never raises for arbitrary valid inputs) would
+    # guard that every implementation still satisfies the same interface
+    # - useful once there is more than a fixed five-rule set to keep in
+    # sync by hand.
+
 
 class TestKingRule:
     def test_one_step_any_direction_matches(self):
