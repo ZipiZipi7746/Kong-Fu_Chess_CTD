@@ -33,10 +33,21 @@
 <td class="decor title-decor" colspan=2><span class="code">Dedicated&nbsp;strategy/sub-service&nbsp;(Rule&nbsp;6)&nbsp;for&nbsp;pawn&nbsp;promotion.<br>
 Resolves&nbsp;whether&nbsp;a&nbsp;piece&nbsp;that&nbsp;just&nbsp;arrived&nbsp;at&nbsp;its&nbsp;destination&nbsp;should<br>
 be&nbsp;promoted,&nbsp;and&nbsp;returns&nbsp;the&nbsp;resulting&nbsp;piece.&nbsp;Called&nbsp;by&nbsp;GameEngine<br>
-upon&nbsp;Motion&nbsp;arrival&nbsp;(Rule&nbsp;8).<br>&nbsp;</span></td></tr>
+upon&nbsp;Motion&nbsp;arrival&nbsp;(Rule&nbsp;8).<br>
+&nbsp;<br>
+The&nbsp;promotion&nbsp;target&nbsp;defaults&nbsp;to&nbsp;Queen&nbsp;(DEFAULT_PROMOTION_KIND),<br>
+matching&nbsp;standard&nbsp;chess,&nbsp;but&nbsp;is&nbsp;an&nbsp;overridable&nbsp;parameter&nbsp;rather&nbsp;than<br>
+an&nbsp;inline&nbsp;literal&nbsp;-&nbsp;a&nbsp;variant&nbsp;needing&nbsp;a&nbsp;different&nbsp;target&nbsp;(or<br>
+eventually&nbsp;player-choice&nbsp;promotion)&nbsp;can&nbsp;pass&nbsp;promotion_kind&nbsp;without<br>
+editing&nbsp;this&nbsp;class&nbsp;(configuration&nbsp;over&nbsp;hard&nbsp;coding,&nbsp;Open/Closed).<br>
+Promotion&nbsp;*rows*&nbsp;are&nbsp;left&nbsp;as&nbsp;standard-chess&nbsp;assumptions&nbsp;(row&nbsp;0&nbsp;for<br>
+White,&nbsp;the&nbsp;last&nbsp;row&nbsp;for&nbsp;Black&nbsp;-&nbsp;the&nbsp;latter&nbsp;already&nbsp;derived&nbsp;from<br>
+board.rows&nbsp;rather&nbsp;than&nbsp;hardcoded):&nbsp;this&nbsp;project&nbsp;has&nbsp;no&nbsp;variant&nbsp;with<br>
+a&nbsp;different&nbsp;promotion&nbsp;rank,&nbsp;so&nbsp;parameterizing&nbsp;rows&nbsp;too&nbsp;would&nbsp;be<br>
+speculative&nbsp;until&nbsp;one&nbsp;exists.<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Static methods defined here:<br>
-<dl><dt><a name="PromotionRule-resolve"><strong>resolve</strong></a>(piece, to_row, board)</dt></dl>
+<dl><dt><a name="PromotionRule-resolve"><strong>resolve</strong></a>(piece, to_row, board, promotion_kind=None)</dt></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -46,5 +57,9 @@ Data descriptors defined here:<br>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
 </dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>DEFAULT_PROMOTION_KIND</strong> = 'Q'</dl>
+
 </td></tr></table></td></tr></table>
 </body></html>

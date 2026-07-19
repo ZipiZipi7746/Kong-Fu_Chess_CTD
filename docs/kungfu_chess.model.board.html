@@ -36,14 +36,38 @@ Pure&nbsp;logic&nbsp;Model:&nbsp;the&nbsp;grid&nbsp;of&nbsp;Pieces&nbsp;and&nbsp
 &nbsp;<br>
 Deliberately&nbsp;has&nbsp;NO&nbsp;rendering/printing&nbsp;method&nbsp;on&nbsp;it&nbsp;(Rule&nbsp;3&nbsp;-&nbsp;SoC):<br>
 the&nbsp;Model&nbsp;must&nbsp;be&nbsp;completely&nbsp;decoupled&nbsp;from&nbsp;the&nbsp;View.&nbsp;See<br>
-board_view.BoardRenderer&nbsp;for&nbsp;the&nbsp;View&nbsp;Adapter&nbsp;that&nbsp;reads&nbsp;this&nbsp;model.<br>&nbsp;</span></td></tr>
+board_view.BoardRenderer&nbsp;for&nbsp;the&nbsp;View&nbsp;Adapter&nbsp;that&nbsp;reads&nbsp;this&nbsp;model.<br>
+&nbsp;<br>
+Internal&nbsp;storage&nbsp;(_cells)&nbsp;is&nbsp;private;&nbsp;external&nbsp;callers&nbsp;read&nbsp;it<br>
+through&nbsp;get_cell/set_cell&nbsp;or&nbsp;the&nbsp;read-only&nbsp;<a href="#Board-iter_rows">iter_rows</a>()&nbsp;(Tell,&nbsp;Don't<br>
+Ask)&nbsp;-&nbsp;this&nbsp;keeps&nbsp;the&nbsp;single-writer&nbsp;convention&nbsp;(only&nbsp;GameEngine&nbsp;ever<br>
+calls&nbsp;set_cell)&nbsp;enforced&nbsp;rather&nbsp;than&nbsp;merely&nbsp;conventional.<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
 <dl><dt><a name="Board-__init__"><strong>__init__</strong></a>(self, cells)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
-<dl><dt><a name="Board-get_cell"><strong>get_cell</strong></a>(self, row, col)</dt></dl>
+<dl><dt><a name="Board-get_cell"><strong>get_cell</strong></a>(self, row, col)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;get_cell/set_cell&nbsp;trust&nbsp;the&nbsp;caller&nbsp;to&nbsp;have&nbsp;already<br>
+#&nbsp;checked&nbsp;is_inside&nbsp;-&nbsp;GameController&nbsp;does,&nbsp;before&nbsp;ever&nbsp;calling<br>
+#&nbsp;get_cell&nbsp;with&nbsp;a&nbsp;click-derived&nbsp;cell,&nbsp;but&nbsp;GameEngine&nbsp;and&nbsp;RuleEngine<br>
+#&nbsp;call&nbsp;get_cell/set_cell&nbsp;freely&nbsp;without&nbsp;re-checking,&nbsp;relying&nbsp;on<br>
+#&nbsp;RuleEngine's&nbsp;shape&nbsp;rules&nbsp;and&nbsp;the&nbsp;controller's&nbsp;upstream&nbsp;validation<br>
+#&nbsp;to&nbsp;guarantee&nbsp;in-bounds&nbsp;coordinates.&nbsp;A&nbsp;validated&nbsp;public&nbsp;accessor<br>
+#&nbsp;(raising&nbsp;a&nbsp;domain-specific&nbsp;exception&nbsp;on&nbsp;out-of-range&nbsp;access)&nbsp;with&nbsp;a<br>
+#&nbsp;separate&nbsp;fast/unchecked&nbsp;internal&nbsp;path&nbsp;would&nbsp;centralize&nbsp;boundary<br>
+#&nbsp;enforcement&nbsp;instead&nbsp;of&nbsp;leaving&nbsp;it&nbsp;as&nbsp;an&nbsp;implicit,&nbsp;spread-out<br>
+#&nbsp;contract&nbsp;(Design&nbsp;by&nbsp;Contract,&nbsp;Fail&nbsp;Fast);&nbsp;a&nbsp;Position&nbsp;value&nbsp;<a href="builtins.html#object">object</a><br>
+#&nbsp;(see&nbsp;above)&nbsp;would&nbsp;be&nbsp;a&nbsp;natural&nbsp;place&nbsp;to&nbsp;own&nbsp;that&nbsp;check.&nbsp;Not&nbsp;added<br>
+#&nbsp;now:&nbsp;no&nbsp;out-of-range&nbsp;access&nbsp;has&nbsp;ever&nbsp;actually&nbsp;occurred&nbsp;here,&nbsp;since<br>
+#&nbsp;every&nbsp;caller&nbsp;today&nbsp;is&nbsp;already&nbsp;constrained&nbsp;upstream&nbsp;(click&nbsp;mapping,<br>
+#&nbsp;rule-validated&nbsp;deltas).</span></dd></dl>
 
 <dl><dt><a name="Board-is_inside"><strong>is_inside</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="Board-iter_rows"><strong>iter_rows</strong></a>(self)</dt><dd><span class="code">Read-only&nbsp;iteration&nbsp;over&nbsp;the&nbsp;grid,&nbsp;row&nbsp;by&nbsp;row&nbsp;-&nbsp;the&nbsp;sanctioned<br>
+way&nbsp;for&nbsp;external&nbsp;callers&nbsp;(e.g.&nbsp;BoardRenderer)&nbsp;to&nbsp;inspect&nbsp;the<br>
+whole&nbsp;board&nbsp;without&nbsp;touching&nbsp;internal&nbsp;storage&nbsp;directly.&nbsp;Each&nbsp;row<br>
+is&nbsp;a&nbsp;tuple&nbsp;(not&nbsp;the&nbsp;live&nbsp;list),&nbsp;so&nbsp;callers&nbsp;can't&nbsp;mutate&nbsp;cells<br>
+through&nbsp;it&nbsp;-&nbsp;only&nbsp;set_cell&nbsp;can.</span></dd></dl>
 
 <dl><dt><a name="Board-set_cell"><strong>set_cell</strong></a>(self, row, col, value)</dt></dl>
 

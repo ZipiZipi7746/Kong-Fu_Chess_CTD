@@ -26,6 +26,7 @@
 <dt class="heading-text"><a href="kungfu_chess.rules.piece_rules.html#BishopRule">BishopRule</a>
 </dt><dt class="heading-text"><a href="kungfu_chess.rules.piece_rules.html#KingRule">KingRule</a>
 </dt><dt class="heading-text"><a href="kungfu_chess.rules.piece_rules.html#KnightRule">KnightRule</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.rules.piece_rules.html#PawnRule">PawnRule</a>
 </dt><dt class="heading-text"><a href="kungfu_chess.rules.piece_rules.html#QueenRule">QueenRule</a>
 </dt><dt class="heading-text"><a href="kungfu_chess.rules.piece_rules.html#RookRule">RookRule</a>
 </dt></dl>
@@ -47,6 +48,14 @@
 <hr>
 Methods defined here:<br>
 <dl><dt><a name="BishopRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>requires_clear_path</strong> = True</dl>
+
+<hr>
+Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><a name="BishopRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
 
 <hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
@@ -72,6 +81,10 @@ Methods defined here:<br>
 <dl><dt><a name="KingRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
 
 <hr>
+Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><a name="KingRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+
+<hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
 <dl><dt><strong>__dict__</strong></dt>
 <dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
@@ -79,6 +92,10 @@ Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#Pie
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
 </dl>
+<hr>
+Data and other attributes inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><strong>requires_clear_path</strong> = False</dl>
+
 </td></tr></table> <p>
 <table class="section">
 <tr class="decor title-decor heading-text">
@@ -95,6 +112,10 @@ Methods defined here:<br>
 <dl><dt><a name="KnightRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
 
 <hr>
+Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><a name="KnightRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+
+<hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
 <dl><dt><strong>__dict__</strong></dt>
 <dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
@@ -102,18 +123,73 @@ Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#Pie
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
 </dl>
+<hr>
+Data and other attributes inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><strong>requires_clear_path</strong> = False</dl>
+
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="PawnRule">class <strong>PawnRule</strong></a>(<a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code">Pawn's&nbsp;legality&nbsp;depends&nbsp;on&nbsp;color/direction/capture-vs-empty-square,<br>
+not&nbsp;just&nbsp;(dr,&nbsp;dc)&nbsp;shape,&nbsp;so&nbsp;it&nbsp;overrides&nbsp;<a href="#PawnRule-is_legal">is_legal</a>()&nbsp;directly&nbsp;rather<br>
+than&nbsp;implementing&nbsp;<a href="#PawnRule-matches">matches</a>()&nbsp;(which&nbsp;stays&nbsp;unimplemented&nbsp;here,&nbsp;same&nbsp;as<br>
+the&nbsp;base&nbsp;class&nbsp;-&nbsp;nothing&nbsp;calls&nbsp;it&nbsp;for&nbsp;this&nbsp;rule).&nbsp;Moved&nbsp;here&nbsp;from<br>
+RuleEngine's&nbsp;former&nbsp;_pawn_is_legal,&nbsp;unchanged&nbsp;in&nbsp;behavior.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.rules.piece_rules.html#PawnRule">PawnRule</a></dd>
+<dd><a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="PawnRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+
+<dl><dt><a name="PawnRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
+
+<hr>
+Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Data and other attributes inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><strong>requires_clear_path</strong> = False</dl>
+
 </td></tr></table> <p>
 <table class="section">
 <tr class="decor title-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><a name="PieceRule">class <strong>PieceRule</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
     
 <tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
-<td class="decor title-decor" colspan=2><span class="code">Strategy&nbsp;base&nbsp;class&nbsp;(Rule&nbsp;6):&nbsp;evaluates&nbsp;a&nbsp;piece's&nbsp;theoretical<br>
-movement&nbsp;capability&nbsp;(shape&nbsp;only)&nbsp;independent&nbsp;of&nbsp;board&nbsp;obstruction<br>
-state.&nbsp;Obstruction/path-blocking&nbsp;is&nbsp;handled&nbsp;separately&nbsp;by&nbsp;the<br>
-RuleEngine.<br>&nbsp;</span></td></tr>
+<td class="decor title-decor" colspan=2><span class="code">Strategy&nbsp;base&nbsp;class&nbsp;(Rule&nbsp;6):&nbsp;evaluates&nbsp;whether&nbsp;a&nbsp;piece&nbsp;can&nbsp;legally<br>
+move&nbsp;from&nbsp;one&nbsp;cell&nbsp;to&nbsp;another.<br>
+&nbsp;<br>
+<a href="#PieceRule-matches">matches</a>(dr,&nbsp;dc)&nbsp;is&nbsp;the&nbsp;narrow,&nbsp;original&nbsp;hook:&nbsp;pure&nbsp;movement&nbsp;*shape*,<br>
+independent&nbsp;of&nbsp;board&nbsp;state,&nbsp;color&nbsp;or&nbsp;capture.&nbsp;Most&nbsp;pieces&nbsp;are&nbsp;fully<br>
+described&nbsp;by&nbsp;shape&nbsp;alone,&nbsp;so&nbsp;<a href="#PieceRule-is_legal">is_legal</a>()&nbsp;(the&nbsp;Template&nbsp;Method&nbsp;every<br>
+rule&nbsp;is&nbsp;actually&nbsp;invoked&nbsp;through)&nbsp;has&nbsp;a&nbsp;default&nbsp;implementation&nbsp;that<br>
+just&nbsp;measures&nbsp;the&nbsp;delta&nbsp;and&nbsp;delegates&nbsp;to&nbsp;<a href="#PieceRule-matches">matches</a>().&nbsp;requires_clear_path<br>
+tells&nbsp;RuleEngine&nbsp;whether&nbsp;it&nbsp;also&nbsp;needs&nbsp;to&nbsp;walk&nbsp;the&nbsp;intermediate&nbsp;cells<br>
+for&nbsp;this&nbsp;rule&nbsp;(Information&nbsp;Expert:&nbsp;the&nbsp;rule&nbsp;itself&nbsp;knows&nbsp;whether&nbsp;it<br>
+slides).<br>
+&nbsp;<br>
+A&nbsp;rule&nbsp;whose&nbsp;legality&nbsp;genuinely&nbsp;depends&nbsp;on&nbsp;more&nbsp;than&nbsp;shape&nbsp;(color,<br>
+absolute&nbsp;position,&nbsp;board&nbsp;occupancy&nbsp;-&nbsp;i.e.&nbsp;Pawn)&nbsp;overrides&nbsp;<a href="#PieceRule-is_legal">is_legal</a>()<br>
+directly&nbsp;instead&nbsp;of&nbsp;<a href="#PieceRule-matches">matches</a>(),&nbsp;and&nbsp;RuleEngine&nbsp;never&nbsp;needs&nbsp;to&nbsp;know&nbsp;the<br>
+difference:&nbsp;every&nbsp;kind&nbsp;in&nbsp;PIECE_RULES&nbsp;is&nbsp;looked&nbsp;up&nbsp;and&nbsp;invoked&nbsp;the<br>
+same&nbsp;way&nbsp;(Liskov&nbsp;Substitution,&nbsp;Open/Closed&nbsp;for&nbsp;future&nbsp;context-<br>
+sensitive&nbsp;pieces).<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="PieceRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+
 <dl><dt><a name="PieceRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
 
 <hr>
@@ -124,6 +200,10 @@ Data descriptors defined here:<br>
 <dl><dt><strong>__weakref__</strong></dt>
 <dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
 </dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>requires_clear_path</strong> = False</dl>
+
 </td></tr></table> <p>
 <table class="section">
 <tr class="decor title-decor heading-text">
@@ -140,6 +220,14 @@ Methods defined here:<br>
 <dl><dt><a name="QueenRule-__init__"><strong>__init__</strong></a>(self)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
 <dl><dt><a name="QueenRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>requires_clear_path</strong> = True</dl>
+
+<hr>
+Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><a name="QueenRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
 
 <hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
@@ -165,6 +253,14 @@ Methods defined here:<br>
 <dl><dt><a name="RookRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
 
 <hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>requires_clear_path</strong> = True</dl>
+
+<hr>
+Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
+<dl><dt><a name="RookRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+
+<hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
 <dl><dt><strong>__dict__</strong></dt>
 <dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
@@ -178,5 +274,5 @@ Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#Pie
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
     
 <tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><strong>PIECE_RULES</strong> = {'B': &lt;kungfu_chess.rules.piece_rules.BishopRule object&gt;, 'K': &lt;kungfu_chess.rules.piece_rules.KingRule object&gt;, 'N': &lt;kungfu_chess.rules.piece_rules.KnightRule object&gt;, 'Q': &lt;kungfu_chess.rules.piece_rules.QueenRule object&gt;, 'R': &lt;kungfu_chess.rules.piece_rules.RookRule object&gt;}</td></tr></table>
+<td class="singlecolumn"><strong>PIECE_RULES</strong> = {'B': &lt;kungfu_chess.rules.piece_rules.BishopRule object&gt;, 'K': &lt;kungfu_chess.rules.piece_rules.KingRule object&gt;, 'N': &lt;kungfu_chess.rules.piece_rules.KnightRule object&gt;, 'P': &lt;kungfu_chess.rules.piece_rules.PawnRule object&gt;, 'Q': &lt;kungfu_chess.rules.piece_rules.QueenRule object&gt;, 'R': &lt;kungfu_chess.rules.piece_rules.RookRule object&gt;}</td></tr></table>
 </body></html>

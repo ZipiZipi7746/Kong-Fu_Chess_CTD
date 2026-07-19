@@ -30,18 +30,27 @@
 <td class="section-title" colspan=3>&nbsp;<br><a name="RuleEngine">class <strong>RuleEngine</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
     
 <tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
-<td class="decor title-decor" colspan=2><span class="code">The&nbsp;Validation&nbsp;Service&nbsp;(Rule&nbsp;7).&nbsp;Checks&nbsp;whether&nbsp;a&nbsp;specific&nbsp;piece<br>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#RuleEngine">RuleEngine</a>(rule_registry=None)<br>
+&nbsp;<br>
+The&nbsp;Validation&nbsp;Service&nbsp;(Rule&nbsp;7).&nbsp;Checks&nbsp;whether&nbsp;a&nbsp;specific&nbsp;piece<br>
 can&nbsp;legally&nbsp;move&nbsp;to&nbsp;the&nbsp;requested&nbsp;target&nbsp;cell,&nbsp;based&nbsp;on:<br>
--&nbsp;piece&nbsp;movement&nbsp;shape&nbsp;(delegated&nbsp;to&nbsp;Strategy-pattern&nbsp;PieceRules)<br>
--&nbsp;path&nbsp;blocking&nbsp;for&nbsp;sliding&nbsp;pieces&nbsp;(Rook,&nbsp;Bishop,&nbsp;Queen)<br>
+-&nbsp;piece&nbsp;movement&nbsp;legality&nbsp;(delegated&nbsp;to&nbsp;Strategy-pattern&nbsp;PieceRules,<br>
+&nbsp;&nbsp;including&nbsp;Pawn&nbsp;-&nbsp;see&nbsp;piece_rules.PieceRule)<br>
+-&nbsp;path&nbsp;blocking&nbsp;for&nbsp;sliding&nbsp;pieces&nbsp;(Rook,&nbsp;Bishop,&nbsp;Queen),&nbsp;driven&nbsp;by<br>
+&nbsp;&nbsp;each&nbsp;rule's&nbsp;own&nbsp;requires_clear_path&nbsp;flag<br>
 -&nbsp;capture&nbsp;rules&nbsp;(cannot&nbsp;capture&nbsp;own&nbsp;color)<br>
--&nbsp;pawn-specific&nbsp;direction/forward/diagonal-capture&nbsp;rules<br>
+&nbsp;<br>
+rule_registry&nbsp;is&nbsp;an&nbsp;optional&nbsp;Dependency&nbsp;Injection&nbsp;point&nbsp;(tests&nbsp;can<br>
+supply&nbsp;a&nbsp;fake&nbsp;registry&nbsp;instead&nbsp;of&nbsp;depending&nbsp;on&nbsp;the&nbsp;real&nbsp;PIECE_RULES);<br>
+production&nbsp;code&nbsp;omits&nbsp;it&nbsp;and&nbsp;gets&nbsp;the&nbsp;real&nbsp;one.<br>
 &nbsp;<br>
 Still&nbsp;does&nbsp;NOT&nbsp;check&nbsp;turn&nbsp;order&nbsp;or&nbsp;check/checkmate&nbsp;(Rule&nbsp;11:&nbsp;game<br>
 over&nbsp;is&nbsp;exclusively&nbsp;King&nbsp;capture,&nbsp;there&nbsp;is&nbsp;no&nbsp;check/checkmate&nbsp;in<br>
 this&nbsp;game).<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="RuleEngine-__init__"><strong>__init__</strong></a>(self, rule_registry=None)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
 <dl><dt><a name="RuleEngine-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
 
 <hr>
@@ -58,5 +67,5 @@ Data descriptors defined here:<br>
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
     
 <tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><strong>PIECE_RULES</strong> = {'B': &lt;kungfu_chess.rules.piece_rules.BishopRule object&gt;, 'K': &lt;kungfu_chess.rules.piece_rules.KingRule object&gt;, 'N': &lt;kungfu_chess.rules.piece_rules.KnightRule object&gt;, 'Q': &lt;kungfu_chess.rules.piece_rules.QueenRule object&gt;, 'R': &lt;kungfu_chess.rules.piece_rules.RookRule object&gt;}</td></tr></table>
+<td class="singlecolumn"><strong>PIECE_RULES</strong> = {'B': &lt;kungfu_chess.rules.piece_rules.BishopRule object&gt;, 'K': &lt;kungfu_chess.rules.piece_rules.KingRule object&gt;, 'N': &lt;kungfu_chess.rules.piece_rules.KnightRule object&gt;, 'P': &lt;kungfu_chess.rules.piece_rules.PawnRule object&gt;, 'Q': &lt;kungfu_chess.rules.piece_rules.QueenRule object&gt;, 'R': &lt;kungfu_chess.rules.piece_rules.RookRule object&gt;}</td></tr></table>
 </body></html>
