@@ -332,6 +332,78 @@ class TestDodgingAThreatenedCapture:
         assert board.get_cell(3, 1) is None  # nothing teleported here
 
 
+class TestWinConditionInjection:
+    def test_default_win_condition_is_capture_king(self):
+        board = make_board([["wR", "bK"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+        assert engine.game_over is True
+        assert engine.winner == "w"
+
+    def test_injected_win_condition_is_consulted_instead_of_the_default(self):
+        class NeverWinCondition:
+            def check(self, moving_piece, captured_piece, board):
+                return None
+
+        board = make_board([["wR", "bK"]])
+        engine = GameEngine(board, jump_duration_ms=1000, win_condition=NeverWinCondition())
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+        # The King is still captured on the board - that's motion
+        # resolution, not the win condition's job - but this engine's
+        # injected win condition never declares a winner for it.
+        assert board.get_cell(0, 1) == Piece("w", "R")
+        assert engine.game_over is False
+        assert engine.winner is None
+
+    def test_custom_win_condition_can_declare_a_winner_for_a_different_reason(self):
+        class AlwaysWhiteWinsCondition:
+            def check(self, moving_piece, captured_piece, board):
+                return "w"
+
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000, win_condition=AlwaysWhiteWinsCondition())
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+        assert engine.game_over is True
+        assert engine.winner == "w"
+
+    def test_win_condition_is_consulted_on_every_resolved_motion_even_without_a_capture(self):
+        # Not gating the call on "only if something was captured" is
+        # deliberate: a future win condition (e.g. "reach this cell")
+        # needs to be asked on every arrival, not just capturing ones.
+        calls = []
+
+        class RecordingWinCondition:
+            def check(self, moving_piece, captured_piece, board):
+                calls.append(captured_piece)
+                return None
+
+        board = make_board([["wR", "."]])
+        engine = GameEngine(board, jump_duration_ms=1000, win_condition=RecordingWinCondition())
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+        assert calls == [None]
+
+    def test_win_condition_is_not_consulted_on_a_friendly_collision_stop(self):
+        # Stopping short of the destination isn't an arrival - nothing to
+        # ask a win condition about.
+        calls = []
+
+        class RecordingWinCondition:
+            def check(self, moving_piece, captured_piece, board):
+                calls.append(captured_piece)
+                return None
+
+        board = make_board([["wR", ".", "wR"]])
+        engine = GameEngine(board, jump_duration_ms=1000, win_condition=RecordingWinCondition())
+        engine.request_move(0, 0, 0, 1)  # requested first, lands normally
+        engine.request_move(0, 2, 0, 1)  # ties, stays at its own source
+        engine.advance_time(1000)
+        assert calls == [None]  # only the piece that actually arrived
+
+
 class TestAdvanceTimeAndResolveMotion:
     def test_arrived_move_relocates_piece(self):
         board = make_board([["wR", "."]])

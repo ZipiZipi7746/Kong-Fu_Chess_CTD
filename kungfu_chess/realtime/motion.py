@@ -11,6 +11,20 @@ class Motion:
 
     TIME_PER_CELL_MS = 1000  # how many ms it takes to cross one cell
 
+    # TODO(design): distance (Chebyshev, max(|dr|, |dc|)) and a single
+    # TIME_PER_CELL_MS both assume a rectangular grid with uniform per-
+    # cell cost - this is one MovementDurationPolicy, not the only timing
+    # rule a variant could need. Legality and timing are separate
+    # concerns: a piece can be allowed to reach a destination (RuleEngine
+    # says yes) while a different policy decides how long that takes.
+    # Future policies might include PathLengthDurationPolicy (topology-
+    # aware distance, once BoardTopology exists), WeightedTopologyDuration
+    # Policy (terrain-costed cells), PieceSpecificDurationPolicy (a piece
+    # that's simply faster or slower), or InstantDurationPolicy (a
+    # teleport/swap action with no travel time at all). Not extracted
+    # now: Motion has exactly one timing rule and one consumer
+    # (RealTimeArbiter); a policy object would be premature until a
+    # second timing rule actually exists to justify the seam.
     def __init__(self, from_row, from_col, to_row, to_col, start_time):
         self.from_row = from_row
         self.from_col = from_col
@@ -32,6 +46,21 @@ class Motion:
         start_time = self.arrival_time - self._duration_ms
         return progress_fraction(start_time, self.arrival_time, current_time)
 
+    # TODO(design): previous_cell() (used for the friendly-collision
+    # fallback) and the UI's on-screen interpolation (ViewModelRegistry,
+    # via progress()) both assume straight-line movement between two grid
+    # cells - direct interpolation is one PathStrategy, not the only
+    # shape a path can take. A graph topology's shortest path, a curved
+    # or multi-segment path, or a rule-supplied path (a piece that
+    # teleports or jumps over intermediate cells entirely) would all need
+    # a different notion of "the path this motion takes" than "step
+    # toward the destination one cell at a time". Separating destination
+    # legality (RuleEngine), path generation (a future PathStrategy),
+    # movement timing (see the TODO above) and visual interpolation into
+    # distinct concerns is the eventual direction; not done now because
+    # there is only one path shape in this project today, and a second
+    # concrete case should drive the abstraction's shape rather than
+    # guesswork.
     def previous_cell(self):
         """The cell one step back from the destination, along this
         motion's own straight-line path. Used to resolve friendly

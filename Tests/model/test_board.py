@@ -1,4 +1,5 @@
 from kungfu_chess.model.board import Board
+from kungfu_chess.model.board_topology import RectangularTopology
 
 
 def make_simple_board():
@@ -57,6 +58,40 @@ class TestIsInside:
         board = make_simple_board()
         assert board.is_inside(3, 0) is False
         assert board.is_inside(0, 3) is False
+
+
+class TestTopologyInjection:
+    def test_default_topology_is_rectangular_matching_the_board_shape(self):
+        board = make_simple_board()
+        assert isinstance(board.topology, RectangularTopology)
+        assert board.topology.rows == 3
+        assert board.topology.cols == 3
+
+    def test_is_inside_delegates_to_the_default_topology(self):
+        board = make_simple_board()
+        assert board.is_inside(0, 0) is True
+        assert board.is_inside(2, 2) is True
+        assert board.is_inside(3, 0) is False
+        assert board.is_inside(-1, 0) is False
+
+    def test_is_inside_delegates_to_an_injected_topology(self):
+        # An extreme fake to prove is_inside genuinely asks the injected
+        # topology rather than still checking rows/cols itself: it
+        # rejects a cell the default rectangular topology would accept.
+        class AlwaysOutsideTopology:
+            def contains(self, row, col):
+                return False
+
+        board = Board([["wR", "."]], topology=AlwaysOutsideTopology())
+        assert board.is_inside(0, 0) is False
+
+    def test_an_injected_topology_can_also_accept_cells_a_rectangle_would_reject(self):
+        class EverySquareTopology:
+            def contains(self, row, col):
+                return True
+
+        board = Board([["wR"]], topology=EverySquareTopology())
+        assert board.is_inside(99, 99) is True
 
 
 class TestSetCell:

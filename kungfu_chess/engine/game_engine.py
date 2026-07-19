@@ -2,6 +2,7 @@ from kungfu_chess.engine.events import MoveResolvedEvent
 from kungfu_chess.realtime.real_time_arbiter import RealTimeArbiter
 from kungfu_chess.rules.rule_engine import RuleEngine
 from kungfu_chess.rules.promotion_rule import PromotionRule
+from kungfu_chess.rules.win_condition import CaptureKingWinCondition
 
 
 class GameEngine:
@@ -21,7 +22,8 @@ class GameEngine:
 
     advance_time(...) drives virtual time forward, resolves arrivals
     atomically (Rule 10), resolves promotion (via PromotionRule) and
-    triggers game_over on a King capture (Rule 11).
+    asks the injected WinCondition (default: CaptureKingWinCondition,
+    Rule 11) whether that arrival just ended the game.
 
     Works purely in grid (row, col) terms - it knows nothing about
     pixels; that translation belongs to BoardMapper. It also knows
@@ -31,7 +33,7 @@ class GameEngine:
     """
 
     def __init__(self, board, jump_duration_ms, rule_engine=None, arbiter=None, event_bus=None,
-                 move_cooldown_ms=None, jump_cooldown_ms=None):
+                 move_cooldown_ms=None, jump_cooldown_ms=None, win_condition=None):
         """rule_engine and arbiter are optional Dependency Injection points
         (tests can supply fakes/stubs here instead of monkeypatching);
         production code omits them and gets the real collaborators.
@@ -40,24 +42,29 @@ class GameEngine:
         needs to supply one; GameEngine has no idea who's listening.
         move_cooldown_ms/jump_cooldown_ms configure the default arbiter's
         post-action cooldown (ignored if an arbiter is injected directly -
-        set them on that arbiter instead)."""
+        set them on that arbiter instead). win_condition is an optional
+        Strategy (see rules/win_condition.py) deciding what ends the
+        game; defaults to CaptureKingWinCondition (Rule 11)."""
         self.board = board
         # TODO(design): Game lifecycle is represented as two plain
         # fields, checked with simple guard clauses in request_move/
         # request_jump. This is intentionally simple and sufficient today
-        # - there is exactly one end condition (King capture, Rule 11)
-        # and no other phase (no pause, no check/checkmate, no replay
-        # state). A State Pattern / explicit finite-state machine would
-        # only be justified if more phases or richer phase-dependent
-        # branching are introduced later; forcing one on today's two
-        # fields would be a pattern applied for its own sake, not because
-        # the branching here needs it.
+        # - there is exactly one active WinCondition at a time and no
+        # other phase (no pause, no check/checkmate, no replay state).
+        # This is a separate concern from *which* condition ends the game
+        # (see win_condition below, already injectable): a State Pattern
+        # / explicit finite-state machine for *how lifecycle state itself
+        # is represented* would only be justified if more phases or
+        # richer phase-dependent branching are introduced later; forcing
+        # one on today's two fields would be a pattern applied for its
+        # own sake, not because the branching here needs it.
         self.game_over = False
         self.winner = None
         self.rule_engine = rule_engine if rule_engine is not None else RuleEngine()
         self.arbiter = arbiter if arbiter is not None else RealTimeArbiter(
             jump_duration_ms, move_cooldown_ms=move_cooldown_ms, jump_cooldown_ms=jump_cooldown_ms)
         self.event_bus = event_bus
+        self.win_condition = win_condition if win_condition is not None else CaptureKingWinCondition()
 
     def has_pending_move_from(self, row, col):
         return self.arbiter.has_pending_move_from(row, col)
@@ -92,6 +99,21 @@ class GameEngine:
             return None
         return motion.to_row, motion.to_col
 
+    # TODO(design): request_move/request_jump are two hardcoded action
+    # shapes - both always resolve to "a piece travels from a source
+    # position to a destination position". Future piece behavior may
+    # need actions that aren't source-to-destination travel at all
+    # (teleport, swap, push, ranged attack, transform, spawn, split, or
+    # an action with no movement component). A polymorphic GameAction
+    # (MoveAction/JumpAction/TransformAction/... - Command Pattern) that
+    # GameEngine executes generically, rather than a dedicated
+    # request_*/schedule_* method pair per action kind, would let a new
+    # action type be added without a new GameEngine method each time.
+    # This is a significant domain-model change (Motion, RealTimeArbiter
+    # and _resolve_motion are all shaped around exactly one kind of
+    # travel today) and should not be built without a concrete second
+    # action type driving its design - speculative action polymorphism
+    # tends to guess wrong about what the second case actually needs.
     def request_move(self, from_row, from_col, to_row, to_col):
         """Returns one of: "game_over", "invalid", "blocked", "scheduled"."""
         if self.game_over:
@@ -146,6 +168,21 @@ class GameEngine:
         # destination instead of landing on it. If that fallback cell is
         # itself occupied (by anyone), it stays at its own source
         # instead of overwriting whatever is there.
+        #
+        # TODO(design): Same-color-arrival ("stop short"), enemy-arrival
+        # ("capture" - see below), and arrival-on-an-airborne-piece
+        # ("mover destroyed") are three different interaction outcomes,
+        # all encoded here as sequential if/return branches rather than
+        # delegated to a single policy. A future InteractionResolver /
+        # CollisionResolver (Strategy) that GameEngine asks "what happens
+        # when this motion arrives here" would let a variant introduce
+        # pushing, swapping, merging, mutual removal, or piece-specific
+        # interactions without editing _resolve_motion. Not extracted
+        # now: this method's branches are not yet isolated enough to pull
+        # apart safely - they share board mutation, cooldown timing and
+        # event publishing in ways a first extraction pass would have to
+        # untangle carefully. High-priority OCP gap, deliberately staged
+        # rather than attempted in this pass.
         if destination is not None and destination.color == piece.color:
             stop_row, stop_col = motion.previous_cell()
             if self.board.get_cell(stop_row, stop_col) is None:
@@ -168,10 +205,17 @@ class GameEngine:
         if destination is not None:
             self.arbiter.cancel_pending_move_from(motion.to_row, motion.to_col)
 
-        # Game Over (Rule 11: exclusively King capture)
-        if destination is not None and destination.is_king():
+        # Game Over: delegated to the injected WinCondition (default
+        # CaptureKingWinCondition, Rule 11) rather than hardcoding
+        # "captured a King" here - see rules/win_condition.py. Asked on
+        # every genuine arrival (destination may be None - a future win
+        # condition like "reached this cell" needs to be asked even
+        # without a capture), never on a friendly-collision stop or an
+        # airborne kill, since neither is a completed arrival.
+        winner = self.win_condition.check(piece, destination, self.board)
+        if winner is not None:
             self.game_over = True
-            self.winner = piece.color
+            self.winner = winner
 
         # Pawn promotion (Rule 6/8: dedicated strategy resolves it on arrival)
         piece = PromotionRule.resolve(piece, motion.to_row, self.board)

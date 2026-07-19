@@ -3,7 +3,21 @@ from kungfu_chess.io.board_validator import BoardValidator
 
 
 class BoardParser:
-
+    # TODO(design): This is the project's one existing example of the
+    # boundary a future variant-loading mechanism would extend: text in,
+    # a domain object out, validated before the engine ever sees it.
+    # Declarative board *layout* (which cells exist, starting piece
+    # placement) is a reasonable fit for simple configuration data (this
+    # text DSL today; JSON/YAML would work the same way) - but piece
+    # *behavior* is not: a genuinely new movement rule is executable
+    # logic (a PieceRule/is_legal implementation), not data, and should
+    # stay registered Python strategy code rather than pushed into a
+    # config format. If runtime/plugin loading ever becomes a real
+    # requirement, it belongs at this parsing boundary - constructing
+    # and registering domain objects - never inside RuleEngine, GameEngine
+    # or Board themselves (Plugin Architecture, Registry/Factory Pattern,
+    # Dependency Injection). Not built now: nothing in this project loads
+    # rules or layouts from outside the codebase yet.
     def parse(self, lines=None):
         """lines is an optional Dependency Injection point: pass an
         iterable of strings to parse directly (used by tests, avoiding

@@ -1,3 +1,20 @@
+# TODO(design): cell_to_pixel/derive_cell_size (and BoardMapper.to_cell,
+# see input/board_mapper.py) all assume equal rectangular cells laid out
+# in a uniform row/col grid - this whole module is one BoardLayout
+# implementation (RectangularGridLayout), not a permanent presentation
+# assumption. A non-rectangular domain board (BoardTopology, see
+# model/board_topology.py) is incomplete if the GUI still assumes a
+# rectangular grid underneath it - an irregular or hex board would need
+# its own IrregularBoardLayout/HexBoardLayout answering
+# position_to_screen(position)/screen_to_position(x, y)/
+# cell_shape(position), with game_loop and legal-move highlighting
+# depending on the injected layout instead of computing rows/cols
+# directly (Strategy Pattern, Adapter Pattern, presentation/domain
+# separation). High-priority OCP gap, required by the same non-
+# rectangular-board goal as BoardTopology - deferred because it is a
+# GUI-wide change (this module, BoardMapper, game_loop's highlight/
+# render loop, hit-testing) and should follow the domain-side topology
+# work rather than be guessed at independently of it.
 def cell_to_pixel(row, col, cell_w, cell_h):
     """The inverse of BoardMapper.to_cell: the top-left pixel of a board
     cell. cell_w/cell_h are always derived by the caller from the actual
