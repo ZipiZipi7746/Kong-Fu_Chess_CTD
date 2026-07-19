@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.server.server_main</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.server_main</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Cserver_main.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\server_main.py</a></td></tr></table>
+    <p><span class="code">Composition&nbsp;root:&nbsp;wires&nbsp;GameService,&nbsp;ApplicationMessageBus&nbsp;and<br>
+WebSocketGateway,&nbsp;runs&nbsp;the&nbsp;periodic&nbsp;hybrid-tick&nbsp;loop&nbsp;(Part&nbsp;10),&nbsp;and&nbsp;starts<br>
+the&nbsp;WebSocket&nbsp;server.&nbsp;Real&nbsp;I/O&nbsp;throughout&nbsp;-&nbsp;excluded&nbsp;from&nbsp;coverage,&nbsp;same<br>
+treatment&nbsp;as&nbsp;gui/game_loop.py&nbsp;and&nbsp;BoardParser._read_stdin.&nbsp;Verified&nbsp;by&nbsp;the<br>
+manual&nbsp;end-to-end&nbsp;walkthrough&nbsp;in&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;Part&nbsp;15,&nbsp;not&nbsp;by<br>
+unit&nbsp;tests.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+</td><td class="multicolumn"><a href="logging.html">logging</a><br>
+</td><td class="multicolumn"><a href="websockets.html">websockets</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-main"><strong>main</strong></a>()</dt></dl>
+ <dl><dt>async <a name="-run"><strong>run</strong></a>(host='localhost', port=8765)</dt></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>HOST</strong> = 'localhost'<br>
+<strong>PORT</strong> = 8765<br>
+<strong>TICK_INTERVAL_MS</strong> = 75</td></tr></table>
+</body></html>

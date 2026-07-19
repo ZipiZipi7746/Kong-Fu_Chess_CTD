@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.server.reference_client</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.reference_client</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Creference_client.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\reference_client.py</a></td></tr></table>
+    <p><span class="code">Throwaway&nbsp;Phase&nbsp;A&nbsp;reference&nbsp;client&nbsp;-&nbsp;validates&nbsp;the&nbsp;WebSocket&nbsp;protocol<br>
+end&nbsp;to&nbsp;end&nbsp;from&nbsp;a&nbsp;real&nbsp;process.&nbsp;This&nbsp;is&nbsp;NOT&nbsp;the&nbsp;eventual&nbsp;GUI&nbsp;network<br>
+client&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;Phase&nbsp;F&nbsp;for&nbsp;that&nbsp;staged&nbsp;migration);<br>
+it&nbsp;exists&nbsp;only&nbsp;to&nbsp;drive&nbsp;server_main.py&nbsp;manually&nbsp;for&nbsp;the&nbsp;Part&nbsp;15<br>
+acceptance&nbsp;walkthrough.&nbsp;Real&nbsp;I/O&nbsp;throughout&nbsp;-&nbsp;excluded&nbsp;from&nbsp;coverage,<br>
+verified&nbsp;by&nbsp;running&nbsp;it,&nbsp;not&nbsp;by&nbsp;unit&nbsp;tests.<br>
+&nbsp;<br>
+Prompts&nbsp;for&nbsp;a&nbsp;username&nbsp;only&nbsp;(no&nbsp;password&nbsp;-&nbsp;Phase&nbsp;A's&nbsp;staged&nbsp;auth),&nbsp;joins<br>
+the&nbsp;shared&nbsp;quick_local&nbsp;game,&nbsp;and&nbsp;accepts&nbsp;moves&nbsp;as&nbsp;compact&nbsp;algebraic<br>
+shorthand&nbsp;("e2e4")&nbsp;typed&nbsp;at&nbsp;the&nbsp;prompt&nbsp;-&nbsp;parsed&nbsp;locally&nbsp;into&nbsp;the<br>
+from_row/from_col/to_row/to_col&nbsp;JSON&nbsp;payload&nbsp;the&nbsp;server&nbsp;actually&nbsp;expects.<br>
+The&nbsp;wire&nbsp;protocol&nbsp;itself&nbsp;is&nbsp;JSON&nbsp;throughout;&nbsp;the&nbsp;shorthand&nbsp;is&nbsp;purely&nbsp;this<br>
+client's&nbsp;own&nbsp;input&nbsp;convenience&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;JSON-vs-<br>
+shorthand&nbsp;decision).</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+<a href="json.html">json</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+<a href="sys.html">sys</a><br>
+</td><td class="multicolumn"><a href="websockets.html">websockets</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-main"><strong>main</strong></a>()</dt></dl>
+ <dl><dt><a name="-parse_move"><strong>parse_move</strong></a>(text)</dt></dl>
+ <dl><dt>async <a name="-receive_loop"><strong>receive_loop</strong></a>(websocket, state)</dt></dl>
+ <dl><dt><a name="-render_board"><strong>render_board</strong></a>(board_rows)</dt></dl>
+ <dl><dt>async <a name="-send_loop"><strong>send_loop</strong></a>(websocket, state)</dt></dl>
+ <dl><dt><a name="-square_to_cell"><strong>square_to_cell</strong></a>(square)</dt></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>SERVER_URL</strong> = 'ws://localhost:8765'</td></tr></table>
+</body></html>

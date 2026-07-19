@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.server.websocket_gateway</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.websocket_gateway</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Cwebsocket_gateway.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\websocket_gateway.py</a></td></tr></table>
+    <p><span class="code">Accepts&nbsp;WebSocket&nbsp;connections,&nbsp;reads/writes&nbsp;JSON&nbsp;frames,&nbsp;delegates<br>
+every&nbsp;command&nbsp;to&nbsp;GameService&nbsp;-&nbsp;zero&nbsp;rule&nbsp;logic&nbsp;of&nbsp;its&nbsp;own.&nbsp;Never&nbsp;imports<br>
+kungfu_chess.model,&nbsp;kungfu_chess.rules,&nbsp;or&nbsp;kungfu_chess.realtime&nbsp;directly<br>
+(the&nbsp;architecture&nbsp;plan's&nbsp;forbidden-imports&nbsp;rule);&nbsp;board&nbsp;state&nbsp;only&nbsp;ever<br>
+reaches&nbsp;this&nbsp;module&nbsp;already&nbsp;serialized,&nbsp;via&nbsp;application.dto.<br>
+&nbsp;<br>
+Phase&nbsp;A&nbsp;has&nbsp;no&nbsp;matchmaking&nbsp;or&nbsp;rooms&nbsp;yet:&nbsp;join_game's&nbsp;only&nbsp;supported&nbsp;mode<br>
+is&nbsp;"quick_local"&nbsp;-&nbsp;the&nbsp;first&nbsp;connection&nbsp;to&nbsp;request&nbsp;it&nbsp;waits,&nbsp;the&nbsp;second<br>
+pairs&nbsp;with&nbsp;it&nbsp;(first&nbsp;=&nbsp;White,&nbsp;second&nbsp;=&nbsp;Black)&nbsp;and&nbsp;a&nbsp;GameSession&nbsp;is<br>
+created&nbsp;immediately.&nbsp;Phases&nbsp;C/E&nbsp;replace&nbsp;this&nbsp;with&nbsp;real&nbsp;matchmaking/room<br>
+assignment&nbsp;without&nbsp;changing&nbsp;anything&nbsp;below&nbsp;the&nbsp;join_game&nbsp;handler&nbsp;itself.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+<a href="kungfu_chess.application.dto.html">kungfu_chess.application.dto</a><br>
+</td><td class="multicolumn"><a href="logging.html">logging</a><br>
+<a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+</td><td class="multicolumn"><a href="uuid.html">uuid</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.server.websocket_gateway.html#WebSocketGateway">WebSocketGateway</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="WebSocketGateway">class <strong>WebSocketGateway</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#WebSocketGateway">WebSocketGateway</a>(game_service,&nbsp;message_bus,&nbsp;connection_manager=None)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="WebSocketGateway-__init__"><strong>__init__</strong></a>(self, game_service, message_bus, connection_manager=None)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt>async <a name="WebSocketGateway-handle_connection"><strong>handle_connection</strong></a>(self, websocket)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>logger</strong> = &lt;VerboseLogger kungfu_chess.server.websocket_gateway (WARNING)&gt;</td></tr></table>
+</body></html>

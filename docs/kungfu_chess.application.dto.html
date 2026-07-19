@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.application.dto</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.application.html" class="white">application</a>.dto</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Capplication%5Cdto.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\application\dto.py</a></td></tr></table>
+    <p><span class="code">Domain&nbsp;&lt;-&gt;&nbsp;application&nbsp;DTO&nbsp;mapping&nbsp;-&nbsp;kept&nbsp;distinct&nbsp;from&nbsp;server/schemas.py<br>
+(network&nbsp;&lt;-&gt;&nbsp;application),&nbsp;per&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;Part&nbsp;4:&nbsp;two&nbsp;separate<br>
+translation&nbsp;layers,&nbsp;not&nbsp;collapsed&nbsp;into&nbsp;one.&nbsp;This&nbsp;module&nbsp;is&nbsp;the&nbsp;only&nbsp;place<br>
+that&nbsp;reads&nbsp;BoardRenderer/GameSession/GameEngine&nbsp;to&nbsp;build&nbsp;a&nbsp;JSON-serializable<br>
+snapshot;&nbsp;server/websocket_gateway.py&nbsp;just&nbsp;wraps&nbsp;whatever&nbsp;this&nbsp;returns&nbsp;into<br>
+a&nbsp;schemas&nbsp;envelope,&nbsp;never&nbsp;touching&nbsp;Board/BoardRenderer&nbsp;itself.</span></p>
+<p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-build_state_snapshot"><strong>build_state_snapshot</strong></a>(session)</dt></dl>
+</td></tr></table>
+</body></html>

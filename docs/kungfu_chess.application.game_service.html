@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.application.game_service</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.application.html" class="white">application</a>.game_service</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Capplication%5Cgame_service.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\application\game_service.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="itertools.html">itertools</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.application.game_service.html#GameService">GameService</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="GameService">class <strong>GameService</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameService">GameService</a>(message_bus)<br>
+&nbsp;<br>
+The&nbsp;single&nbsp;place&nbsp;a&nbsp;network&nbsp;move/jump&nbsp;command&nbsp;becomes&nbsp;a&nbsp;call&nbsp;into<br>
+GameEngine&nbsp;(Part&nbsp;8&nbsp;of&nbsp;the&nbsp;architecture&nbsp;plan)&nbsp;-&nbsp;the&nbsp;server's<br>
+equivalent&nbsp;of&nbsp;GameController,&nbsp;calling&nbsp;GameEngine&nbsp;directly&nbsp;rather&nbsp;than<br>
+GameController.click/jump&nbsp;(see&nbsp;the&nbsp;plan's&nbsp;verified&nbsp;reason:&nbsp;click()<br>
+is&nbsp;a&nbsp;pixel/single-selection&nbsp;abstraction&nbsp;with&nbsp;no&nbsp;place&nbsp;for&nbsp;two<br>
+independent&nbsp;remote&nbsp;players).<br>
+&nbsp;<br>
+Owns&nbsp;the&nbsp;GameSession&nbsp;registry&nbsp;itself&nbsp;(Phase&nbsp;A&nbsp;has&nbsp;no&nbsp;GameRepository<br>
+yet);&nbsp;publishes&nbsp;to&nbsp;the&nbsp;injected&nbsp;ApplicationMessageBus&nbsp;and&nbsp;subscribes<br>
+to&nbsp;each&nbsp;session's&nbsp;own&nbsp;per-game&nbsp;EventBus&nbsp;to&nbsp;translate&nbsp;domain&nbsp;events<br>
+(MoveResolvedEvent/GameOverEvent)&nbsp;into&nbsp;application&nbsp;events<br>
+(GameMoveAppliedEvent/GameEndedEvent).&nbsp;GameStartedEvent&nbsp;has&nbsp;no&nbsp;domain<br>
+event&nbsp;to&nbsp;translate&nbsp;-&nbsp;GameEngine&nbsp;has&nbsp;no&nbsp;"not&nbsp;started"&nbsp;state&nbsp;-&nbsp;so&nbsp;it&nbsp;is<br>
+published&nbsp;directly&nbsp;by&nbsp;<a href="#GameService-create_session">create_session</a>()&nbsp;at&nbsp;session-creation&nbsp;time.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="GameService-__init__"><strong>__init__</strong></a>(self, message_bus)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="GameService-create_session"><strong>create_session</strong></a>(
+    self,
+    white,
+    black,
+    board=None,
+    jump_duration_ms=1000,
+    move_cooldown_ms=None,
+    jump_cooldown_ms=None
+)</dt></dl>
+
+<dl><dt><a name="GameService-get_session"><strong>get_session</strong></a>(self, game_id)</dt></dl>
+
+<dl><dt>async <a name="GameService-handle_jump_request"><strong>handle_jump_request</strong></a>(self, game_id, requester, row, col)</dt></dl>
+
+<dl><dt>async <a name="GameService-handle_move_request"><strong>handle_move_request</strong></a>(
+    self,
+    game_id,
+    requester,
+    from_row,
+    from_col,
+    to_row,
+    to_col
+)</dt></dl>
+
+<dl><dt><a name="GameService-sessions"><strong>sessions</strong></a>(self)</dt><dd><span class="code">A&nbsp;snapshot&nbsp;copy&nbsp;of&nbsp;the&nbsp;session&nbsp;registry,&nbsp;keyed&nbsp;by&nbsp;game_id&nbsp;-<br>
+used&nbsp;by&nbsp;server_main.py's&nbsp;periodic&nbsp;tick&nbsp;loop&nbsp;to&nbsp;decide&nbsp;which<br>
+sessions&nbsp;still&nbsp;need&nbsp;advance_time&nbsp;(Part&nbsp;10's&nbsp;hybrid&nbsp;design).&nbsp;A<br>
+copy,&nbsp;not&nbsp;the&nbsp;live&nbsp;dict,&nbsp;so&nbsp;the&nbsp;loop&nbsp;can&nbsp;safely&nbsp;iterate&nbsp;it&nbsp;while<br>
+create_session&nbsp;runs&nbsp;concurrently&nbsp;elsewhere.</span></dd></dl>
+
+<dl><dt>async <a name="GameService-tick"><strong>tick</strong></a>(self, game_id, elapsed_ms)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

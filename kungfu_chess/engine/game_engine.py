@@ -1,4 +1,4 @@
-from kungfu_chess.engine.events import MoveResolvedEvent
+from kungfu_chess.engine.events import GameOverEvent, MoveResolvedEvent
 from kungfu_chess.realtime.real_time_arbiter import RealTimeArbiter
 from kungfu_chess.rules.rule_engine import RuleEngine
 from kungfu_chess.rules.promotion_rule import PromotionRule
@@ -224,6 +224,12 @@ class GameEngine:
             self.event_bus.publish(MoveResolvedEvent(
                 motion.from_row, motion.from_col, motion.to_row, motion.to_col,
                 piece, destination, timestamp_ms=self.arbiter.clock))
+            # Published after MoveResolvedEvent, not instead of it: this
+            # arrival is still a completed move (that event fires
+            # unchanged) which also happens to end the game - a listener
+            # sees "the move happened" before "the game just ended".
+            if winner is not None:
+                self.event_bus.publish(GameOverEvent(winner, timestamp_ms=self.arbiter.clock))
 
         self.arbiter.start_move_cooldown(motion.to_row, motion.to_col)
 

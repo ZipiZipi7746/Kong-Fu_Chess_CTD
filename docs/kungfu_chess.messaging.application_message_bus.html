@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.messaging.application_message_bus</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.messaging.html" class="white">messaging</a>.application_message_bus</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cmessaging%5Capplication_message_bus.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\messaging\application_message_bus.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="logging.html">logging</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.messaging.application_message_bus.html#ApplicationMessageBus">ApplicationMessageBus</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="ApplicationMessageBus">class <strong>ApplicationMessageBus</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code">Server-wide&nbsp;in-memory&nbsp;pub/sub,&nbsp;a&nbsp;sibling&nbsp;to&nbsp;engine/events.EventBus<br>
+(one&nbsp;EventBus&nbsp;per&nbsp;game;&nbsp;one&nbsp;<a href="#ApplicationMessageBus">ApplicationMessageBus</a>&nbsp;for&nbsp;the&nbsp;whole<br>
+server).&nbsp;Unlike&nbsp;EventBus,&nbsp;subscribers&nbsp;register&nbsp;for&nbsp;a&nbsp;specific&nbsp;event<br>
+type&nbsp;rather&nbsp;than&nbsp;receiving&nbsp;everything&nbsp;and&nbsp;filtering&nbsp;with&nbsp;isinstance&nbsp;-<br>
+the&nbsp;server&nbsp;has&nbsp;many&nbsp;more&nbsp;event&nbsp;types&nbsp;and&nbsp;consumers&nbsp;than&nbsp;a&nbsp;single<br>
+game's&nbsp;small,&nbsp;fixed&nbsp;subscriber&nbsp;set.<br>
+&nbsp;<br>
+A&nbsp;handler&nbsp;raising&nbsp;is&nbsp;logged&nbsp;and&nbsp;isolated&nbsp;(Risk&nbsp;Register:&nbsp;"Message&nbsp;Bus<br>
+handler&nbsp;failure")&nbsp;-&nbsp;one&nbsp;broken&nbsp;consumer&nbsp;(e.g.&nbsp;a&nbsp;crashed&nbsp;WebSocket<br>
+write)&nbsp;must&nbsp;never&nbsp;stop&nbsp;other&nbsp;consumers&nbsp;of&nbsp;the&nbsp;same&nbsp;event,&nbsp;or&nbsp;stop<br>
+later&nbsp;publishes&nbsp;entirely.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="ApplicationMessageBus-__init__"><strong>__init__</strong></a>(self)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="ApplicationMessageBus-publish"><strong>publish</strong></a>(self, event)</dt></dl>
+
+<dl><dt><a name="ApplicationMessageBus-subscribe"><strong>subscribe</strong></a>(self, event_type, callback)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>logger</strong> = &lt;VerboseLogger kungfu_chess.messaging.application_message_bus (WARNING)&gt;</td></tr></table>
+</body></html>

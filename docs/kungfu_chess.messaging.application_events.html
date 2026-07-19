@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.messaging.application_events</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.messaging.html" class="white">messaging</a>.application_events</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cmessaging%5Capplication_events.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\messaging\application_events.py</a></td></tr></table>
+    <p><span class="code">Application-level&nbsp;events:&nbsp;server-wide,&nbsp;cross-cutting,&nbsp;and&nbsp;distinct&nbsp;from<br>
+both&nbsp;engine/events.py's&nbsp;domain&nbsp;events&nbsp;(scoped&nbsp;to&nbsp;one&nbsp;GameEngine/EventBus,<br>
+no&nbsp;game_id/user_id)&nbsp;and&nbsp;server/schemas.py's&nbsp;network&nbsp;JSON&nbsp;messages&nbsp;(no<br>
+Python&nbsp;objects).&nbsp;Published/consumed&nbsp;only&nbsp;through&nbsp;ApplicationMessageBus.<br>
+&nbsp;<br>
+This&nbsp;is&nbsp;the&nbsp;Phase&nbsp;A&nbsp;subset&nbsp;only&nbsp;-&nbsp;GameService's&nbsp;own&nbsp;lifecycle&nbsp;moments<br>
+(<a href="#GameStartedEvent">GameStartedEvent</a>)&nbsp;plus&nbsp;its&nbsp;translations&nbsp;of&nbsp;GameEngine's&nbsp;domain&nbsp;events<br>
+(<a href="#GameMoveAppliedEvent">GameMoveAppliedEvent</a>/<a href="#MoveRejectedEvent">MoveRejectedEvent</a>&nbsp;from&nbsp;MoveResolvedEvent-shaped<br>
+outcomes,&nbsp;<a href="#GameEndedEvent">GameEndedEvent</a>&nbsp;from&nbsp;GameOverEvent).&nbsp;Room/matchmaking/connection<br>
+events&nbsp;(PlayerJoinedRoomEvent,&nbsp;MatchFoundEvent,&nbsp;PlayerDisconnectedEvent,<br>
+AutoResignAppliedEvent,&nbsp;RatingUpdatedEvent)&nbsp;belong&nbsp;to&nbsp;their&nbsp;own&nbsp;later<br>
+phases&nbsp;and&nbsp;are&nbsp;added&nbsp;following&nbsp;this&nbsp;same&nbsp;pattern&nbsp;when&nbsp;those&nbsp;phases&nbsp;start,<br>
+not&nbsp;built&nbsp;ahead&nbsp;of&nbsp;a&nbsp;consumer&nbsp;that&nbsp;needs&nbsp;them.</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.messaging.application_events.html#GameEndedEvent">GameEndedEvent</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.messaging.application_events.html#GameMoveAppliedEvent">GameMoveAppliedEvent</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.messaging.application_events.html#GameStartedEvent">GameStartedEvent</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.messaging.application_events.html#MoveRejectedEvent">MoveRejectedEvent</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="GameEndedEvent">class <strong>GameEndedEvent</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameEndedEvent">GameEndedEvent</a>(game_id,&nbsp;winner,&nbsp;timestamp_ms=0)<br>
+&nbsp;<br>
+GameService's&nbsp;translation&nbsp;of&nbsp;a&nbsp;domain&nbsp;GameOverEvent,&nbsp;with&nbsp;game_id<br>
+attached.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="GameEndedEvent-__init__"><strong>__init__</strong></a>(self, game_id, winner, timestamp_ms=0)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="GameMoveAppliedEvent">class <strong>GameMoveAppliedEvent</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameMoveAppliedEvent">GameMoveAppliedEvent</a>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;game_id,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from_row,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;from_col,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;to_row,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;to_col,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;moving_piece,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;captured_piece=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;timestamp_ms=0<br>
+)<br>
+&nbsp;<br>
+GameService's&nbsp;translation&nbsp;of&nbsp;a&nbsp;domain&nbsp;MoveResolvedEvent,&nbsp;with<br>
+game_id&nbsp;attached.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="GameMoveAppliedEvent-__init__"><strong>__init__</strong></a>(
+    self,
+    game_id,
+    from_row,
+    from_col,
+    to_row,
+    to_col,
+    moving_piece,
+    captured_piece=None,
+    timestamp_ms=0
+)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="GameStartedEvent">class <strong>GameStartedEvent</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameStartedEvent">GameStartedEvent</a>(game_id,&nbsp;white,&nbsp;black,&nbsp;timestamp_ms=0)<br>
+&nbsp;<br>
+Published&nbsp;by&nbsp;GameService&nbsp;itself&nbsp;at&nbsp;session-creation&nbsp;time&nbsp;-&nbsp;see<br>
+game_engine.py's&nbsp;docstring&nbsp;note:&nbsp;GameEngine&nbsp;has&nbsp;no&nbsp;"not&nbsp;started&nbsp;yet"<br>
+state,&nbsp;so&nbsp;this&nbsp;is&nbsp;not&nbsp;a&nbsp;translation&nbsp;of&nbsp;any&nbsp;domain&nbsp;event.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="GameStartedEvent-__init__"><strong>__init__</strong></a>(self, game_id, white, black, timestamp_ms=0)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="MoveRejectedEvent">class <strong>MoveRejectedEvent</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#MoveRejectedEvent">MoveRejectedEvent</a>(game_id,&nbsp;user_id,&nbsp;reason,&nbsp;timestamp_ms=0)<br>
+&nbsp;<br>
+Published&nbsp;by&nbsp;GameService&nbsp;itself&nbsp;(not&nbsp;a&nbsp;domain-event&nbsp;translation&nbsp;-<br>
+GameEngine.request_move's&nbsp;rejection&nbsp;is&nbsp;a&nbsp;return&nbsp;value,&nbsp;not&nbsp;an&nbsp;event)<br>
+when&nbsp;a&nbsp;move/jump&nbsp;command&nbsp;is&nbsp;rejected,&nbsp;so&nbsp;the&nbsp;gateway&nbsp;can&nbsp;notify&nbsp;only<br>
+the&nbsp;requesting&nbsp;connection.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="MoveRejectedEvent-__init__"><strong>__init__</strong></a>(self, game_id, user_id, reason, timestamp_ms=0)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

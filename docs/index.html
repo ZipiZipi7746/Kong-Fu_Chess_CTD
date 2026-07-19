@@ -57,7 +57,38 @@
   <ul>
     <li><a href="kungfu_chess.engine.html">kungfu_chess.engine</a></li>
     <li><a href="kungfu_chess.engine.game_engine.html">kungfu_chess.engine.game_engine</a> &mdash; <code>GameEngine</code></li>
-    <li><a href="kungfu_chess.engine.events.html">kungfu_chess.engine.events</a> &mdash; <code>MoveResolvedEvent</code>, <code>EventBus</code></li>
+    <li><a href="kungfu_chess.engine.events.html">kungfu_chess.engine.events</a> &mdash; <code>MoveResolvedEvent</code>, <code>GameOverEvent</code>, <code>EventBus</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Application (server-side orchestration, Phase A)</h2>
+  <ul>
+    <li><a href="kungfu_chess.application.html">kungfu_chess.application</a></li>
+    <li><a href="kungfu_chess.application.game_session.html">kungfu_chess.application.game_session</a> &mdash; <code>GameSession</code></li>
+    <li><a href="kungfu_chess.application.game_service.html">kungfu_chess.application.game_service</a> &mdash; <code>GameService</code></li>
+    <li><a href="kungfu_chess.application.dto.html">kungfu_chess.application.dto</a> &mdash; domain &harr; application DTO mapping</li>
+  </ul>
+</section>
+
+<section>
+  <h2>Messaging (application-wide pub/sub, sibling to engine/events.py)</h2>
+  <ul>
+    <li><a href="kungfu_chess.messaging.html">kungfu_chess.messaging</a></li>
+    <li><a href="kungfu_chess.messaging.application_message_bus.html">kungfu_chess.messaging.application_message_bus</a> &mdash; <code>ApplicationMessageBus</code></li>
+    <li><a href="kungfu_chess.messaging.application_events.html">kungfu_chess.messaging.application_events</a> &mdash; <code>GameStartedEvent</code>, <code>GameMoveAppliedEvent</code>, <code>MoveRejectedEvent</code>, <code>GameEndedEvent</code></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Server (WebSocket gateway, Phase A)</h2>
+  <ul>
+    <li><a href="kungfu_chess.server.html">kungfu_chess.server</a></li>
+    <li><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a> &mdash; JSON envelope (de)serialization</li>
+    <li><a href="kungfu_chess.server.connection_manager.html">kungfu_chess.server.connection_manager</a> &mdash; <code>ConnectionManager</code></li>
+    <li><a href="kungfu_chess.server.websocket_gateway.html">kungfu_chess.server.websocket_gateway</a> &mdash; <code>WebSocketGateway</code></li>
+    <li><a href="kungfu_chess.server.server_main.html">kungfu_chess.server.server_main</a> &mdash; composition root, real I/O, not unit tested</li>
+    <li><a href="kungfu_chess.server.reference_client.html">kungfu_chess.server.reference_client</a> &mdash; throwaway Phase A reference client, not the eventual GUI client</li>
   </ul>
 </section>
 
@@ -110,6 +141,7 @@
   <ul>
     <li><a href="kungfu_chess.main.html">kungfu_chess.main</a> &mdash; text-DSL entrypoint</li>
     <li><a href="kungfu_chess.gui.gui_main.html">kungfu_chess.gui.gui_main</a> &mdash; graphical entrypoint</li>
+    <li><a href="kungfu_chess.server.server_main.html">kungfu_chess.server.server_main</a> &mdash; multiplayer WebSocket server entrypoint (Phase A)</li>
   </ul>
 </section>
 </body>

@@ -1,6 +1,6 @@
 from kungfu_chess.model.board import Board
 from kungfu_chess.model.piece import Piece
-from kungfu_chess.engine.events import EventBus
+from kungfu_chess.engine.events import EventBus, GameOverEvent, MoveResolvedEvent
 from kungfu_chess.engine.game_engine import GameEngine
 
 
@@ -609,3 +609,86 @@ class TestEventPublishing:
         # merely stopped in place, it didn't complete a move.
         assert len(received) == 1
         assert (received[0].from_row, received[0].from_col) == (0, 0)
+
+
+class TestGameOverEventPublishing:
+    def test_king_capture_publishes_game_over_event_exactly_once(self):
+        board = make_board([["wR", "bK"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+
+        game_over_events = [e for e in received if isinstance(e, GameOverEvent)]
+        assert len(game_over_events) == 1
+        assert game_over_events[0].winner == "w"
+        assert game_over_events[0].timestamp_ms == 1000
+
+    def test_capturing_non_king_does_not_publish_game_over_event(self):
+        board = make_board([["wR", "bR"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+
+        assert [e for e in received if isinstance(e, GameOverEvent)] == []
+
+    def test_move_resolved_event_still_publishes_alongside_game_over_event(self):
+        # The King-capture arrival is still a completed move - both
+        # events fire for it, MoveResolvedEvent unchanged and
+        # GameOverEvent newly added, not one replacing the other.
+        board = make_board([["wR", "bK"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+
+        assert len(received) == 2
+        assert isinstance(received[0], MoveResolvedEvent)
+        assert isinstance(received[1], GameOverEvent)
+
+    def test_friendly_collision_stop_does_not_publish_game_over_event(self):
+        board = make_board([["wR", ".", "wR"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.request_move(0, 0, 0, 1)
+        engine.request_move(0, 2, 0, 1)
+        engine.advance_time(1000)
+
+        assert [e for e in received if isinstance(e, GameOverEvent)] == []
+
+    def test_no_event_bus_is_fine_on_a_king_capture(self):
+        board = make_board([["wR", "bK"]])
+        engine = GameEngine(board, jump_duration_ms=1000)  # no event_bus
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)  # must not raise
+        assert engine.game_over is True
+
+    def test_injected_win_condition_not_declaring_a_winner_publishes_no_game_over_event(self):
+        class NeverWinCondition:
+            def check(self, moving_piece, captured_piece, board):
+                return None
+
+        board = make_board([["wR", "bK"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(
+            board, jump_duration_ms=1000, event_bus=bus, win_condition=NeverWinCondition())
+
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)
+
+        assert [e for e in received if isinstance(e, GameOverEvent)] == []

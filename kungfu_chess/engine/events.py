@@ -14,6 +14,19 @@ class MoveResolvedEvent:
         self.timestamp_ms = timestamp_ms
 
 
+class GameOverEvent:
+    """Published the instant a resolved arrival's injected WinCondition
+    (see rules/win_condition.py) declares a winner - i.e. exactly when
+    GameEngine.game_over transitions from False to True. Carries only
+    domain values (no game_id/user_id - those are an application-layer
+    concern, added by whatever translates this into a network message),
+    same design as MoveResolvedEvent."""
+
+    def __init__(self, winner, timestamp_ms=0):
+        self.winner = winner
+        self.timestamp_ms = timestamp_ms
+
+
 class EventBus:
     """Minimal Subject/Observer hub: GameEngine publishes, anything
     (a moves-log, a score tracker, a sound effect later) subscribes.

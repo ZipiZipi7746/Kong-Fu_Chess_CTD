@@ -1,4 +1,4 @@
-from kungfu_chess.engine.events import EventBus, MoveResolvedEvent
+from kungfu_chess.engine.events import EventBus, MoveResolvedEvent, GameOverEvent
 
 
 class TestEventBus:
@@ -49,3 +49,17 @@ class TestMoveResolvedEvent:
     def test_stores_timestamp_ms_when_given(self):
         event = MoveResolvedEvent(0, 0, 0, 1, moving_piece="wR", timestamp_ms=4000)
         assert event.timestamp_ms == 4000
+
+
+class TestGameOverEvent:
+    def test_stores_winner(self):
+        event = GameOverEvent(winner="w")
+        assert event.winner == "w"
+
+    def test_timestamp_ms_defaults_to_zero(self):
+        event = GameOverEvent(winner="b")
+        assert event.timestamp_ms == 0
+
+    def test_stores_timestamp_ms_when_given(self):
+        event = GameOverEvent(winner="b", timestamp_ms=5000)
+        assert event.timestamp_ms == 5000

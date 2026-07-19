@@ -1,4 +1,6 @@
 pytest
 pytest-cov
+pytest-asyncio
 opencv-python
 numpy
+websockets
