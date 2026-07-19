@@ -6,22 +6,26 @@ class PromotionRule:
     Resolves whether a piece that just arrived at its destination should
     be promoted, and returns the resulting piece. Called by GameEngine
     upon Motion arrival (Rule 8).
+
+    The promotion target defaults to Queen (DEFAULT_PROMOTION_KIND),
+    matching standard chess, but is an overridable parameter rather than
+    an inline literal - a variant needing a different target (or
+    eventually player-choice promotion) can pass promotion_kind without
+    editing this class (configuration over hard coding, Open/Closed).
+    Promotion *rows* are left as standard-chess assumptions (row 0 for
+    White, the last row for Black - the latter already derived from
+    board.rows rather than hardcoded): this project has no variant with
+    a different promotion rank, so parameterizing rows too would be
+    speculative until one exists.
     """
 
-    # TODO(design): The promotion target ("Q") is hardcoded here, and the
-    # promotion rows are standard-chess assumptions (row 0 for White, the
-    # last row for Black). Injecting the promotion kind/rows (or sourcing
-    # them from a future PieceDefinition registry, see the TODO on
-    # Piece.kind) would let a variant configure "promote to Queen only"
-    # vs. player-choice promotion, or a differently-shaped board, without
-    # editing this class (Strategy Pattern, configuration over hard
-    # coding, Open/Closed). Left hardcoded for this iteration: standard
-    # chess promotion is the only rule this project needs right now, and
-    # configurability would be speculative until a variant requires it.
+    DEFAULT_PROMOTION_KIND = "Q"
+
     @staticmethod
-    def resolve(piece, to_row, board):
+    def resolve(piece, to_row, board, promotion_kind=None):
+        kind = promotion_kind if promotion_kind is not None else PromotionRule.DEFAULT_PROMOTION_KIND
         if piece.color == "w" and piece.is_pawn() and to_row == 0:
-            return Piece("w", "Q")
+            return Piece("w", kind)
         if piece.color == "b" and piece.is_pawn() and to_row == board.rows - 1:
-            return Piece("b", "Q")
+            return Piece("b", kind)
         return piece

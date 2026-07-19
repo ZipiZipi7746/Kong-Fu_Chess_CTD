@@ -2,6 +2,8 @@ import subprocess
 import sys
 import textwrap
 
+import pytest
+
 from kungfu_chess.main import run
 
 
@@ -35,6 +37,17 @@ class TestRun:
         ])
         out = capsys.readouterr().out
         assert out.startswith("ERROR ")
+
+    def test_an_unrelated_value_error_propagates_instead_of_being_swallowed(self):
+        # Regression test for narrowing run()'s catch from ValueError to
+        # GameInputError (see model/exceptions.py): a malformed command
+        # (not a malformed board) makes int() raise a plain ValueError
+        # inside commands.parse_command - that used to be silently
+        # swallowed and printed as a board-parsing "ERROR" by the old
+        # bare "except ValueError". It's a real bug/bad-input signal,
+        # not a BoardParsingError, so it must now propagate instead.
+        with pytest.raises(ValueError):
+            run(["Board:", "wR .", "Commands:", "click abc def"])
 
     def test_click_wait_and_capture_flow_end_to_end(self, capsys):
         run([

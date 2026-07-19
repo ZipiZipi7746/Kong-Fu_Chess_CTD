@@ -11,7 +11,7 @@ class BoardRenderer:
         e.g. [["wR", ".", "bK"], ...]."""
         return [
             [str(piece) if piece else "." for piece in row]
-            for row in board.cells
+            for row in board.iter_rows()
         ]
 
     @staticmethod

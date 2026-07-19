@@ -7,13 +7,39 @@ def board_from_rows(rows):
     return Board(rows)
 
 
-# TODO(test): If PIECE_RULES is ever injected through RuleEngine's
-# constructor instead of imported as a module global (see the TODO in
-# rule_engine.py), a test constructing RuleEngine(rule_registry={...a
-# minimal fake...}) and asserting is_legal() consults the injected
-# registry rather than the real PIECE_RULES would prove that seam
-# actually works, the same way GameEngine's injected-arbiter/rule_engine
-# tests do today.
+class TestRuleRegistryInjection:
+    def test_default_constructor_uses_the_real_piece_rules(self):
+        board = board_from_rows([["wR", "."]])
+        engine = RuleEngine()
+        rook = board.get_cell(0, 0)
+        assert engine.is_legal(rook, 0, 0, 0, 1, board) is True
+
+    def test_injected_registry_is_consulted_instead_of_the_real_one(self):
+        class AlwaysLegalRule:
+            requires_clear_path = False
+
+            def is_legal(self, piece, from_row, from_col, to_row, to_col, board):
+                return True
+
+        board = board_from_rows([
+            ["wR", ".", "."],
+            [".", ".", "."],
+            [".", ".", "."],
+        ])
+        engine = RuleEngine(rule_registry={"R": AlwaysLegalRule()})
+        rook = board.get_cell(0, 0)
+        # A real RookRule would reject a diagonal move; the injected fake
+        # approves everything, proving is_legal() actually consults the
+        # registry it was constructed with rather than the module global.
+        assert engine.is_legal(rook, 0, 0, 2, 2, board) is True
+
+    def test_kind_missing_from_the_injected_registry_is_illegal(self):
+        board = board_from_rows([["wR", "."]])
+        engine = RuleEngine(rule_registry={})
+        rook = board.get_cell(0, 0)
+        assert engine.is_legal(rook, 0, 0, 0, 1, board) is False
+
+
 class TestIsLegalGeneral:
     def test_same_from_and_to_cell_is_illegal(self):
         board = board_from_rows([["wR", "."], [".", "."]])

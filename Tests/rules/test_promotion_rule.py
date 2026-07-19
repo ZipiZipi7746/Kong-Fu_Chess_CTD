@@ -51,3 +51,18 @@ class TestResolve:
         pawn = Piece("w", "P")
         result = PromotionRule.resolve(pawn, board.rows - 1, board)
         assert result is pawn
+
+    def test_promotion_kind_defaults_to_queen(self):
+        assert PromotionRule.DEFAULT_PROMOTION_KIND == "Q"
+
+    def test_explicit_promotion_kind_overrides_the_default(self):
+        board = make_board()
+        pawn = Piece("w", "P")
+        result = PromotionRule.resolve(pawn, 0, board, promotion_kind="N")
+        assert result == Piece("w", "N")
+
+    def test_explicit_promotion_kind_has_no_effect_when_not_promoting(self):
+        board = make_board()
+        pawn = Piece("w", "P")
+        result = PromotionRule.resolve(pawn, 3, board, promotion_kind="N")
+        assert result is pawn

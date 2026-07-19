@@ -1,21 +1,20 @@
-# TODO(design): Both domain exceptions subclass the built-in ValueError
-# directly, and main.py's run() catches board-parsing failures with a
-# bare "except ValueError" - which would also silently swallow an
-# unrelated ValueError raised by a bug elsewhere in the call chain (e.g.
-# int(parts[1]) in commands.parse_command). Introducing a small
-# exception hierarchy rooted in a project-specific base (e.g.
-# GameInputError, with BoardParsingError/CommandParsingError as
-# subclasses covering these two and any future parsing failures) would
-# let callers catch exactly the expected domain failures and let
-# anything else propagate (Fail Fast, explicit error contracts, clearer
-# Separation of Concerns between "expected bad input" and "a bug").
-# Not changed now: today's two exceptions and one catch site behave
-# correctly, and this would be a type change with no behavior
-# difference for the current test suite - not required by anything the
-# project needs yet.
-class UnknownToken(ValueError):
+class GameInputError(ValueError):
+    """Base for expected, user-facing input failures (bad board text,
+    eventually bad command text) - as opposed to an unrelated ValueError
+    from a bug elsewhere in the call chain (e.g. a bad int() parse),
+    which should propagate rather than being silently caught alongside
+    these. Still a ValueError subclass, so any existing "except
+    ValueError" keeps working unchanged; callers that want the narrower,
+    precise contract can catch GameInputError instead (see main.py)."""
+
+
+class BoardParsingError(GameInputError):
+    """Base for board-text parsing failures (see BoardParser/BoardValidator)."""
+
+
+class UnknownToken(BoardParsingError):
     pass
 
 
-class RowWidthMismatch(ValueError):
+class RowWidthMismatch(BoardParsingError):
     pass

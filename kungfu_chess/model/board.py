@@ -7,19 +7,13 @@ class Board:
     Deliberately has NO rendering/printing method on it (Rule 3 - SoC):
     the Model must be completely decoupled from the View. See
     board_view.BoardRenderer for the View Adapter that reads this model.
+
+    Internal storage (_cells) is private; external callers read it
+    through get_cell/set_cell or the read-only iter_rows() (Tell, Don't
+    Ask) - this keeps the single-writer convention (only GameEngine ever
+    calls set_cell) enforced rather than merely conventional.
     """
 
-    # TODO(design): Board.cells is read directly from outside this class
-    # (BoardRenderer.to_rows iterates board.cells rather than going
-    # through get_cell). Direct access is simple and fine for this
-    # project's current single-writer usage (only GameEngine ever calls
-    # set_cell), but it also means nothing stops an external caller from
-    # mutating the grid in place. Hiding storage behind a read-only
-    # iteration/query method (Tell, Don't Ask) would make the
-    # single-writer convention enforced rather than just conventional.
-    # Not done now: no caller currently needs to mutate cells directly,
-    # so there is no observed problem to fix yet.
-    #
     # TODO(design): Every (row, col) is passed around as two loose
     # integers - here and throughout Motion, RealTimeArbiter, GameEngine,
     # RuleEngine, MoveResolvedEvent and the GUI layer. An immutable
@@ -32,9 +26,9 @@ class Board:
     # its own deliberate, test-driven pass rather than alongside
     # unrelated work.
     def __init__(self, cells):
-        self.cells = [[Piece.parse(token) for token in row] for row in cells]
-        self.rows = len(self.cells)
-        self.cols = len(self.cells[0]) if self.cells else 0
+        self._cells = [[Piece.parse(token) for token in row] for row in cells]
+        self.rows = len(self._cells)
+        self.cols = len(self._cells[0]) if self._cells else 0
 
     def is_inside(self, row, col):
         return 0 <= row < self.rows and 0 <= col < self.cols
@@ -54,10 +48,18 @@ class Board:
     # every caller today is already constrained upstream (click mapping,
     # rule-validated deltas).
     def get_cell(self, row, col):
-        return self.cells[row][col]
+        return self._cells[row][col]
 
     def set_cell(self, row, col, value):
-        self.cells[row][col] = value
+        self._cells[row][col] = value
+
+    def iter_rows(self):
+        """Read-only iteration over the grid, row by row - the sanctioned
+        way for external callers (e.g. BoardRenderer) to inspect the
+        whole board without touching internal storage directly. Each row
+        is a tuple (not the live list), so callers can't mutate cells
+        through it - only set_cell can."""
+        return (tuple(row) for row in self._cells)
 
     # TODO(design): Board has no way to copy or snapshot its current
     # state. A Memento-style immutable snapshot (or a cheap copy-on-write

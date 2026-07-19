@@ -1,6 +1,7 @@
 from kungfu_chess.io.board_parser import BoardParser
 from kungfu_chess.input.commands import parse_command
 from kungfu_chess.input.controller import GameController
+from kungfu_chess.model.exceptions import GameInputError
 
 
 def run(lines=None):
@@ -19,7 +20,7 @@ def run(lines=None):
             if command is not None:
                 command.execute(controller)
 
-    except ValueError as e:
+    except GameInputError as e:
         print(f"ERROR {e}")
 
 

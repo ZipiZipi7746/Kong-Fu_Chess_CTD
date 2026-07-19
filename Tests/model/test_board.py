@@ -67,3 +67,27 @@ class TestSetCell:
         board.set_cell(1, 1, None)
         assert board.get_cell(0, 1) is new_piece
         assert board.get_cell(1, 1) is None
+
+
+class TestIterRows:
+    def test_yields_one_tuple_per_row_matching_get_cell(self):
+        board = make_simple_board()
+        rows = list(board.iter_rows())
+        assert len(rows) == board.rows
+        for row_index, row in enumerate(rows):
+            assert tuple(row) == tuple(
+                board.get_cell(row_index, col) for col in range(board.cols))
+
+    def test_rows_are_tuples_not_the_live_list(self):
+        # A read-only view (Tell, Don't Ask): mutating what iter_rows()
+        # yields must not be possible to route back into the board -
+        # only set_cell can change board state.
+        board = make_simple_board()
+        first_row = next(iter(board.iter_rows()))
+        assert isinstance(first_row, tuple)
+
+    def test_reflects_mutations_made_via_set_cell(self):
+        board = make_simple_board()
+        board.set_cell(0, 1, board.get_cell(0, 0))
+        rows = list(board.iter_rows())
+        assert rows[0][1] is board.get_cell(0, 0)
