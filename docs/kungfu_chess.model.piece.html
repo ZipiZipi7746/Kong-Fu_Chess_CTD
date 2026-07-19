@@ -60,7 +60,18 @@ movement-rule&nbsp;logic&nbsp;of&nbsp;its&nbsp;own&nbsp;(SRP).<br>&nbsp;</span><
 
 <hr>
 Static methods defined here:<br>
-<dl><dt><a name="Piece-parse"><strong>parse</strong></a>(token)</dt></dl>
+<dl><dt><a name="Piece-parse"><strong>parse</strong></a>(token)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;Text&nbsp;(de)serialization&nbsp;of&nbsp;a&nbsp;<a href="#Piece">Piece</a>&nbsp;("wK"&nbsp;&lt;-&gt;&nbsp;<a href="#Piece">Piece</a>)<br>
+#&nbsp;lives&nbsp;directly&nbsp;on&nbsp;the&nbsp;domain&nbsp;<a href="builtins.html#object">object</a>&nbsp;via&nbsp;<a href="#Piece-parse">parse</a>()/<a href="#Piece-__str__">__str__</a>(),&nbsp;and&nbsp;is<br>
+#&nbsp;invoked&nbsp;from&nbsp;Board.__init__&nbsp;and&nbsp;BoardRenderer.to_rows&nbsp;respectively.<br>
+#&nbsp;Extracting&nbsp;an&nbsp;injectable&nbsp;PieceCodec&nbsp;(e.g.&nbsp;TextPieceCodec,&nbsp;with&nbsp;a<br>
+#&nbsp;BinaryPieceCodec&nbsp;possible&nbsp;later)&nbsp;would&nbsp;separate&nbsp;the&nbsp;domain&nbsp;model<br>
+#&nbsp;from&nbsp;any&nbsp;particular&nbsp;wire/storage&nbsp;format&nbsp;(Strategy/Adapter,<br>
+#&nbsp;Dependency&nbsp;Inversion,&nbsp;SRP)&nbsp;and&nbsp;let&nbsp;a&nbsp;new&nbsp;format&nbsp;be&nbsp;added&nbsp;without<br>
+#&nbsp;touching&nbsp;<a href="#Piece">Piece</a>,&nbsp;Board&nbsp;or&nbsp;BoardRenderer.&nbsp;Useful&nbsp;only&nbsp;once&nbsp;a&nbsp;second<br>
+#&nbsp;format&nbsp;is&nbsp;actually&nbsp;needed&nbsp;(e.g.&nbsp;a&nbsp;saved-game&nbsp;file,&nbsp;a&nbsp;network&nbsp;wire<br>
+#&nbsp;format)&nbsp;-&nbsp;not&nbsp;required&nbsp;by&nbsp;the&nbsp;board-shape/piece-rule&nbsp;extensibility<br>
+#&nbsp;goal&nbsp;itself,&nbsp;so&nbsp;it&nbsp;stays&nbsp;a&nbsp;feature-triggered&nbsp;TODO&nbsp;rather&nbsp;than&nbsp;a<br>
+#&nbsp;required&nbsp;direction.</span></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>

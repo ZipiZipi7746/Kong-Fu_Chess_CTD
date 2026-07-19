@@ -9,7 +9,23 @@
 <tr class="heading-text decor">
 <td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.geometry.html" class="white">geometry</a>.board_geometry</strong></td>
 <td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cgeometry%5Cboard_geometry.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\geometry\board_geometry.py</a></td></tr></table>
-    <p></p>
+    <p><span class="code">#&nbsp;TODO(design):&nbsp;cell_to_pixel/derive_cell_size&nbsp;(and&nbsp;BoardMapper.to_cell,<br>
+#&nbsp;see&nbsp;input/board_mapper.py)&nbsp;all&nbsp;assume&nbsp;equal&nbsp;rectangular&nbsp;cells&nbsp;laid&nbsp;out<br>
+#&nbsp;in&nbsp;a&nbsp;uniform&nbsp;row/col&nbsp;grid&nbsp;-&nbsp;this&nbsp;whole&nbsp;module&nbsp;is&nbsp;one&nbsp;BoardLayout<br>
+#&nbsp;implementation&nbsp;(RectangularGridLayout),&nbsp;not&nbsp;a&nbsp;permanent&nbsp;presentation<br>
+#&nbsp;assumption.&nbsp;A&nbsp;non-rectangular&nbsp;domain&nbsp;board&nbsp;(BoardTopology,&nbsp;see<br>
+#&nbsp;model/board_topology.py)&nbsp;is&nbsp;incomplete&nbsp;if&nbsp;the&nbsp;GUI&nbsp;still&nbsp;assumes&nbsp;a<br>
+#&nbsp;rectangular&nbsp;grid&nbsp;underneath&nbsp;it&nbsp;-&nbsp;an&nbsp;irregular&nbsp;or&nbsp;hex&nbsp;board&nbsp;would&nbsp;need<br>
+#&nbsp;its&nbsp;own&nbsp;IrregularBoardLayout/HexBoardLayout&nbsp;answering<br>
+#&nbsp;position_to_screen(position)/screen_to_position(x,&nbsp;y)/<br>
+#&nbsp;cell_shape(position),&nbsp;with&nbsp;game_loop&nbsp;and&nbsp;legal-move&nbsp;highlighting<br>
+#&nbsp;depending&nbsp;on&nbsp;the&nbsp;injected&nbsp;layout&nbsp;instead&nbsp;of&nbsp;computing&nbsp;rows/cols<br>
+#&nbsp;directly&nbsp;(Strategy&nbsp;Pattern,&nbsp;Adapter&nbsp;Pattern,&nbsp;presentation/domain<br>
+#&nbsp;separation).&nbsp;High-priority&nbsp;OCP&nbsp;gap,&nbsp;required&nbsp;by&nbsp;the&nbsp;same&nbsp;non-<br>
+#&nbsp;rectangular-board&nbsp;goal&nbsp;as&nbsp;BoardTopology&nbsp;-&nbsp;deferred&nbsp;because&nbsp;it&nbsp;is&nbsp;a<br>
+#&nbsp;GUI-wide&nbsp;change&nbsp;(this&nbsp;module,&nbsp;BoardMapper,&nbsp;game_loop's&nbsp;highlight/<br>
+#&nbsp;render&nbsp;loop,&nbsp;hit-testing)&nbsp;and&nbsp;should&nbsp;follow&nbsp;the&nbsp;domain-side&nbsp;topology<br>
+#&nbsp;work&nbsp;rather&nbsp;than&nbsp;be&nbsp;guessed&nbsp;at&nbsp;independently&nbsp;of&nbsp;it.</span></p>
 <p>
 <table class="section">
 <tr class="decor functions-decor heading-text">

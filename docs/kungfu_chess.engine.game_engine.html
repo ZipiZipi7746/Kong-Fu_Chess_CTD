@@ -37,7 +37,8 @@
 &nbsp;&nbsp;&nbsp;&nbsp;arbiter=None,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;event_bus=None,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;move_cooldown_ms=None,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;jump_cooldown_ms=None<br>
+&nbsp;&nbsp;&nbsp;&nbsp;jump_cooldown_ms=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;win_condition=None<br>
 )<br>
 &nbsp;<br>
 Central&nbsp;orchestration&nbsp;layer&nbsp;/&nbsp;Application&nbsp;Service&nbsp;(Rule&nbsp;8).<br>
@@ -56,7 +57,8 @@ and&nbsp;executes&nbsp;checks&nbsp;in&nbsp;the&nbsp;required&nbsp;sequential&nbs
 &nbsp;<br>
 <a href="#GameEngine-advance_time">advance_time</a>(...)&nbsp;drives&nbsp;virtual&nbsp;time&nbsp;forward,&nbsp;resolves&nbsp;arrivals<br>
 atomically&nbsp;(Rule&nbsp;10),&nbsp;resolves&nbsp;promotion&nbsp;(via&nbsp;PromotionRule)&nbsp;and<br>
-triggers&nbsp;game_over&nbsp;on&nbsp;a&nbsp;King&nbsp;capture&nbsp;(Rule&nbsp;11).<br>
+asks&nbsp;the&nbsp;injected&nbsp;WinCondition&nbsp;(default:&nbsp;CaptureKingWinCondition,<br>
+Rule&nbsp;11)&nbsp;whether&nbsp;that&nbsp;arrival&nbsp;just&nbsp;ended&nbsp;the&nbsp;game.<br>
 &nbsp;<br>
 Works&nbsp;purely&nbsp;in&nbsp;grid&nbsp;(row,&nbsp;col)&nbsp;terms&nbsp;-&nbsp;it&nbsp;knows&nbsp;nothing&nbsp;about<br>
 pixels;&nbsp;that&nbsp;translation&nbsp;belongs&nbsp;to&nbsp;BoardMapper.&nbsp;It&nbsp;also&nbsp;knows<br>
@@ -73,7 +75,8 @@ GameController&nbsp;(Rule&nbsp;5:&nbsp;decouple&nbsp;validation/orchestration&nb
     arbiter=None,
     event_bus=None,
     move_cooldown_ms=None,
-    jump_cooldown_ms=None
+    jump_cooldown_ms=None,
+    win_condition=None
 )</dt><dd><span class="code">rule_engine&nbsp;and&nbsp;arbiter&nbsp;are&nbsp;optional&nbsp;Dependency&nbsp;Injection&nbsp;points<br>
 (tests&nbsp;can&nbsp;supply&nbsp;fakes/stubs&nbsp;here&nbsp;instead&nbsp;of&nbsp;monkeypatching);<br>
 production&nbsp;code&nbsp;omits&nbsp;them&nbsp;and&nbsp;gets&nbsp;the&nbsp;real&nbsp;collaborators.<br>
@@ -82,7 +85,9 @@ wants&nbsp;move-resolved&nbsp;notifications&nbsp;(for&nbsp;a&nbsp;moves&nbsp;log
 needs&nbsp;to&nbsp;supply&nbsp;one;&nbsp;<a href="#GameEngine">GameEngine</a>&nbsp;has&nbsp;no&nbsp;idea&nbsp;who's&nbsp;listening.<br>
 move_cooldown_ms/jump_cooldown_ms&nbsp;configure&nbsp;the&nbsp;default&nbsp;arbiter's<br>
 post-action&nbsp;cooldown&nbsp;(ignored&nbsp;if&nbsp;an&nbsp;arbiter&nbsp;is&nbsp;injected&nbsp;directly&nbsp;-<br>
-set&nbsp;them&nbsp;on&nbsp;that&nbsp;arbiter&nbsp;instead).</span></dd></dl>
+set&nbsp;them&nbsp;on&nbsp;that&nbsp;arbiter&nbsp;instead).&nbsp;win_condition&nbsp;is&nbsp;an&nbsp;optional<br>
+Strategy&nbsp;(see&nbsp;rules/win_condition.py)&nbsp;deciding&nbsp;what&nbsp;ends&nbsp;the<br>
+game;&nbsp;defaults&nbsp;to&nbsp;CaptureKingWinCondition&nbsp;(Rule&nbsp;11).</span></dd></dl>
 
 <dl><dt><a name="GameEngine-advance_time"><strong>advance_time</strong></a>(self, ms)</dt></dl>
 

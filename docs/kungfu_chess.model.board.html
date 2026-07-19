@@ -30,7 +30,7 @@
 <td class="section-title" colspan=3>&nbsp;<br><a name="Board">class <strong>Board</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
     
 <tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
-<td class="decor title-decor" colspan=2><span class="code"><a href="#Board">Board</a>(cells)<br>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#Board">Board</a>(cells,&nbsp;topology=None)<br>
 &nbsp;<br>
 Pure&nbsp;logic&nbsp;Model:&nbsp;the&nbsp;grid&nbsp;of&nbsp;Pieces&nbsp;and&nbsp;cell&nbsp;access.<br>
 &nbsp;<br>
@@ -41,10 +41,17 @@ board_view.BoardRenderer&nbsp;for&nbsp;the&nbsp;View&nbsp;Adapter&nbsp;that&nbsp
 Internal&nbsp;storage&nbsp;(_cells)&nbsp;is&nbsp;private;&nbsp;external&nbsp;callers&nbsp;read&nbsp;it<br>
 through&nbsp;get_cell/set_cell&nbsp;or&nbsp;the&nbsp;read-only&nbsp;<a href="#Board-iter_rows">iter_rows</a>()&nbsp;(Tell,&nbsp;Don't<br>
 Ask)&nbsp;-&nbsp;this&nbsp;keeps&nbsp;the&nbsp;single-writer&nbsp;convention&nbsp;(only&nbsp;GameEngine&nbsp;ever<br>
-calls&nbsp;set_cell)&nbsp;enforced&nbsp;rather&nbsp;than&nbsp;merely&nbsp;conventional.<br>&nbsp;</span></td></tr>
+calls&nbsp;set_cell)&nbsp;enforced&nbsp;rather&nbsp;than&nbsp;merely&nbsp;conventional.<br>
+&nbsp;<br>
+topology&nbsp;is&nbsp;an&nbsp;optional&nbsp;Dependency&nbsp;Injection&nbsp;point&nbsp;(Strategy<br>
+Pattern):&nbsp;it&nbsp;answers&nbsp;"does&nbsp;this&nbsp;(row,&nbsp;col)&nbsp;exist"&nbsp;for&nbsp;is_inside,<br>
+defaulting&nbsp;to&nbsp;RectangularTopology(rows,&nbsp;cols)&nbsp;-&nbsp;the&nbsp;current&nbsp;grid<br>
+shape&nbsp;treated&nbsp;as&nbsp;one&nbsp;implementation&nbsp;rather&nbsp;than&nbsp;a&nbsp;permanent<br>
+assumption&nbsp;(see&nbsp;board_topology.py&nbsp;for&nbsp;what&nbsp;a&nbsp;fuller,&nbsp;non-rectangular<br>
+topology&nbsp;would&nbsp;still&nbsp;need&nbsp;beyond&nbsp;this&nbsp;first&nbsp;seam).<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
-<dl><dt><a name="Board-__init__"><strong>__init__</strong></a>(self, cells)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+<dl><dt><a name="Board-__init__"><strong>__init__</strong></a>(self, cells, topology=None)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
 <dl><dt><a name="Board-get_cell"><strong>get_cell</strong></a>(self, row, col)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;get_cell/set_cell&nbsp;trust&nbsp;the&nbsp;caller&nbsp;to&nbsp;have&nbsp;already<br>
 #&nbsp;checked&nbsp;is_inside&nbsp;-&nbsp;GameController&nbsp;does,&nbsp;before&nbsp;ever&nbsp;calling<br>
@@ -55,10 +62,12 @@ calls&nbsp;set_cell)&nbsp;enforced&nbsp;rather&nbsp;than&nbsp;merely&nbsp;conven
 #&nbsp;(raising&nbsp;a&nbsp;domain-specific&nbsp;exception&nbsp;on&nbsp;out-of-range&nbsp;access)&nbsp;with&nbsp;a<br>
 #&nbsp;separate&nbsp;fast/unchecked&nbsp;internal&nbsp;path&nbsp;would&nbsp;centralize&nbsp;boundary<br>
 #&nbsp;enforcement&nbsp;instead&nbsp;of&nbsp;leaving&nbsp;it&nbsp;as&nbsp;an&nbsp;implicit,&nbsp;spread-out<br>
-#&nbsp;contract&nbsp;(Design&nbsp;by&nbsp;Contract,&nbsp;Fail&nbsp;Fast);&nbsp;a&nbsp;Position&nbsp;value&nbsp;<a href="builtins.html#object">object</a><br>
-#&nbsp;(see&nbsp;above)&nbsp;would&nbsp;be&nbsp;a&nbsp;natural&nbsp;place&nbsp;to&nbsp;own&nbsp;that&nbsp;check.&nbsp;Not&nbsp;added<br>
-#&nbsp;now:&nbsp;no&nbsp;out-of-range&nbsp;access&nbsp;has&nbsp;ever&nbsp;actually&nbsp;occurred&nbsp;here,&nbsp;since<br>
-#&nbsp;every&nbsp;caller&nbsp;today&nbsp;is&nbsp;already&nbsp;constrained&nbsp;upstream&nbsp;(click&nbsp;mapping,<br>
+#&nbsp;contract&nbsp;(Design&nbsp;by&nbsp;Contract,&nbsp;Fail&nbsp;Fast)&nbsp;-&nbsp;topology.contains()&nbsp;(see<br>
+#&nbsp;above)&nbsp;is&nbsp;already&nbsp;the&nbsp;natural&nbsp;place&nbsp;to&nbsp;ask&nbsp;"is&nbsp;this&nbsp;valid",&nbsp;so&nbsp;this<br>
+#&nbsp;would&nbsp;mean&nbsp;get_cell/set_cell&nbsp;consulting&nbsp;self.<strong>topology</strong>&nbsp;before<br>
+#&nbsp;indexing&nbsp;rather&nbsp;than&nbsp;a&nbsp;separate&nbsp;check.&nbsp;Not&nbsp;added&nbsp;now:&nbsp;no<br>
+#&nbsp;out-of-range&nbsp;access&nbsp;has&nbsp;ever&nbsp;actually&nbsp;occurred&nbsp;here,&nbsp;since&nbsp;every<br>
+#&nbsp;caller&nbsp;today&nbsp;is&nbsp;already&nbsp;constrained&nbsp;upstream&nbsp;(click&nbsp;mapping,<br>
 #&nbsp;rule-validated&nbsp;deltas).</span></dd></dl>
 
 <dl><dt><a name="Board-is_inside"><strong>is_inside</strong></a>(self, row, col)</dt></dl>

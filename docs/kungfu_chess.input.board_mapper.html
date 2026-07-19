@@ -41,7 +41,14 @@ downstream&nbsp;(GameEngine,&nbsp;RuleEngine,&nbsp;etc.)&nbsp;works&nbsp;purely&
 <td class="singlecolumn">Methods defined here:<br>
 <dl><dt><a name="BoardMapper-__init__"><strong>__init__</strong></a>(self, cell_size)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
-<dl><dt><a name="BoardMapper-to_cell"><strong>to_cell</strong></a>(self, x, y)</dt></dl>
+<dl><dt><a name="BoardMapper-to_cell"><strong>to_cell</strong></a>(self, x, y)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;Delegate&nbsp;hit-testing&nbsp;to&nbsp;the&nbsp;injected&nbsp;BoardLayout<br>
+#&nbsp;(see&nbsp;gui/geometry/board_geometry.py)&nbsp;instead&nbsp;of&nbsp;deriving&nbsp;row&nbsp;and<br>
+#&nbsp;column&nbsp;through&nbsp;integer&nbsp;division.&nbsp;This&nbsp;keeps&nbsp;rectangular&nbsp;geometry<br>
+#&nbsp;in&nbsp;RectangularGridLayout&nbsp;and&nbsp;allows&nbsp;irregular&nbsp;layouts&nbsp;without<br>
+#&nbsp;changing&nbsp;GameController,&nbsp;which&nbsp;only&nbsp;ever&nbsp;calls&nbsp;<a href="#BoardMapper-to_cell">to_cell</a>(x,&nbsp;y)&nbsp;and<br>
+#&nbsp;doesn't&nbsp;need&nbsp;to&nbsp;know&nbsp;how&nbsp;the&nbsp;mapping&nbsp;happens.&nbsp;Not&nbsp;done&nbsp;now:&nbsp;no<br>
+#&nbsp;BoardLayout&nbsp;abstraction&nbsp;exists&nbsp;yet&nbsp;for&nbsp;this&nbsp;to&nbsp;delegate&nbsp;to&nbsp;-&nbsp;see<br>
+#&nbsp;the&nbsp;TODO&nbsp;in&nbsp;board_geometry.py&nbsp;for&nbsp;why&nbsp;that's&nbsp;staged&nbsp;separately.</span></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>

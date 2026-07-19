@@ -55,7 +55,17 @@ Data and other attributes defined here:<br>
 
 <hr>
 Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
-<dl><dt><a name="BishopRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+<dl><dt><a name="BishopRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;dr/dc&nbsp;here&nbsp;are&nbsp;a&nbsp;rectangular-grid&nbsp;delta&nbsp;-&nbsp;this<br>
+#&nbsp;default&nbsp;implementation,&nbsp;and&nbsp;every&nbsp;non-Pawn&nbsp;rule's&nbsp;<a href="#BishopRule-matches">matches</a>(),&nbsp;is<br>
+#&nbsp;still&nbsp;bound&nbsp;to&nbsp;"distance&nbsp;measured&nbsp;on&nbsp;a&nbsp;grid".&nbsp;A&nbsp;future&nbsp;rule&nbsp;may<br>
+#&nbsp;need&nbsp;to&nbsp;depend&nbsp;on&nbsp;board&nbsp;contents,&nbsp;topology/connectivity,&nbsp;piece<br>
+#&nbsp;state,&nbsp;cooldown,&nbsp;time,&nbsp;zone,&nbsp;previous&nbsp;actions,&nbsp;or&nbsp;a&nbsp;multi-stage<br>
+#&nbsp;movement&nbsp;-&nbsp;none&nbsp;of&nbsp;which&nbsp;fit&nbsp;through&nbsp;(dr,&nbsp;dc).&nbsp;The&nbsp;eventual<br>
+#&nbsp;topology-independent&nbsp;contract&nbsp;(RuleContext,&nbsp;see&nbsp;this&nbsp;class's<br>
+#&nbsp;docstring)&nbsp;would&nbsp;replace&nbsp;is_legal's&nbsp;signature&nbsp;project-wide,&nbsp;not<br>
+#&nbsp;just&nbsp;add&nbsp;a&nbsp;new&nbsp;parameter&nbsp;here&nbsp;-&nbsp;a&nbsp;cross-cutting&nbsp;change&nbsp;on&nbsp;the&nbsp;same<br>
+#&nbsp;scale&nbsp;as&nbsp;the&nbsp;Position/BoardTopology&nbsp;work,&nbsp;and&nbsp;deliberately&nbsp;staged<br>
+#&nbsp;after&nbsp;those&nbsp;settle&nbsp;rather&nbsp;than&nbsp;guessed&nbsp;at&nbsp;first.</span></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
@@ -82,7 +92,17 @@ Methods defined here:<br>
 
 <hr>
 Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
-<dl><dt><a name="KingRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+<dl><dt><a name="KingRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;dr/dc&nbsp;here&nbsp;are&nbsp;a&nbsp;rectangular-grid&nbsp;delta&nbsp;-&nbsp;this<br>
+#&nbsp;default&nbsp;implementation,&nbsp;and&nbsp;every&nbsp;non-Pawn&nbsp;rule's&nbsp;<a href="#KingRule-matches">matches</a>(),&nbsp;is<br>
+#&nbsp;still&nbsp;bound&nbsp;to&nbsp;"distance&nbsp;measured&nbsp;on&nbsp;a&nbsp;grid".&nbsp;A&nbsp;future&nbsp;rule&nbsp;may<br>
+#&nbsp;need&nbsp;to&nbsp;depend&nbsp;on&nbsp;board&nbsp;contents,&nbsp;topology/connectivity,&nbsp;piece<br>
+#&nbsp;state,&nbsp;cooldown,&nbsp;time,&nbsp;zone,&nbsp;previous&nbsp;actions,&nbsp;or&nbsp;a&nbsp;multi-stage<br>
+#&nbsp;movement&nbsp;-&nbsp;none&nbsp;of&nbsp;which&nbsp;fit&nbsp;through&nbsp;(dr,&nbsp;dc).&nbsp;The&nbsp;eventual<br>
+#&nbsp;topology-independent&nbsp;contract&nbsp;(RuleContext,&nbsp;see&nbsp;this&nbsp;class's<br>
+#&nbsp;docstring)&nbsp;would&nbsp;replace&nbsp;is_legal's&nbsp;signature&nbsp;project-wide,&nbsp;not<br>
+#&nbsp;just&nbsp;add&nbsp;a&nbsp;new&nbsp;parameter&nbsp;here&nbsp;-&nbsp;a&nbsp;cross-cutting&nbsp;change&nbsp;on&nbsp;the&nbsp;same<br>
+#&nbsp;scale&nbsp;as&nbsp;the&nbsp;Position/BoardTopology&nbsp;work,&nbsp;and&nbsp;deliberately&nbsp;staged<br>
+#&nbsp;after&nbsp;those&nbsp;settle&nbsp;rather&nbsp;than&nbsp;guessed&nbsp;at&nbsp;first.</span></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
@@ -113,7 +133,17 @@ Methods defined here:<br>
 
 <hr>
 Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
-<dl><dt><a name="KnightRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+<dl><dt><a name="KnightRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;dr/dc&nbsp;here&nbsp;are&nbsp;a&nbsp;rectangular-grid&nbsp;delta&nbsp;-&nbsp;this<br>
+#&nbsp;default&nbsp;implementation,&nbsp;and&nbsp;every&nbsp;non-Pawn&nbsp;rule's&nbsp;<a href="#KnightRule-matches">matches</a>(),&nbsp;is<br>
+#&nbsp;still&nbsp;bound&nbsp;to&nbsp;"distance&nbsp;measured&nbsp;on&nbsp;a&nbsp;grid".&nbsp;A&nbsp;future&nbsp;rule&nbsp;may<br>
+#&nbsp;need&nbsp;to&nbsp;depend&nbsp;on&nbsp;board&nbsp;contents,&nbsp;topology/connectivity,&nbsp;piece<br>
+#&nbsp;state,&nbsp;cooldown,&nbsp;time,&nbsp;zone,&nbsp;previous&nbsp;actions,&nbsp;or&nbsp;a&nbsp;multi-stage<br>
+#&nbsp;movement&nbsp;-&nbsp;none&nbsp;of&nbsp;which&nbsp;fit&nbsp;through&nbsp;(dr,&nbsp;dc).&nbsp;The&nbsp;eventual<br>
+#&nbsp;topology-independent&nbsp;contract&nbsp;(RuleContext,&nbsp;see&nbsp;this&nbsp;class's<br>
+#&nbsp;docstring)&nbsp;would&nbsp;replace&nbsp;is_legal's&nbsp;signature&nbsp;project-wide,&nbsp;not<br>
+#&nbsp;just&nbsp;add&nbsp;a&nbsp;new&nbsp;parameter&nbsp;here&nbsp;-&nbsp;a&nbsp;cross-cutting&nbsp;change&nbsp;on&nbsp;the&nbsp;same<br>
+#&nbsp;scale&nbsp;as&nbsp;the&nbsp;Position/BoardTopology&nbsp;work,&nbsp;and&nbsp;deliberately&nbsp;staged<br>
+#&nbsp;after&nbsp;those&nbsp;settle&nbsp;rather&nbsp;than&nbsp;guessed&nbsp;at&nbsp;first.</span></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
@@ -185,10 +215,33 @@ absolute&nbsp;position,&nbsp;board&nbsp;occupancy&nbsp;-&nbsp;i.e.&nbsp;Pawn)&nb
 directly&nbsp;instead&nbsp;of&nbsp;<a href="#PieceRule-matches">matches</a>(),&nbsp;and&nbsp;RuleEngine&nbsp;never&nbsp;needs&nbsp;to&nbsp;know&nbsp;the<br>
 difference:&nbsp;every&nbsp;kind&nbsp;in&nbsp;PIECE_RULES&nbsp;is&nbsp;looked&nbsp;up&nbsp;and&nbsp;invoked&nbsp;the<br>
 same&nbsp;way&nbsp;(Liskov&nbsp;Substitution,&nbsp;Open/Closed&nbsp;for&nbsp;future&nbsp;context-<br>
-sensitive&nbsp;pieces).<br>&nbsp;</span></td></tr>
+sensitive&nbsp;pieces).<br>
+&nbsp;<br>
+This&nbsp;Template&nbsp;Method&nbsp;is&nbsp;a&nbsp;pragmatic&nbsp;*current*&nbsp;solution,&nbsp;not&nbsp;the<br>
+final&nbsp;extensible&nbsp;contract:&nbsp;it&nbsp;was&nbsp;chosen&nbsp;specifically&nbsp;because&nbsp;it<br>
+removes&nbsp;the&nbsp;piece.kind&nbsp;==&nbsp;"P"&nbsp;branch&nbsp;from&nbsp;RuleEngine&nbsp;while&nbsp;touching<br>
+zero&nbsp;already-stable&nbsp;rule&nbsp;classes&nbsp;(see&nbsp;the&nbsp;design-dilemmas&nbsp;write-up<br>
+for&nbsp;the&nbsp;full&nbsp;trade-off).&nbsp;But&nbsp;<a href="#PieceRule-is_legal">is_legal</a>()'s&nbsp;default&nbsp;implementation<br>
+still&nbsp;computes&nbsp;dr/dc&nbsp;and&nbsp;calls&nbsp;<a href="#PieceRule-matches">matches</a>(self,&nbsp;dr,&nbsp;dc)&nbsp;-&nbsp;and&nbsp;dr/dc<br>
+(a&nbsp;rectangular-grid&nbsp;delta)&nbsp;is&nbsp;exactly&nbsp;as&nbsp;grid-specific&nbsp;as&nbsp;it&nbsp;always<br>
+was.&nbsp;A&nbsp;genuinely&nbsp;topology-independent&nbsp;rule&nbsp;contract&nbsp;-&nbsp;e.g.<br>
+<a href="#PieceRule-is_legal">is_legal</a>(self,&nbsp;context:&nbsp;RuleContext),&nbsp;where&nbsp;context&nbsp;carries&nbsp;the<br>
+piece,&nbsp;source/destination&nbsp;positions,&nbsp;board,&nbsp;topology,&nbsp;game&nbsp;state&nbsp;and<br>
+clock&nbsp;rather&nbsp;than&nbsp;two&nbsp;integers&nbsp;-&nbsp;is&nbsp;still&nbsp;a&nbsp;required&nbsp;future&nbsp;step,<br>
+not&nbsp;something&nbsp;this&nbsp;refactor&nbsp;already&nbsp;provides.<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
-<dl><dt><a name="PieceRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+<dl><dt><a name="PieceRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;dr/dc&nbsp;here&nbsp;are&nbsp;a&nbsp;rectangular-grid&nbsp;delta&nbsp;-&nbsp;this<br>
+#&nbsp;default&nbsp;implementation,&nbsp;and&nbsp;every&nbsp;non-Pawn&nbsp;rule's&nbsp;<a href="#PieceRule-matches">matches</a>(),&nbsp;is<br>
+#&nbsp;still&nbsp;bound&nbsp;to&nbsp;"distance&nbsp;measured&nbsp;on&nbsp;a&nbsp;grid".&nbsp;A&nbsp;future&nbsp;rule&nbsp;may<br>
+#&nbsp;need&nbsp;to&nbsp;depend&nbsp;on&nbsp;board&nbsp;contents,&nbsp;topology/connectivity,&nbsp;piece<br>
+#&nbsp;state,&nbsp;cooldown,&nbsp;time,&nbsp;zone,&nbsp;previous&nbsp;actions,&nbsp;or&nbsp;a&nbsp;multi-stage<br>
+#&nbsp;movement&nbsp;-&nbsp;none&nbsp;of&nbsp;which&nbsp;fit&nbsp;through&nbsp;(dr,&nbsp;dc).&nbsp;The&nbsp;eventual<br>
+#&nbsp;topology-independent&nbsp;contract&nbsp;(RuleContext,&nbsp;see&nbsp;this&nbsp;class's<br>
+#&nbsp;docstring)&nbsp;would&nbsp;replace&nbsp;is_legal's&nbsp;signature&nbsp;project-wide,&nbsp;not<br>
+#&nbsp;just&nbsp;add&nbsp;a&nbsp;new&nbsp;parameter&nbsp;here&nbsp;-&nbsp;a&nbsp;cross-cutting&nbsp;change&nbsp;on&nbsp;the&nbsp;same<br>
+#&nbsp;scale&nbsp;as&nbsp;the&nbsp;Position/BoardTopology&nbsp;work,&nbsp;and&nbsp;deliberately&nbsp;staged<br>
+#&nbsp;after&nbsp;those&nbsp;settle&nbsp;rather&nbsp;than&nbsp;guessed&nbsp;at&nbsp;first.</span></dd></dl>
 
 <dl><dt><a name="PieceRule-matches"><strong>matches</strong></a>(self, dr, dc)</dt></dl>
 
@@ -227,7 +280,17 @@ Data and other attributes defined here:<br>
 
 <hr>
 Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
-<dl><dt><a name="QueenRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+<dl><dt><a name="QueenRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;dr/dc&nbsp;here&nbsp;are&nbsp;a&nbsp;rectangular-grid&nbsp;delta&nbsp;-&nbsp;this<br>
+#&nbsp;default&nbsp;implementation,&nbsp;and&nbsp;every&nbsp;non-Pawn&nbsp;rule's&nbsp;<a href="#QueenRule-matches">matches</a>(),&nbsp;is<br>
+#&nbsp;still&nbsp;bound&nbsp;to&nbsp;"distance&nbsp;measured&nbsp;on&nbsp;a&nbsp;grid".&nbsp;A&nbsp;future&nbsp;rule&nbsp;may<br>
+#&nbsp;need&nbsp;to&nbsp;depend&nbsp;on&nbsp;board&nbsp;contents,&nbsp;topology/connectivity,&nbsp;piece<br>
+#&nbsp;state,&nbsp;cooldown,&nbsp;time,&nbsp;zone,&nbsp;previous&nbsp;actions,&nbsp;or&nbsp;a&nbsp;multi-stage<br>
+#&nbsp;movement&nbsp;-&nbsp;none&nbsp;of&nbsp;which&nbsp;fit&nbsp;through&nbsp;(dr,&nbsp;dc).&nbsp;The&nbsp;eventual<br>
+#&nbsp;topology-independent&nbsp;contract&nbsp;(RuleContext,&nbsp;see&nbsp;this&nbsp;class's<br>
+#&nbsp;docstring)&nbsp;would&nbsp;replace&nbsp;is_legal's&nbsp;signature&nbsp;project-wide,&nbsp;not<br>
+#&nbsp;just&nbsp;add&nbsp;a&nbsp;new&nbsp;parameter&nbsp;here&nbsp;-&nbsp;a&nbsp;cross-cutting&nbsp;change&nbsp;on&nbsp;the&nbsp;same<br>
+#&nbsp;scale&nbsp;as&nbsp;the&nbsp;Position/BoardTopology&nbsp;work,&nbsp;and&nbsp;deliberately&nbsp;staged<br>
+#&nbsp;after&nbsp;those&nbsp;settle&nbsp;rather&nbsp;than&nbsp;guessed&nbsp;at&nbsp;first.</span></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
@@ -258,7 +321,17 @@ Data and other attributes defined here:<br>
 
 <hr>
 Methods inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>
-<dl><dt><a name="RookRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt></dl>
+<dl><dt><a name="RookRule-is_legal"><strong>is_legal</strong></a>(self, piece, from_row, from_col, to_row, to_col, board)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;dr/dc&nbsp;here&nbsp;are&nbsp;a&nbsp;rectangular-grid&nbsp;delta&nbsp;-&nbsp;this<br>
+#&nbsp;default&nbsp;implementation,&nbsp;and&nbsp;every&nbsp;non-Pawn&nbsp;rule's&nbsp;<a href="#RookRule-matches">matches</a>(),&nbsp;is<br>
+#&nbsp;still&nbsp;bound&nbsp;to&nbsp;"distance&nbsp;measured&nbsp;on&nbsp;a&nbsp;grid".&nbsp;A&nbsp;future&nbsp;rule&nbsp;may<br>
+#&nbsp;need&nbsp;to&nbsp;depend&nbsp;on&nbsp;board&nbsp;contents,&nbsp;topology/connectivity,&nbsp;piece<br>
+#&nbsp;state,&nbsp;cooldown,&nbsp;time,&nbsp;zone,&nbsp;previous&nbsp;actions,&nbsp;or&nbsp;a&nbsp;multi-stage<br>
+#&nbsp;movement&nbsp;-&nbsp;none&nbsp;of&nbsp;which&nbsp;fit&nbsp;through&nbsp;(dr,&nbsp;dc).&nbsp;The&nbsp;eventual<br>
+#&nbsp;topology-independent&nbsp;contract&nbsp;(RuleContext,&nbsp;see&nbsp;this&nbsp;class's<br>
+#&nbsp;docstring)&nbsp;would&nbsp;replace&nbsp;is_legal's&nbsp;signature&nbsp;project-wide,&nbsp;not<br>
+#&nbsp;just&nbsp;add&nbsp;a&nbsp;new&nbsp;parameter&nbsp;here&nbsp;-&nbsp;a&nbsp;cross-cutting&nbsp;change&nbsp;on&nbsp;the&nbsp;same<br>
+#&nbsp;scale&nbsp;as&nbsp;the&nbsp;Position/BoardTopology&nbsp;work,&nbsp;and&nbsp;deliberately&nbsp;staged<br>
+#&nbsp;after&nbsp;those&nbsp;settle&nbsp;rather&nbsp;than&nbsp;guessed&nbsp;at&nbsp;first.</span></dd></dl>
 
 <hr>
 Data descriptors inherited from <a href="kungfu_chess.rules.piece_rules.html#PieceRule">PieceRule</a>:<br>

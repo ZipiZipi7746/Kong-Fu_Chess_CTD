@@ -29,13 +29,27 @@
 <tr class="decor title-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><a name="BoardValidator">class <strong>BoardValidator</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
     
-<tr><td class="decor title-decor"><span class="code">&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code">valid_piece_kinds&nbsp;is&nbsp;an&nbsp;optional&nbsp;Dependency&nbsp;Injection&nbsp;point,<br>
+defaulting&nbsp;to&nbsp;PIECE_RULES.keys()&nbsp;-&nbsp;the&nbsp;same&nbsp;registry&nbsp;RuleEngine<br>
+dispatches&nbsp;through&nbsp;(Single&nbsp;Source&nbsp;of&nbsp;Truth:&nbsp;a&nbsp;board-text&nbsp;validator<br>
+and&nbsp;a&nbsp;rules&nbsp;engine&nbsp;agreeing&nbsp;on&nbsp;"which&nbsp;piece&nbsp;kinds&nbsp;exist"&nbsp;by<br>
+construction,&nbsp;rather&nbsp;than&nbsp;each&nbsp;keeping&nbsp;its&nbsp;own&nbsp;separately&nbsp;maintained<br>
+list&nbsp;that&nbsp;could&nbsp;drift&nbsp;out&nbsp;of&nbsp;sync).<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
 <td class="singlecolumn">Static methods defined here:<br>
-<dl><dt><a name="BoardValidator-validate"><strong>validate</strong></a>(board_rows)</dt></dl>
+<dl><dt><a name="BoardValidator-validate"><strong>validate</strong></a>(board_rows, valid_piece_kinds=None)</dt></dl>
 
-<dl><dt><a name="BoardValidator-validate_row_width"><strong>validate_row_width</strong></a>(board_rows)</dt></dl>
+<dl><dt><a name="BoardValidator-validate_row_width"><strong>validate_row_width</strong></a>(board_rows)</dt><dd><span class="code">#&nbsp;TODO(design):&nbsp;validate_row_width&nbsp;requires&nbsp;every&nbsp;row&nbsp;to&nbsp;share<br>
+#&nbsp;exactly&nbsp;one&nbsp;width&nbsp;-&nbsp;a&nbsp;rectangular-board&nbsp;assumption&nbsp;baked&nbsp;directly<br>
+#&nbsp;into&nbsp;board&nbsp;text&nbsp;validation.&nbsp;An&nbsp;irregular&nbsp;topology&nbsp;(holes,&nbsp;uneven<br>
+#&nbsp;rows)&nbsp;would&nbsp;need&nbsp;this&nbsp;relaxed&nbsp;or&nbsp;replaced&nbsp;by&nbsp;asking&nbsp;a&nbsp;BoardTopology<br>
+#&nbsp;(see&nbsp;model/board_topology.py)&nbsp;whether&nbsp;the&nbsp;parsed&nbsp;shape&nbsp;is&nbsp;valid,<br>
+#&nbsp;rather&nbsp;than&nbsp;a&nbsp;fixed&nbsp;"all&nbsp;rows&nbsp;equal&nbsp;length"&nbsp;rule.&nbsp;Not&nbsp;changed&nbsp;now:<br>
+#&nbsp;no&nbsp;irregular&nbsp;board&nbsp;format&nbsp;exists&nbsp;yet&nbsp;to&nbsp;validate&nbsp;against,&nbsp;and<br>
+#&nbsp;guessing&nbsp;at&nbsp;the&nbsp;future&nbsp;text&nbsp;format&nbsp;without&nbsp;one&nbsp;would&nbsp;be&nbsp;premature.</span></dd></dl>
 
-<dl><dt><a name="BoardValidator-validate_tokens"><strong>validate_tokens</strong></a>(board_rows)</dt></dl>
+<dl><dt><a name="BoardValidator-validate_tokens"><strong>validate_tokens</strong></a>(board_rows, valid_piece_kinds=None)</dt></dl>
 
 <hr>
 Data descriptors defined here:<br>
@@ -51,6 +65,6 @@ Data descriptors defined here:<br>
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
     
 <tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><strong>VALID_COLORS</strong> = {'b', 'w'}<br>
-<strong>VALID_PIECES</strong> = {'B', 'K', 'N', 'P', 'Q', 'R'}</td></tr></table>
+<td class="singlecolumn"><strong>PIECE_RULES</strong> = {'B': &lt;kungfu_chess.rules.piece_rules.BishopRule object&gt;, 'K': &lt;kungfu_chess.rules.piece_rules.KingRule object&gt;, 'N': &lt;kungfu_chess.rules.piece_rules.KnightRule object&gt;, 'P': &lt;kungfu_chess.rules.piece_rules.PawnRule object&gt;, 'Q': &lt;kungfu_chess.rules.piece_rules.QueenRule object&gt;, 'R': &lt;kungfu_chess.rules.piece_rules.RookRule object&gt;}<br>
+<strong>VALID_COLORS</strong> = {'b', 'w'}</td></tr></table>
 </body></html>

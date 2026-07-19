@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.rules.win_condition</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.rules.html" class="white">rules</a>.win_condition</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Crules%5Cwin_condition.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\rules\win_condition.py</a></td></tr></table>
+    <p></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.rules.win_condition.html#CaptureKingWinCondition">CaptureKingWinCondition</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="CaptureKingWinCondition">class <strong>CaptureKingWinCondition</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code">The&nbsp;current&nbsp;(and&nbsp;only)&nbsp;WinCondition:&nbsp;the&nbsp;game&nbsp;ends&nbsp;the&nbsp;instant&nbsp;a<br>
+King&nbsp;is&nbsp;captured,&nbsp;and&nbsp;the&nbsp;capturing&nbsp;piece's&nbsp;color&nbsp;wins&nbsp;(Rule&nbsp;11).<br>
+&nbsp;<br>
+Injected&nbsp;into&nbsp;GameEngine&nbsp;(Strategy&nbsp;Pattern)&nbsp;so&nbsp;"what&nbsp;ends&nbsp;the&nbsp;game"<br>
+is&nbsp;a&nbsp;swappable&nbsp;policy&nbsp;rather&nbsp;than&nbsp;an&nbsp;if-statement&nbsp;inside&nbsp;motion<br>
+resolution&nbsp;-&nbsp;a&nbsp;future&nbsp;variant&nbsp;with&nbsp;multiple&nbsp;kings,&nbsp;a&nbsp;score<br>
+threshold,&nbsp;a&nbsp;target&nbsp;cell,&nbsp;territory&nbsp;control,&nbsp;survival&nbsp;time,&nbsp;or&nbsp;no<br>
+king&nbsp;at&nbsp;all&nbsp;can&nbsp;supply&nbsp;its&nbsp;own&nbsp;WinCondition&nbsp;without&nbsp;touching<br>
+GameEngine&nbsp;itself&nbsp;(Open/Closed&nbsp;Principle).<br>
+&nbsp;<br>
+<a href="#CaptureKingWinCondition-check">check</a>()&nbsp;is&nbsp;called&nbsp;once&nbsp;per&nbsp;resolved&nbsp;arrival&nbsp;(never&nbsp;for&nbsp;a&nbsp;friendly-<br>
+collision&nbsp;stop&nbsp;or&nbsp;an&nbsp;airborne&nbsp;kill,&nbsp;since&nbsp;those&nbsp;aren't&nbsp;a&nbsp;completed<br>
+move),&nbsp;strictly&nbsp;to&nbsp;*decide*&nbsp;whether&nbsp;the&nbsp;game&nbsp;just&nbsp;ended&nbsp;-&nbsp;by&nbsp;the<br>
+time&nbsp;it&nbsp;runs,&nbsp;GameEngine&nbsp;has&nbsp;already&nbsp;applied&nbsp;the&nbsp;arrival&nbsp;to&nbsp;the<br>
+board&nbsp;(Single&nbsp;Responsibility:&nbsp;this&nbsp;class&nbsp;never&nbsp;mutates&nbsp;state,&nbsp;only<br>
+answers&nbsp;a&nbsp;question).<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="CaptureKingWinCondition-check"><strong>check</strong></a>(self, moving_piece, captured_piece, board)</dt><dd><span class="code">Returns&nbsp;the&nbsp;winning&nbsp;color&nbsp;("w"/"b")&nbsp;if&nbsp;this&nbsp;arrival&nbsp;just<br>
+ended&nbsp;the&nbsp;game,&nbsp;or&nbsp;None&nbsp;if&nbsp;it&nbsp;didn't.&nbsp;captured_piece&nbsp;is&nbsp;whatever<br>
+piece&nbsp;previously&nbsp;occupied&nbsp;the&nbsp;destination&nbsp;(None&nbsp;if&nbsp;the&nbsp;square<br>
+was&nbsp;empty).</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

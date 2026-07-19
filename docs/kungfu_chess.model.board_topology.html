@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.model.board_topology</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.model.html" class="white">model</a>.board_topology</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cmodel%5Cboard_topology.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\model\board_topology.py</a></td></tr></table>
+    <p><span class="code">#&nbsp;TODO(design):&nbsp;The&nbsp;full&nbsp;BoardTopology&nbsp;a&nbsp;non-rectangular&nbsp;variant&nbsp;would<br>
+#&nbsp;need&nbsp;also&nbsp;has&nbsp;positions()&nbsp;(iterate&nbsp;every&nbsp;position&nbsp;that&nbsp;exists)&nbsp;and<br>
+#&nbsp;neighbors(position)&nbsp;(what's&nbsp;adjacent&nbsp;to&nbsp;a&nbsp;given&nbsp;position,&nbsp;for<br>
+#&nbsp;connectivity-aware&nbsp;rules&nbsp;or&nbsp;movement)&nbsp;-&nbsp;not&nbsp;just&nbsp;contains()&nbsp;below.<br>
+#&nbsp;RuleEngine's&nbsp;path-clearing&nbsp;(_is_path_clear)&nbsp;and&nbsp;the&nbsp;GUI's&nbsp;row/col<br>
+#&nbsp;iteration&nbsp;both&nbsp;still&nbsp;assume&nbsp;a&nbsp;rectangular&nbsp;range&nbsp;independently&nbsp;of&nbsp;this<br>
+#&nbsp;class,&nbsp;and&nbsp;would&nbsp;need&nbsp;to&nbsp;be&nbsp;migrated&nbsp;to&nbsp;ask&nbsp;a&nbsp;topology&nbsp;instead&nbsp;once&nbsp;a<br>
+#&nbsp;second&nbsp;implementation&nbsp;(IrregularTopology,&nbsp;HexTopology,&nbsp;GraphTopology)<br>
+#&nbsp;actually&nbsp;exists.&nbsp;Keeping&nbsp;this&nbsp;first&nbsp;seam&nbsp;minimal&nbsp;-&nbsp;contains()&nbsp;only,<br>
+#&nbsp;still&nbsp;(row,&nbsp;col)-keyed&nbsp;rather&nbsp;than&nbsp;an&nbsp;opaque&nbsp;Position&nbsp;-&nbsp;avoids<br>
+#&nbsp;inventing&nbsp;an&nbsp;interface&nbsp;shaped&nbsp;by&nbsp;guesswork&nbsp;instead&nbsp;of&nbsp;a&nbsp;real&nbsp;second<br>
+#&nbsp;implementation&nbsp;(Open/Closed&nbsp;Principle,&nbsp;Dependency&nbsp;Inversion).</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.model.board_topology.html#RectangularTopology">RectangularTopology</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="RectangularTopology">class <strong>RectangularTopology</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#RectangularTopology">RectangularTopology</a>(rows,&nbsp;cols)<br>
+&nbsp;<br>
+The&nbsp;current&nbsp;(and&nbsp;only)&nbsp;BoardTopology&nbsp;implementation:&nbsp;every&nbsp;(row,<br>
+col)&nbsp;with&nbsp;0&nbsp;&lt;=&nbsp;row&nbsp;&lt;&nbsp;rows&nbsp;and&nbsp;0&nbsp;&lt;=&nbsp;col&nbsp;&lt;&nbsp;cols&nbsp;exists;&nbsp;nothing&nbsp;else<br>
+does.&nbsp;Injected&nbsp;into&nbsp;Board&nbsp;(Strategy&nbsp;Pattern)&nbsp;so&nbsp;"which&nbsp;positions<br>
+exist"&nbsp;is&nbsp;asked&nbsp;of&nbsp;an&nbsp;<a href="builtins.html#object">object</a>&nbsp;rather&nbsp;than&nbsp;hardcoded&nbsp;in<br>
+Board.is_inside.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="RectangularTopology-__init__"><strong>__init__</strong></a>(self, rows, cols)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="RectangularTopology-contains"><strong>contains</strong></a>(self, row, col)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

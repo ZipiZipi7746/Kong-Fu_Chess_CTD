@@ -73,7 +73,7 @@ header.bar .meta{
 }
 
 /* ---------- shell ---------- */
-main{max-width:840px; margin:0 auto; padding:56px 28px 100px;}
+main{max-width:900px; margin:0 auto; padding:56px 28px 100px;}
 
 .eyebrow{
   font-family:'IBM Plex Mono',monospace; font-size:.74rem; letter-spacing:.12em;
@@ -87,7 +87,7 @@ h1{
   line-height:1.08; letter-spacing:-.01em; margin:0 0 14px; text-wrap:balance;
 }
 .sub{
-  font-size:1.1rem; color:var(--ink-dim); max-width:60ch; margin:0 0 40px;
+  font-size:1.1rem; color:var(--ink-dim); max-width:64ch; margin:0 0 40px;
   text-wrap:balance;
 }
 .sub em{font-family:'Newsreader',serif; font-style:italic; color:var(--ink);}
@@ -97,13 +97,33 @@ h1{
   display:grid; grid-template-columns:repeat(4,1fr);
   border:1px solid var(--line); border-radius:3px; overflow:hidden;
   background:var(--surface); box-shadow:var(--shadow);
-  margin-bottom:56px;
+  margin-bottom:40px;
 }
 .stat{padding:16px 18px; border-right:1px solid var(--line);}
 .stat:last-child{border-right:none;}
 .stat .n{font-family:'IBM Plex Mono',monospace; font-weight:600; font-size:1.5rem; color:var(--accent); font-variant-numeric:tabular-nums;}
-.stat .n small{font-size:.6em; color:var(--ink-dim); font-weight:500;}
+.stat .n small{font-size:.55em; color:var(--ink-dim); font-weight:500; letter-spacing:0;}
 .stat .l{font-size:.72rem; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-dim); margin-top:4px;}
+
+/* ---------- requirement callout ---------- */
+.requirement{
+  border:1px solid var(--line-strong); border-radius:4px; background:var(--surface);
+  box-shadow:var(--shadow); padding:26px 28px; margin-bottom:56px;
+  position:relative; overflow:hidden;
+}
+.requirement::before{
+  content:""; position:absolute; left:0; top:0; bottom:0; width:4px; background:var(--accent);
+}
+.requirement .req-label{
+  font-family:'IBM Plex Mono',monospace; font-size:.7rem; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent); margin:0 0 10px;
+}
+.requirement blockquote{
+  margin:0 0 16px; font-family:'Newsreader',serif; font-style:italic; font-size:1.15rem;
+  color:var(--ink); line-height:1.45; max-width:68ch;
+}
+.requirement .req-consequence{margin:0; color:var(--ink-dim); font-size:.94rem; max-width:68ch;}
+.requirement .req-consequence strong{color:var(--ink); font-weight:600;}
 
 /* ---------- section headings ---------- */
 section{margin-bottom:64px;}
@@ -113,7 +133,7 @@ h2{
   display:flex; align-items:baseline; gap:10px;
 }
 h2 .glyph{font-size:1.2rem; color:var(--accent); font-weight:400;}
-.lede{color:var(--ink-dim); max-width:64ch; margin:0 0 28px;}
+.lede{color:var(--ink-dim); max-width:66ch; margin:0 0 28px;}
 p{max-width:66ch;}
 
 pre{
@@ -172,18 +192,69 @@ pre code{background:none; padding:0;}
 .verdict p{margin:0; font-size:.92rem; color:var(--ink-dim);}
 .verdict p strong{color:var(--ink); font-weight:600;}
 
-/* ---------- deferred (reused "gap" language) ---------- */
+/* ---------- extension map / data tables ---------- */
+.table-wrap{
+  border:1px solid var(--line); border-radius:3px; overflow-x:auto;
+  background:var(--surface); box-shadow:var(--shadow);
+}
+table{border-collapse:collapse; width:100%; font-size:.88rem; min-width:640px;}
+thead th{
+  text-align:left; font-family:'IBM Plex Mono',monospace; font-size:.68rem;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--ink-dim);
+  padding:12px 16px; border-bottom:1px solid var(--line-strong); white-space:nowrap;
+}
+tbody td{padding:12px 16px; border-bottom:1px solid var(--line); vertical-align:top;}
+tbody tr:last-child td{border-bottom:none;}
+tbody td.dim{color:var(--ink-dim);}
+tbody td code{white-space:nowrap;}
+
+.pill{
+  display:inline-flex; align-items:center; gap:5px; font-family:'IBM Plex Mono',monospace;
+  font-size:.68rem; letter-spacing:.05em; text-transform:uppercase; padding:3px 9px;
+  border-radius:20px; border:1px solid var(--line-strong); white-space:nowrap;
+}
+.pill::before{content:""; width:6px; height:6px; border-radius:50%;}
+.pill.strong{color:var(--good); border-color:var(--good);}
+.pill.strong::before{background:var(--good);}
+.pill.partial{color:var(--accent); border-color:var(--accent);}
+.pill.partial::before{background:var(--accent);}
+.pill.weak{color:var(--bad); border-color:var(--bad);}
+.pill.weak::before{background:var(--bad);}
+
+/* ---------- status cards (implemented / deferred / rejected) ---------- */
 .gaps{display:flex; flex-direction:column; gap:14px;}
 .gap-card{
   border:1px solid var(--line); border-left:3px solid var(--accent); border-radius:2px;
   background:var(--surface); padding:16px 18px; box-shadow:var(--shadow);
 }
+.gap-card.done{border-left-color:var(--good);}
+.gap-card.rejected{border-left-color:var(--bad);}
 .gap-card h3{
   font-family:'Source Sans 3',sans-serif; font-weight:600; font-size:1rem; margin:0 0 6px;
   display:flex; align-items:center; gap:8px;
 }
 .gap-card p{margin:0; font-size:.92rem; color:var(--ink-dim);}
 .gap-card .where{font-family:'IBM Plex Mono',monospace; font-size:.74rem; color:var(--accent); margin-top:8px; display:block;}
+.gap-card.done .where{color:var(--good);}
+.gap-card.rejected .where{color:var(--bad);}
+
+.status-groups{display:flex; flex-direction:column; gap:44px;}
+.status-group h3{
+  font-family:'IBM Plex Mono',monospace; font-size:.76rem; letter-spacing:.08em;
+  text-transform:uppercase; color:var(--ink); margin:0 0 6px;
+  display:flex; align-items:center; gap:8px;
+}
+.status-group .status-note{color:var(--ink-dim); font-size:.88rem; margin:0 0 16px; max-width:66ch;}
+
+/* ---------- talking points ---------- */
+.talking-points{
+  border:1px solid var(--line); border-radius:3px; background:var(--surface);
+  padding:20px 22px; box-shadow:var(--shadow);
+}
+.talking-points ul{margin:0; padding-left:1.2em;}
+.talking-points li{margin-bottom:10px; font-size:.95rem;}
+.talking-points li:last-child{margin-bottom:0;}
+.talking-points li strong{font-weight:600;}
 
 /* ---------- agenda / footer ---------- */
 .agenda{
@@ -210,25 +281,33 @@ footer{
 
 <header class="bar">
   <span class="proj">Kong-Fu Chess &middot; CTD</span>
-  <span class="meta">Design Notes &middot; three trade-offs from the TODO pass</span>
+  <span class="meta">Design Notes &middot; extensibility &amp; OCP review</span>
 </header>
 
 <main>
 
-  <div class="eyebrow">Architecture Review &middot; Follow-up</div>
+  <div class="eyebrow">Architecture Review &middot; Extensibility Pass</div>
   <h1>The Rule Every Piece Doesn't Follow</h1>
-  <p class="sub">Six architectural TODOs went from comment to code this cycle. None of them were mechanical &mdash; each one had a real fork in the road. These are the three forks worth defending out loud, and what was <em>deliberately</em> left on the whiteboard.</p>
+  <p class="sub">A follow-up pass, now against an explicit requirement: the board may stop being rectangular, piece rules may stop being chess, and variants must be addable without rewriting the engine. Nine architectural TODOs are code so far &mdash; three of them this cycle &mdash; and the rest are staged on purpose, not forgotten.</p>
 
   <div class="stats">
-    <div class="stat"><div class="n tab">6</div><div class="l">TODOs implemented</div></div>
-    <div class="stat"><div class="n tab">12</div><div class="l">Left as documented TODOs</div></div>
-    <div class="stat"><div class="n tab">389</div><div class="l">Tests passing</div></div>
-    <div class="stat"><div class="n mono" style="font-size:1.05rem">db6cefe</div><div class="l">HEAD on main</div></div>
+    <div class="stat"><div class="n tab">9<small> / 3 new</small></div><div class="l">TODOs implemented</div></div>
+    <div class="stat"><div class="n tab">22</div><div class="l">Documented TODOs remaining</div></div>
+    <div class="stat"><div class="n tab">406</div><div class="l">Tests passing</div></div>
+    <div class="stat"><div class="n mono" style="font-size:1.05rem">bbcf16c</div><div class="l">HEAD on main</div></div>
   </div>
 
+  <section id="requirement">
+    <p class="req-label">The Extension Requirement</p>
+    <div class="requirement">
+      <blockquote>&ldquo;The system must remain highly extensible. In the future, the board may not be rectangular, piece movement rules may be completely different from standard chess, and game variants should be introduced with minimal modification to existing stable code.&rdquo;</blockquote>
+      <p class="req-consequence">This changes how every existing TODO in this codebase should be read. Rectangular rows/cols, standard chess pieces, delta-based movement, capture-by-overwrite, and king-capture victory are <strong>implementations of the current iteration, not permanent engine assumptions</strong>. Open/Closed is therefore a primary project requirement, not an optional future concern &mdash; and every dilemma below is re-argued against that standard, not against &ldquo;is this convenient for the current chess-only game.&rdquo;</p>
+    </div>
+  </section>
+
   <section id="dilemmas">
-    <h2><span class="glyph">&#9823;</span> Three forks in the road</h2>
-    <p class="lede">Each one is a real trade-off, not a right-answer-vs-wrong-answer. The verdict names the cost of the option that won, not just its benefit.</p>
+    <h2><span class="glyph">&#9823;</span> Four forks in the road</h2>
+    <p class="lede">Each one is a real trade-off, not a right-answer-vs-wrong-answer. The verdict names the cost of the option that won, not just its benefit &mdash; and, where the extension requirement changes the calculus, says so explicitly.</p>
 
     <div class="dilemmas">
 
@@ -267,7 +346,7 @@ class PawnRule(PieceRule):
         </div>
         <div class="verdict">
           <span class="vlabel">Verdict</span>
-          <p><strong>Chose blast radius over purity.</strong> PawnRule now inherits a <code>matches()</code> it never implements &mdash; still a bare <code>NotImplementedError</code>, dead weight on that one class. A strict reading of Strategy would call that a leak. It's a fair price for not touching five stable classes to serve the needs of a sixth.</p>
+          <p><strong>A pragmatic current win, not the final contract.</strong> Chose blast radius over purity: PawnRule inherits a <code>matches()</code> it never implements, and <code>is_legal</code>'s default still measures <code>dr</code>/<code>dc</code> &mdash; a rectangular-grid delta, exactly as grid-specific as before. Under the extension requirement, that's now a named gap rather than a footnote: a genuinely topology-independent <code>RuleContext</code> (piece, positions, board, topology, game state, clock) is still required, staged deliberately after Position/BoardTopology settle rather than guessed at here.</p>
         </div>
       </div>
 
@@ -299,81 +378,289 @@ class FakeRenderer:
         </div>
         <div class="verdict">
           <span class="vlabel">Verdict</span>
-          <p>The two payoffs don't have to travel together. Declined to add a &ldquo;swap rendering backends&rdquo; TODO here (see the note left on the class itself) &mdash; that benefit was never available under this project's constraints. The testability benefit is real today and already in use, which is reason enough on its own.</p>
+          <p>The two payoffs don't have to travel together, and a non-rectangular board doesn't reopen this question either way: an irregular or hex board still paints through <code>ImgRenderer</code>, at pixel rects <code>Renderer</code> never has an opinion about. What changes is <em>which coordinates</em> get handed to it &mdash; that's a future <code>BoardLayout</code>'s job (see Dilemma&nbsp;4), not a second Renderer backend. Declined a &ldquo;swap rendering backends&rdquo; TODO here on purpose; the testability benefit already in use is reason enough on its own.</p>
         </div>
       </div>
 
       <div class="dilemma">
         <div class="dilemma-head">
-          <p class="kicker">Encapsulation &middot; model/board.py</p>
+          <p class="kicker">Encapsulation &amp; Strategy &middot; model/board.py</p>
           <h3>How far does one pass go?</h3>
-          <p class="tension">The only real violation was <code>BoardRenderer</code> reaching into <code>board.cells</code> directly &mdash; a two-line fix. But the same review also named boundary-checked access and a <code>Position</code> value object as related gaps, in the same file, one scroll away. <strong>Fix the one bug, or the whole neighborhood, while already inside the file?</strong></p>
+          <p class="tension">Last cycle's fix was narrow: <code>BoardRenderer</code> reaching into <code>board.cells</code> directly, a two-line encapsulation fix. This cycle, the explicit non-rectangular-board requirement turned one item from that same file's TODO list &mdash; boundary validity &mdash; from &ldquo;someday&rdquo; into &ldquo;now.&rdquo; <strong>Which one gets a real seam this time, and which stay on the list?</strong></p>
         </div>
         <div class="choice-grid">
           <div class="choice rejected">
             <span class="label">&#10005; Considered</span>
-            <h4>Fix all three together</h4>
+            <h4>Fix everything board.py's TODOs name</h4>
             <pre><code># in one pass:
-# - _cells + iter_rows()
-# - get_cell() raises on
-#   out-of-range
-# - Position(row, col)
-#   replaces every (row, col)</code></pre>
-            <p>They're thematically related and live in the same class &mdash; batching them means one review instead of three, and less "here we go again" fatigue re-opening the same file.</p>
+# - full BoardTopology
+#   (positions/neighbors)
+# - BoardStorage
+# - Position value object
+# - validated get_cell/set_cell</code></pre>
+            <p>They're all named in the same file, all pointing at the same rectangular assumption. Batching them means one review instead of four &mdash; but a <code>Position</code> value object alone touches roughly thirteen files across every layer.</p>
           </div>
           <div class="choice chosen">
             <span class="label">&#10003; Chosen</span>
-            <h4>Fix only the violation that exists today</h4>
-            <pre><code>def iter_rows(self):
-    return (tuple(row)
-        for row in self._cells)</code></pre>
-            <p><code>cells</code> &rarr; <code>_cells</code>, one read-only accessor, one caller migrated. <code>get_cell</code>/<code>set_cell</code> and every <code>(row, col)</code> call site are untouched.</p>
+            <h4>One minimal, provably real seam</h4>
+            <pre><code>class RectangularTopology:
+    def contains(self, row, col):
+        return (0 <= row < self.rows
+            and 0 <= col < self.cols)
+
+# Board(cells, topology=None)
+# is_inside() -&gt; self.topology
+#     .contains(row, col)</code></pre>
+            <p><code>Board.is_inside</code> now asks an injected object, defaulting to today's rectangle &mdash; zero callers changed, behavior identical, and a test proves it by injecting a topology a rectangle would reject.</p>
           </div>
         </div>
         <div class="verdict">
           <span class="vlabel">Verdict</span>
-          <p><strong>Related in the write-up isn't related in the risk.</strong> A <code>Position</code> value object touches roughly thirteen files across every layer; boundary validation has zero observed failures to guard against. Bundling three unequal-risk changes under one motivating paragraph would've made the diff harder to review and rolled three independent bets into a single commit. Each stays its own TODO, timed on its own.</p>
+          <p><strong>A seam is not the same thing as the abstraction.</strong> This is <code>contains()</code> only, still keyed by <code>(row, col)</code> &mdash; not <code>positions()</code>/<code>neighbors()</code>, not a topology-independent Position, not migrated into RuleEngine or the GUI. Each of those remains a named, required-direction TODO (not speculative &mdash; the requirement asks for exactly this), deferred because each has a different, larger blast radius than a single default-parameter injection. Related in the write-up still isn't related in the risk.</p>
+        </div>
+      </div>
+
+      <div class="dilemma">
+        <div class="dilemma-head">
+          <p class="kicker">Staged Extensibility &middot; engine/game_engine.py</p>
+          <h3>General engine, or chess-specific engine?</h3>
+          <p class="tension">GameEngine still knows what a King is, still resolves every arrival as source-to-destination travel, still decides victory inline. A truly variant-agnostic engine would know none of that. <strong>Generalize the whole orchestration layer now, or extract one seam at a time?</strong></p>
+        </div>
+        <div class="choice-grid">
+          <div class="choice rejected">
+            <span class="label">&#10005; Considered</span>
+            <h4>Generalize everything in one pass</h4>
+            <pre><code># in one rewrite:
+# - GameAction (Command)
+# - InteractionResolver
+# - full BoardTopology
+# - WinCondition
+# all wired through GameEngine
+# simultaneously</code></pre>
+            <p>Would produce the &ldquo;properly generic&rdquo; engine the requirement ultimately points at &mdash; but as one large, hard-to-review rewrite touching every method GameEngine has, with no test coverage proving any single seam correct before the next one lands on top of it.</p>
+          </div>
+          <div class="choice chosen">
+            <span class="label">&#10003; Chosen</span>
+            <h4>Extract the one seam that was safe to isolate</h4>
+            <pre><code>class CaptureKingWinCondition:
+    def check(self, moving_piece,
+        captured_piece, board):
+        if (captured_piece and
+            captured_piece.is_king()):
+            return moving_piece.color
+        return None
+
+# GameEngine(..., win_condition=None)</code></pre>
+            <p><code>WinCondition</code> was genuinely isolated (one inline <code>if</code>, one clear question: &ldquo;did this arrival just end the game&rdquo;) &mdash; extracted, injected, tested with a fake that proves the engine no longer hardcodes King capture. <code>InteractionResolver</code> and <code>GameAction</code> were judged <em>not</em> isolated enough yet and stayed TODOs.</p>
+          </div>
+        </div>
+        <div class="verdict">
+          <span class="vlabel">Verdict</span>
+          <p>OCP is being reached <strong>incrementally</strong>, by identifying real extension seams and implementing the ones that are already isolated - not by declaring one large framework necessary and building it speculatively. That is slower to look &ldquo;done,&rdquo; and is the honest trade-off: a reviewer should see exactly which seams exist today, which were added this pass, and which are still staged &mdash; not a claim that the engine is already variant-agnostic.</p>
         </div>
       </div>
 
     </div>
   </section>
 
-  <section id="deferred">
-    <h2>Deliberately still open</h2>
-    <p class="lede">The other twelve TODOs from the review, left as comments on purpose. Named here so it reads as a decision, not an omission.</p>
+  <section id="map">
+    <h2>Architecture extension map</h2>
+    <p class="lede">Every dimension the requirement names as likely to vary, what implements it today, and the seam that would let it vary without touching stable code.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Dimension expected to vary</th><th>Current implementation</th><th>Future extension seam</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Board shape</td><td class="dim">rectangular rows/cols</td><td><code>BoardTopology</code> &mdash; <em>contains() seam implemented</em></td></tr>
+          <tr><td>Position</td><td class="dim">row + col integers</td><td>topology-independent <code>Position</code></td></tr>
+          <tr><td>Board storage</td><td class="dim">2D list (<code>_cells</code>)</td><td><code>BoardStorage</code></td></tr>
+          <tr><td>Piece behavior</td><td class="dim"><code>PieceRule</code> / <code>PawnRule</code></td><td><code>RuleContext</code> / topology-independent <code>is_legal</code></td></tr>
+          <tr><td>Piece registration</td><td class="dim">hard-coded kinds, 3 collaborators</td><td><code>PieceDefinition</code> registry</td></tr>
+          <tr><td>Board-text validation</td><td class="dim">fixed piece-kind set</td><td class="dim"><em>registry-backed &mdash; implemented</em></td></tr>
+          <tr><td>Capture / collision</td><td class="dim">replace enemy on arrival, inline</td><td><code>InteractionResolver</code></td></tr>
+          <tr><td>Victory</td><td class="dim">fixed King-capture check</td><td class="dim"><em><code>WinCondition</code> &mdash; implemented</em></td></tr>
+          <tr><td>Action shape</td><td class="dim">source &rarr; destination only</td><td><code>GameAction</code> (Command)</td></tr>
+          <tr><td>Timing</td><td class="dim">distance &times; constant</td><td><code>MovementDurationPolicy</code></td></tr>
+          <tr><td>Path</td><td class="dim">direct interpolation</td><td><code>PathStrategy</code></td></tr>
+          <tr><td>GUI geometry</td><td class="dim">rectangular cells, integer division</td><td><code>BoardLayout</code></td></tr>
+          <tr><td>Parsing / plugin boundary</td><td class="dim">fixed text DSL</td><td>declarative layout + registered strategy code</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
 
-    <div class="gaps">
-      <div class="gap-card">
-        <h3>Position value object</h3>
-        <p>Every layer passes (row, col) as loose integers &mdash; Motion, RealTimeArbiter, GameEngine, RuleEngine, MoveResolvedEvent, the GUI. Real Primitive Obsession, but fixing it touches method signatures across the whole codebase for a purely structural win. Its own deliberate pass, not a rider on this one.</p>
-        <span class="where">board.py &middot; ~13 files project-wide</span>
+  <section id="ocp">
+    <h2>Open/Closed Principle assessment</h2>
+    <p class="lede">Honest, not aspirational: rated by what adding each extension would actually require in the code as it stands today.</p>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Extension scenario</th><th>Current effort</th><th>OCP status</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Add a simple chess-like piece</td><td class="dim">register one <code>PieceRule</code></td><td><span class="pill partial">Partial</span></td></tr>
+          <tr><td>Add a context-sensitive piece (like Pawn)</td><td class="dim">implement <code>is_legal</code> directly</td><td><span class="pill partial">Partial</span></td></tr>
+          <tr><td>Add a completely new action type</td><td class="dim">edit Motion, Arbiter, GameEngine</td><td><span class="pill weak">Weak</span></td></tr>
+          <tr><td>Add an irregular/non-rectangular board</td><td class="dim">domain seam exists; GUI still rectangular</td><td><span class="pill weak">Weak</span></td></tr>
+          <tr><td>Add a new win condition</td><td class="dim">inject a <code>WinCondition</code></td><td><span class="pill strong">Strong</span></td></tr>
+          <tr><td>Add a custom capture/collision rule</td><td class="dim">edit <code>_resolve_motion</code> directly</td><td><span class="pill weak">Weak</span></td></tr>
+          <tr><td>Add a custom piece registry for validation</td><td class="dim">inject <code>valid_piece_kinds</code></td><td><span class="pill strong">Strong</span></td></tr>
+          <tr><td>Add a GUI layout for an irregular board</td><td class="dim">rewrite geometry + mapper + loop</td><td><span class="pill weak">Weak</span></td></tr>
+          <tr><td>Add a test/fake renderer</td><td class="dim">implement the <code>Renderer</code> ABC</td><td><span class="pill strong">Strong</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section id="status">
+    <h2>TODO status, reclassified</h2>
+    <p class="lede">The extension requirement changes <em>why</em> things are deferred. Nothing below is deferred because it's speculative anymore &mdash; only because of scope, or because no concrete need exists yet.</p>
+
+    <div class="status-groups">
+
+      <div class="status-group">
+        <h3>Implemented this pass</h3>
+        <p class="status-note">Three small, independently testable seams &mdash; each removes one concrete hardcoded dependency, none migrate any other layer.</p>
+        <div class="gaps">
+          <div class="gap-card done">
+            <h3>BoardTopology (minimal seam)</h3>
+            <p><code>Board.is_inside</code> now delegates to an injected topology object, defaulting to <code>RectangularTopology</code>. <code>contains()</code> only &mdash; not the full future interface.</p>
+            <span class="where">model/board.py &middot; model/board_topology.py (new)</span>
+          </div>
+          <div class="gap-card done">
+            <h3>WinCondition</h3>
+            <p>King-capture victory extracted from an inline <code>if</code> in <code>_resolve_motion</code> into an injected Strategy, defaulting to <code>CaptureKingWinCondition</code>.</p>
+            <span class="where">engine/game_engine.py &middot; rules/win_condition.py (new)</span>
+          </div>
+          <div class="gap-card done">
+            <h3>Injected piece registry in BoardValidator</h3>
+            <p><code>validate_tokens</code> now defaults to <code>PIECE_RULES.keys()</code> instead of its own separately maintained <code>VALID_PIECES</code> set &mdash; one fewer place a new piece kind has to be registered.</p>
+            <span class="where">io/board_validator.py</span>
+          </div>
+        </div>
       </div>
-      <div class="gap-card">
-        <h3>Central PieceDefinition registry</h3>
-        <p>Kind letters and what they mean are re-declared in five places (rules, promotion, validation, HUD scoring). Small and stable duplication today; a registry is warranted once a second piece set or variant actually exists, not before.</p>
-        <span class="where">model/piece.py</span>
+
+      <div class="status-group">
+        <h3>High-priority architecture TODOs</h3>
+        <p class="status-note">Required by the extension requirement, not speculative &mdash; deferred purely on blast radius/scope.</p>
+        <div class="gaps">
+          <div class="gap-card">
+            <h3>Topology-independent Position</h3>
+            <p>Every layer passes (row, col) as loose integers. A Position family (GridPosition today, HexPosition/NodePosition later) is required once BoardTopology needs positions that aren't two integers.</p>
+            <span class="where">model/board.py &middot; ~13 files project-wide</span>
+          </div>
+          <div class="gap-card">
+            <h3>Full BoardTopology (positions/neighbors)</h3>
+            <p>Today's seam is <code>contains()</code> only. RuleEngine's path-clearing and the GUI's row/col iteration still assume a rectangular range independently of it.</p>
+            <span class="where">model/board_topology.py &middot; rules/rule_engine.py &middot; gui/</span>
+          </div>
+          <div class="gap-card">
+            <h3>BoardStorage</h3>
+            <p>A dense 2D list agrees with a rectangle by coincidence, not by design. An irregular or graph board needs storage that can vary independently of topology.</p>
+            <span class="where">model/board.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>Topology-independent RuleContext</h3>
+            <p>The Pawn Template Method (Dilemma&nbsp;1) still measures a grid delta. A context object (piece, positions, board, topology, game state, clock) is the actual long-term contract.</p>
+            <span class="where">rules/piece_rules.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>Central PieceDefinition registry</h3>
+            <p>Kind letters are still re-declared in three places (down from four). One record per kind &mdash; rule, display name, score, rendering key, duration/transformation policy &mdash; finishes the job.</p>
+            <span class="where">model/piece.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>InteractionResolver</h3>
+            <p>Friendly-collision, capture and airborne-kill are three sequential branches sharing board mutation, cooldown timing and event publishing &mdash; not yet isolated enough to extract safely.</p>
+            <span class="where">engine/game_engine.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>GUI BoardLayout</h3>
+            <p>A non-rectangular domain board is incomplete if the presentation layer still assumes equal rectangular cells. Needed for board_geometry.py, BoardMapper and game_loop together.</p>
+            <span class="where">gui/geometry/board_geometry.py &middot; input/board_mapper.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>Validated Board boundary access</h3>
+            <p><code>get_cell</code>/<code>set_cell</code> still trust callers to have checked <code>is_inside</code> first; <code>topology.contains()</code> is now the natural place to own that check.</p>
+            <span class="where">model/board.py</span>
+          </div>
+        </div>
       </div>
-      <div class="gap-card">
-        <h3>Injectable PieceCodec</h3>
-        <p>Text (de)serialization still lives on <code>Piece</code> itself. Exactly one wire format is in use, so a Strategy/Adapter seam here would be speculative until a second one is needed.</p>
-        <span class="where">model/piece.py</span>
+
+      <div class="status-group">
+        <h3>Feature-triggered TODOs</h3>
+        <p class="status-note">Real, but only worth building once a concrete requirement names the second case &mdash; building them speculatively risks guessing the shape wrong.</p>
+        <div class="gaps">
+          <div class="gap-card">
+            <h3>GameAction generalization</h3>
+            <p>Would be justified by an actual second action type (teleport, swap, push, ranged attack). No such requirement exists yet.</p>
+            <span class="where">engine/game_engine.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>MovementDurationPolicy / PathStrategy</h3>
+            <p>Justified by a second timing rule or path shape (e.g. once a hex/graph BoardTopology exists). Exactly one of each exists today.</p>
+            <span class="where">realtime/motion.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>Cell / CellState (multi-occupancy, terrain)</h3>
+            <p>Justified by a concrete requirement for obstacles, traps, or shared occupancy. Changes the central domain model &mdash; not introduced speculatively.</p>
+            <span class="where">model/board.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>Board snapshot / Memento</h3>
+            <p>Justified by undo, replay, or AI search. No such requirement exists yet.</p>
+            <span class="where">model/board.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>Injectable PieceCodec</h3>
+            <p>Justified by a second wire/storage format. Exactly one text format is in use.</p>
+            <span class="where">model/piece.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>State Pattern for game lifecycle</h3>
+            <p>Two booleans, one end condition (now pluggable via WinCondition), no other phase. Explicitly <em>not</em> recommended unless more phases appear.</p>
+            <span class="where">engine/game_engine.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>Plugin / config loading boundary</h3>
+            <p>Declarative layout data is a reasonable future config format; piece behavior should stay executable strategy code, not JSON. No runtime loading exists yet.</p>
+            <span class="where">io/board_parser.py</span>
+          </div>
+          <div class="gap-card">
+            <h3>EventBus listener Protocol, Composition Root, GUI clock injection, Command registry</h3>
+            <p>Unrelated to the board/piece extensibility goal specifically &mdash; each still valid, each waiting on its own trigger (more subscriber variety, growing construction complexity, GUI-loop tests, a larger command set).</p>
+            <span class="where">engine/events.py &middot; gui/game_loop.py &middot; input/commands.py</span>
+          </div>
+        </div>
       </div>
-      <div class="gap-card">
-        <h3>Board snapshot / Memento</h3>
-        <p>No undo, replay, or AI search exists in this project, so nothing consumes a snapshot yet. Infrastructure without a consumer is a cost with no offsetting benefit.</p>
-        <span class="where">model/board.py</span>
+
+      <div class="status-group">
+        <h3>Explicitly rejected</h3>
+        <p class="status-note">Not deferred &mdash; ruled out, and said so in the code.</p>
+        <div class="gaps">
+          <div class="gap-card rejected">
+            <h3>A second production Renderer backend</h3>
+            <p>The instructor's Img-only constraint makes this the one item that isn't &ldquo;not yet&rdquo; &mdash; it's &ldquo;not ever, on purpose.&rdquo; Irregular boards still render through <code>ImgRenderer</code>, via a future <code>BoardLayout</code> supplying different coordinates (see Dilemma&nbsp;4), never via a second Renderer.</p>
+            <span class="where">gui/rendering/renderer.py</span>
+          </div>
+        </div>
       </div>
-      <div class="gap-card">
-        <h3>State Pattern for game-over</h3>
-        <p>Two booleans, one end condition, no other lifecycle phase. A finite-state machine here would be a pattern applied because it's available, not because the branching needs it &mdash; explicitly <em>not</em> recommended unless more phases appear.</p>
-        <span class="where">engine/game_engine.py</span>
-      </div>
-      <div class="gap-card">
-        <h3>Alternative Renderer backend</h3>
-        <p>Not deferred &mdash; ruled out. The instructor's Img-only constraint makes this the one TODO on the list that isn't &ldquo;not yet,&rdquo; it's &ldquo;not ever, on purpose.&rdquo;</p>
-        <span class="where">gui/rendering/renderer.py</span>
-      </div>
+
+    </div>
+  </section>
+
+  <section id="talking-points">
+    <h2>How to present this in the review</h2>
+    <div class="talking-points">
+      <ul>
+        <li><strong>Name the assumptions as implementations, not contracts, up front.</strong> Rectangular geometry, chess pieces, capture-by-overwrite, and king-capture victory are all things the current code does, not things the architecture requires.</li>
+        <li><strong>Point at the seams that already exist</strong> before this pass: Strategy-pattern rules, DI throughout GameEngine/RuleEngine/GameController, a Renderer interface already exercised by a fake.</li>
+        <li><strong>Show which seams were added now</strong> &mdash; BoardTopology, WinCondition, the shared piece registry &mdash; and that each has a test proving it's genuinely injectable, not just structurally present.</li>
+        <li><strong>Be explicit about what crosses too many layers to do safely in this pass</strong> &mdash; Position, full BoardTopology, BoardLayout, InteractionResolver &mdash; and why: each touches multiple files with no way to verify correctness incrementally.</li>
+        <li><strong>Deferral is not the same as ignoring the requirement.</strong> Every deferred item is named, classified (required-direction vs. feature-triggered vs. rejected), and reasoned about in this document and in the code comment at its exact seam.</li>
+        <li><strong>Overengineering all of this in one commit would have cost more than it bought</strong> &mdash; harder to review, harder to verify, and more likely to guess wrong about interfaces no second implementation has tested yet. Staged extensibility is the deliberate choice, not a shortcut.</li>
+      </ul>
     </div>
   </section>
 
@@ -381,10 +668,12 @@ class FakeRenderer:
     <h2>Suggested order for the review</h2>
     <div class="agenda">
       <ol>
-        <li><strong>The Pawn dilemma first</strong> &mdash; it's the one with real interface-design tension worth debating live.</li>
-        <li><strong>Run the suite on screen</strong> &mdash; <code class="mono">pytest Tests -v</code>, 389 green, same two pre-existing unrelated subprocess failures as before this pass.</li>
-        <li><strong>The Renderer question</strong> &mdash; good test of whether &ldquo;DI for testability alone&rdquo; reads as legitimate or as ceremony to a reviewer seeing it cold.</li>
-        <li><strong>Deliberately-open list</strong> &mdash; confirm each deferral reads as a decision; challenge any that seem like an excuse.</li>
+        <li><strong>The Extension Requirement, read aloud</strong> &mdash; frame everything that follows against it before showing any code.</li>
+        <li><strong>Dilemma 4 (general vs. chess-specific engine)</strong> &mdash; the clearest statement of the staged-extensibility strategy; start here, not with Dilemma 1.</li>
+        <li><strong>Run the suite on screen</strong> &mdash; <code class="mono">pytest Tests -v</code>, 406 green, same two pre-existing unrelated subprocess failures as before this pass.</li>
+        <li><strong>The extension map and OCP table</strong> &mdash; let the reviewer see the honest weak spots before they ask about them.</li>
+        <li><strong>Dilemmas 1&ndash;3</strong> &mdash; each is a smaller, concrete instance of the same staging decision.</li>
+        <li><strong>TODO status groups</strong> &mdash; confirm every deferral reads as reasoned, not as an excuse.</li>
       </ol>
     </div>
   </section>
@@ -393,5 +682,5 @@ class FakeRenderer:
 
 <footer>
   <span>ZipiZipi7746/Kong-Fu_Chess_CTD &middot; branch main</span>
-  <span>389 passed &middot; 2 pre-existing, unrelated failures</span>
+  <span>406 passed &middot; 2 pre-existing, unrelated failures</span>
 </footer>
