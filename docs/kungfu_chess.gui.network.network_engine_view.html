@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.network.network_engine_view</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.network.html" class="white">network</a>.network_engine_view</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cnetwork_engine_view.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\network_engine_view.py</a></td></tr></table>
+    <p><span class="code">Phase&nbsp;F&nbsp;Milestone&nbsp;1:&nbsp;a&nbsp;read-only&nbsp;GameEngine-shaped&nbsp;adapter&nbsp;over&nbsp;the<br>
+latest&nbsp;render_state&nbsp;payload&nbsp;received&nbsp;from&nbsp;the&nbsp;server.&nbsp;Lets&nbsp;the&nbsp;existing<br>
+ViewModelRegistry/cooldown-highlight&nbsp;drawing&nbsp;code&nbsp;(built&nbsp;against&nbsp;a&nbsp;real<br>
+local&nbsp;GameEngine)&nbsp;consume&nbsp;network&nbsp;state&nbsp;through&nbsp;the&nbsp;exact&nbsp;same&nbsp;method<br>
+surface,&nbsp;without&nbsp;either&nbsp;of&nbsp;them&nbsp;needing&nbsp;to&nbsp;know&nbsp;the&nbsp;difference.<br>
+&nbsp;<br>
+Holds&nbsp;no&nbsp;board-legality&nbsp;logic&nbsp;and&nbsp;imports&nbsp;nothing&nbsp;from<br>
+kungfu_chess.rules/realtime/model&nbsp;-&nbsp;it&nbsp;only&nbsp;ever&nbsp;remembers&nbsp;whatever&nbsp;the<br>
+server's&nbsp;most&nbsp;recent&nbsp;render_state&nbsp;said&nbsp;(Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;1's&nbsp;hard<br>
+rule:&nbsp;the&nbsp;client&nbsp;only&nbsp;ever&nbsp;renders&nbsp;and&nbsp;requests).</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.gui.network.network_engine_view.html#NetworkEngineView">NetworkEngineView</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="NetworkEngineView">class <strong>NetworkEngineView</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor"><span class="code">&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="NetworkEngineView-__init__"><strong>__init__</strong></a>(self)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="NetworkEngineView-cooldown_progress"><strong>cooldown_progress</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="NetworkEngineView-has_pending_move_from"><strong>has_pending_move_from</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="NetworkEngineView-is_airborne"><strong>is_airborne</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="NetworkEngineView-is_on_cooldown"><strong>is_on_cooldown</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="NetworkEngineView-motion_progress"><strong>motion_progress</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="NetworkEngineView-motion_target"><strong>motion_target</strong></a>(self, row, col)</dt></dl>
+
+<dl><dt><a name="NetworkEngineView-update"><strong>update</strong></a>(self, render_state)</dt><dd><span class="code">Accepts&nbsp;either&nbsp;a&nbsp;full&nbsp;render_state&nbsp;payload&nbsp;or&nbsp;a&nbsp;state_snapshot/<br>
+game_started&nbsp;payload&nbsp;(board/sequence/game_over/winner&nbsp;only,&nbsp;no<br>
+motions/cooldowns/airborne&nbsp;keys)&nbsp;-&nbsp;the&nbsp;network&nbsp;game&nbsp;loop&nbsp;feeds<br>
+both&nbsp;shapes&nbsp;through&nbsp;this&nbsp;same&nbsp;call&nbsp;rather&nbsp;than&nbsp;branching&nbsp;on<br>
+message&nbsp;type.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

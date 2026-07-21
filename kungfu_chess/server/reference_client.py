@@ -22,7 +22,7 @@ import sys
 import websockets  # pragma: no cover
 
 from kungfu_chess.server import schemas  # pragma: no cover
-from kungfu_chess.server.cli_login_flow import CliLoginFlow  # pragma: no cover
+from kungfu_chess.server.login_client import perform_login  # pragma: no cover
 
 SERVER_URL = "ws://localhost:8765"  # pragma: no cover
 
@@ -94,41 +94,6 @@ async def send_loop(websocket, state):  # pragma: no cover
             "move_request",
             {"from_row": from_row, "from_col": from_col, "to_row": to_row, "to_col": to_col},
             game_id=state.get("game_id"))))
-
-
-async def _send_and_await(websocket, type_, payload):  # pragma: no cover
-    await websocket.send(schemas.encode(schemas.make_envelope(type_, payload)))
-    return json.loads(await websocket.recv())
-
-
-async def perform_login(websocket):  # pragma: no cover
-    """Drives CliLoginFlow's username -> password -> authenticated
-    sequence over the wire, offering registration for a brand-new
-    account. Returns the authenticated flow, or None if the user gave up
-    after a failure."""
-    flow = CliLoginFlow()
-    flow.submit_username(input("Username: ").strip())
-    # Plain input(), not getpass.getpass(): on Windows, getpass reads
-    # directly from the console (msvcrt) rather than sys.stdin, so it
-    # hangs forever under any redirected/piped stdin - unacceptable for a
-    # client meant to be scriptable for the acceptance walkthrough.
-    flow.submit_password(input("Password: ").strip())
-
-    if input("New account? [y/N]: ").strip().lower().startswith("y"):
-        response = await _send_and_await(
-            websocket, "register", {"username": flow.username, "password": flow.password})
-        if response["type"] == "error":
-            print(f"Registration failed: {response['payload']['code']}")
-            return None
-        print(f"Registered as {flow.username}.")
-
-    response = await _send_and_await(
-        websocket, "login", {"username": flow.username, "password": flow.password})
-    if response["type"] == "error":
-        print(f"Login failed: {response['payload']['code']}")
-        return None
-    flow.mark_authenticated(response["payload"]["session_token"])
-    return flow
 
 
 async def main():  # pragma: no cover

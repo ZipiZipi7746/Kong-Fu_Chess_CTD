@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.network.network_game_controller</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.network.html" class="white">network</a>.network_game_controller</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cnetwork_game_controller.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\network_game_controller.py</a></td></tr></table>
+    <p><span class="code">Phase&nbsp;F&nbsp;Milestone&nbsp;1:&nbsp;the&nbsp;client-side&nbsp;click-to-command&nbsp;state&nbsp;machine<br>
+for&nbsp;networked&nbsp;play&nbsp;-&nbsp;the&nbsp;network&nbsp;analogue&nbsp;of&nbsp;input.controller.<br>
+GameController,&nbsp;but&nbsp;it&nbsp;never&nbsp;decides&nbsp;legality&nbsp;itself.&nbsp;A&nbsp;click&nbsp;either<br>
+selects&nbsp;a&nbsp;friendly&nbsp;piece&nbsp;(a&nbsp;UX-only&nbsp;convenience&nbsp;-&nbsp;not&nbsp;a&nbsp;rules&nbsp;decision;<br>
+the&nbsp;pending/airborne/cooldown&nbsp;filtering&nbsp;below&nbsp;only&nbsp;reads&nbsp;booleans&nbsp;the<br>
+server&nbsp;already&nbsp;told&nbsp;this&nbsp;client&nbsp;via&nbsp;self.<strong>engine</strong>,&nbsp;a&nbsp;NetworkEngineView)<br>
+or&nbsp;submits&nbsp;a&nbsp;move_request/jump_request&nbsp;for&nbsp;the&nbsp;server&nbsp;to&nbsp;accept&nbsp;or<br>
+reject.&nbsp;Holds&nbsp;no&nbsp;board-legality&nbsp;logic&nbsp;and&nbsp;imports&nbsp;nothing&nbsp;from<br>
+kungfu_chess.rules/model&nbsp;-&nbsp;the&nbsp;server&nbsp;remains&nbsp;the&nbsp;sole&nbsp;authority<br>
+(Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;1).<br>
+&nbsp;<br>
+self.<strong>engine</strong>&nbsp;mirrors&nbsp;input.controller.GameController's&nbsp;own&nbsp;self.<strong>engine</strong><br>
+attribute&nbsp;on&nbsp;purpose&nbsp;(same&nbsp;name,&nbsp;same&nbsp;read-only&nbsp;surface&nbsp;for&nbsp;game_over/<br>
+has_pending_move_from/is_airborne/is_on_cooldown/cooldown_progress/<br>
+motion_progress/motion_target)&nbsp;so&nbsp;game_loop.py's&nbsp;existing<br>
+_draw_game_over_overlay&nbsp;helper&nbsp;works&nbsp;unchanged&nbsp;against&nbsp;either<br>
+controller.</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.gui.network.network_game_controller.html#NetworkGameController">NetworkGameController</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="NetworkGameController">class <strong>NetworkGameController</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#NetworkGameController">NetworkGameController</a>(my_color,&nbsp;on_move_request,&nbsp;on_jump_request,&nbsp;engine=None)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="NetworkGameController-__init__"><strong>__init__</strong></a>(self, my_color, on_move_request, on_jump_request, engine=None)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="NetworkGameController-click"><strong>click</strong></a>(self, row, col, board_rows)</dt></dl>
+
+<dl><dt><a name="NetworkGameController-jump"><strong>jump</strong></a>(self, row, col, board_rows)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

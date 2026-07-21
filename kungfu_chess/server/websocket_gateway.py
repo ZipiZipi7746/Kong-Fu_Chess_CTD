@@ -226,7 +226,9 @@ class WebSocketGateway:
             "kind": "capture" if event.captured_piece is not None else "move",
             "from": [event.from_row, event.from_col],
             "to": [event.to_row, event.to_col],
+            "moving_piece": str(event.moving_piece),
             "captured": str(event.captured_piece) if event.captured_piece is not None else None,
+            "timestamp_ms": event.timestamp_ms,
             "sequence": session.sequence,
         }
         await self._broadcast(event.game_id, schemas.make_envelope(

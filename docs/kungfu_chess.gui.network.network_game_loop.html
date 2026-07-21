@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.network.network_game_loop</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.network.html" class="white">network</a>.network_game_loop</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cnetwork_game_loop.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\network_game_loop.py</a></td></tr></table>
+    <p><span class="code">Real&nbsp;I/O&nbsp;only&nbsp;(window,&nbsp;mouse,&nbsp;timing,&nbsp;sockets)&nbsp;-&nbsp;pragma:&nbsp;no&nbsp;cover<br>
+throughout,&nbsp;same&nbsp;treatment&nbsp;as&nbsp;gui/game_loop.py&nbsp;and&nbsp;server/server_main.py.<br>
+&nbsp;<br>
+Phase&nbsp;F&nbsp;Milestone&nbsp;1:&nbsp;the&nbsp;networked&nbsp;analogue&nbsp;of&nbsp;gui/game_loop.py.&nbsp;Reuses<br>
+ImgRenderer/ViewModelRegistry/SpriteLibrary/HUD&nbsp;exactly&nbsp;as&nbsp;the&nbsp;local<br>
+game&nbsp;does&nbsp;-&nbsp;only&nbsp;the&nbsp;data&nbsp;source&nbsp;changes&nbsp;(a&nbsp;websocket&nbsp;connection<br>
+instead&nbsp;of&nbsp;a&nbsp;locally-constructed&nbsp;GameEngine.advance_time&nbsp;loop).&nbsp;Also<br>
+reuses&nbsp;game_loop.py's&nbsp;own&nbsp;_draw_side_panels/_draw_game_over_overlay/<br>
+_use_hand_cursor&nbsp;and&nbsp;window&nbsp;constants&nbsp;directly&nbsp;rather&nbsp;than&nbsp;duplicating<br>
+them&nbsp;-&nbsp;this&nbsp;file's&nbsp;own&nbsp;_draw_cell_highlights&nbsp;is&nbsp;a&nbsp;separate,&nbsp;smaller<br>
+variant&nbsp;that&nbsp;drops&nbsp;the&nbsp;legal-destination&nbsp;glow&nbsp;(no&nbsp;RuleEngine&nbsp;is<br>
+available&nbsp;client-side&nbsp;by&nbsp;design:&nbsp;the&nbsp;server&nbsp;remains&nbsp;the&nbsp;sole&nbsp;rules<br>
+authority,&nbsp;Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;1).<br>
+&nbsp;<br>
+Never&nbsp;imports&nbsp;kungfu_chess.rules/realtime&nbsp;for&nbsp;decision-making&nbsp;-&nbsp;Board/<br>
+Piece&nbsp;are&nbsp;used&nbsp;here&nbsp;purely&nbsp;as&nbsp;inert,&nbsp;already-tested&nbsp;rendering&nbsp;data<br>
+containers&nbsp;(exactly&nbsp;how&nbsp;BoardRenderer/ViewModelRegistry&nbsp;already&nbsp;treat<br>
+them),&nbsp;never&nbsp;to&nbsp;compute&nbsp;legality&nbsp;or&nbsp;timing&nbsp;locally.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+<a href="cv2.html">cv2</a><br>
+</td><td class="multicolumn"><a href="json.html">json</a><br>
+<a href="numpy.html">numpy</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+<a href="time.html">time</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-run"><strong>run</strong></a>(
+    websocket,
+    my_username,
+    board_image_path='assets/board.png',
+    pieces_root='assets/pieces_mine'
+)</dt></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>COOLDOWN_COLOR</strong> = (0, 170, 255, 140)<br>
+<strong>PANEL_WIDTH</strong> = 220<br>
+<strong>SELECTED_COLOR</strong> = (0, 215, 255, 130)<br>
+<strong>WINDOW_NAME</strong> = 'Kung Fu Chess'</td></tr></table>
+</body></html>

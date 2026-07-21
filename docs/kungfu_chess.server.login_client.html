@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.server.login_client</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.login_client</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Clogin_client.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\login_client.py</a></td></tr></table>
+    <p><span class="code">Shared&nbsp;client-side&nbsp;login&nbsp;glue&nbsp;-&nbsp;real&nbsp;I/O,&nbsp;excluded&nbsp;from&nbsp;coverage,<br>
+verified&nbsp;by&nbsp;running&nbsp;it&nbsp;(same&nbsp;treatment&nbsp;as&nbsp;reference_client.py).&nbsp;Used&nbsp;by<br>
+both&nbsp;reference_client.py&nbsp;and&nbsp;the&nbsp;networked&nbsp;GUI&nbsp;client<br>
+(gui/network/network_gui_main.py)&nbsp;so&nbsp;the&nbsp;CLI&nbsp;login&nbsp;flow's&nbsp;wire&nbsp;sequence<br>
+(register?&nbsp;-&gt;&nbsp;login&nbsp;-&gt;&nbsp;session&nbsp;token)&nbsp;is&nbsp;written&nbsp;once,&nbsp;not&nbsp;duplicated<br>
+per&nbsp;client.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="json.html">json</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-perform_login"><strong>perform_login</strong></a>(websocket)</dt><dd><span class="code">Drives&nbsp;CliLoginFlow's&nbsp;username&nbsp;-&gt;&nbsp;password&nbsp;-&gt;&nbsp;authenticated<br>
+sequence&nbsp;over&nbsp;the&nbsp;wire,&nbsp;offering&nbsp;registration&nbsp;for&nbsp;a&nbsp;brand-new<br>
+account.&nbsp;Returns&nbsp;the&nbsp;authenticated&nbsp;flow,&nbsp;or&nbsp;None&nbsp;if&nbsp;the&nbsp;user&nbsp;gave&nbsp;up<br>
+after&nbsp;a&nbsp;failure.</span></dd></dl>
+</td></tr></table>
+</body></html>

@@ -200,6 +200,8 @@ class TestMoveFlow:
                 assert white_event["type"] == "game_event"
                 assert white_event["payload"]["from"] == [6, 4]
                 assert white_event["payload"]["to"] == [5, 4]
+                assert white_event["payload"]["moving_piece"] == "wP"
+                assert white_event["payload"]["timestamp_ms"] == 1000
                 assert black_event["type"] == "game_event"
 
     @pytest.mark.asyncio
