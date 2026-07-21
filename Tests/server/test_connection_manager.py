@@ -31,6 +31,19 @@ class TestIdentity:
         assert manager.get_identity("c1") == "alice"
 
 
+class TestSessionToken:
+    def test_session_token_defaults_to_none(self):
+        manager = ConnectionManager()
+        manager.register("c1", socket="s")
+        assert manager.get_session_token("c1") is None
+
+    def test_set_session_token_is_retrievable(self):
+        manager = ConnectionManager()
+        manager.register("c1", socket="s")
+        manager.set_session_token("c1", "tok-123")
+        assert manager.get_session_token("c1") == "tok-123"
+
+
 class TestGameAssignment:
     def test_game_id_defaults_to_none(self):
         manager = ConnectionManager()

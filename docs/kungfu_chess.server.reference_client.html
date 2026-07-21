@@ -9,20 +9,22 @@
 <tr class="heading-text decor">
 <td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.reference_client</strong></td>
 <td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Creference_client.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\reference_client.py</a></td></tr></table>
-    <p><span class="code">Throwaway&nbsp;Phase&nbsp;A&nbsp;reference&nbsp;client&nbsp;-&nbsp;validates&nbsp;the&nbsp;WebSocket&nbsp;protocol<br>
-end&nbsp;to&nbsp;end&nbsp;from&nbsp;a&nbsp;real&nbsp;process.&nbsp;This&nbsp;is&nbsp;NOT&nbsp;the&nbsp;eventual&nbsp;GUI&nbsp;network<br>
-client&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;Phase&nbsp;F&nbsp;for&nbsp;that&nbsp;staged&nbsp;migration);<br>
-it&nbsp;exists&nbsp;only&nbsp;to&nbsp;drive&nbsp;server_main.py&nbsp;manually&nbsp;for&nbsp;the&nbsp;Part&nbsp;15<br>
-acceptance&nbsp;walkthrough.&nbsp;Real&nbsp;I/O&nbsp;throughout&nbsp;-&nbsp;excluded&nbsp;from&nbsp;coverage,<br>
-verified&nbsp;by&nbsp;running&nbsp;it,&nbsp;not&nbsp;by&nbsp;unit&nbsp;tests.<br>
+    <p><span class="code">Throwaway&nbsp;reference&nbsp;client&nbsp;-&nbsp;validates&nbsp;the&nbsp;WebSocket&nbsp;protocol&nbsp;end&nbsp;to<br>
+end&nbsp;from&nbsp;a&nbsp;real&nbsp;process.&nbsp;This&nbsp;is&nbsp;NOT&nbsp;the&nbsp;eventual&nbsp;GUI&nbsp;network&nbsp;client<br>
+(see&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;Phase&nbsp;F&nbsp;for&nbsp;that&nbsp;staged&nbsp;migration);&nbsp;it<br>
+exists&nbsp;only&nbsp;to&nbsp;drive&nbsp;server_main.py&nbsp;manually&nbsp;for&nbsp;the&nbsp;Part&nbsp;15/Master&nbsp;Plan<br>
+v2&nbsp;Section&nbsp;14&nbsp;acceptance&nbsp;walkthroughs.&nbsp;Real&nbsp;I/O&nbsp;throughout&nbsp;-&nbsp;excluded<br>
+from&nbsp;coverage,&nbsp;verified&nbsp;by&nbsp;running&nbsp;it,&nbsp;not&nbsp;by&nbsp;unit&nbsp;tests.<br>
 &nbsp;<br>
-Prompts&nbsp;for&nbsp;a&nbsp;username&nbsp;only&nbsp;(no&nbsp;password&nbsp;-&nbsp;Phase&nbsp;A's&nbsp;staged&nbsp;auth),&nbsp;joins<br>
-the&nbsp;shared&nbsp;quick_local&nbsp;game,&nbsp;and&nbsp;accepts&nbsp;moves&nbsp;as&nbsp;compact&nbsp;algebraic<br>
-shorthand&nbsp;("e2e4")&nbsp;typed&nbsp;at&nbsp;the&nbsp;prompt&nbsp;-&nbsp;parsed&nbsp;locally&nbsp;into&nbsp;the<br>
-from_row/from_col/to_row/to_col&nbsp;JSON&nbsp;payload&nbsp;the&nbsp;server&nbsp;actually&nbsp;expects.<br>
-The&nbsp;wire&nbsp;protocol&nbsp;itself&nbsp;is&nbsp;JSON&nbsp;throughout;&nbsp;the&nbsp;shorthand&nbsp;is&nbsp;purely&nbsp;this<br>
-client's&nbsp;own&nbsp;input&nbsp;convenience&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;JSON-vs-<br>
-shorthand&nbsp;decision).</span></p>
+Drives&nbsp;the&nbsp;permanent&nbsp;CLI&nbsp;login&nbsp;flow&nbsp;(Master&nbsp;Plan&nbsp;v2&nbsp;Decision&nbsp;2,&nbsp;via<br>
+cli_login_flow.CliLoginFlow):&nbsp;username,&nbsp;then&nbsp;password,&nbsp;then&nbsp;either<br>
+register&nbsp;or&nbsp;login&nbsp;before&nbsp;anything&nbsp;else&nbsp;is&nbsp;possible.&nbsp;Once&nbsp;authenticated,<br>
+joins&nbsp;the&nbsp;shared&nbsp;quick_local&nbsp;game&nbsp;and&nbsp;accepts&nbsp;moves&nbsp;as&nbsp;compact<br>
+algebraic&nbsp;shorthand&nbsp;("e2e4")&nbsp;typed&nbsp;at&nbsp;the&nbsp;prompt&nbsp;-&nbsp;parsed&nbsp;locally&nbsp;into<br>
+the&nbsp;from_row/from_col/to_row/to_col&nbsp;JSON&nbsp;payload&nbsp;the&nbsp;server&nbsp;actually<br>
+expects.&nbsp;The&nbsp;wire&nbsp;protocol&nbsp;itself&nbsp;is&nbsp;JSON&nbsp;throughout;&nbsp;the&nbsp;shorthand&nbsp;is<br>
+purely&nbsp;this&nbsp;client's&nbsp;own&nbsp;input&nbsp;convenience&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's<br>
+JSON-vs-shorthand&nbsp;decision).</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -42,6 +44,10 @@ shorthand&nbsp;decision).</span></p>
 <tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
 <td class="singlecolumn"><dl><dt>async <a name="-main"><strong>main</strong></a>()</dt></dl>
  <dl><dt><a name="-parse_move"><strong>parse_move</strong></a>(text)</dt></dl>
+ <dl><dt>async <a name="-perform_login"><strong>perform_login</strong></a>(websocket)</dt><dd><span class="code">Drives&nbsp;CliLoginFlow's&nbsp;username&nbsp;-&gt;&nbsp;password&nbsp;-&gt;&nbsp;authenticated<br>
+sequence&nbsp;over&nbsp;the&nbsp;wire,&nbsp;offering&nbsp;registration&nbsp;for&nbsp;a&nbsp;brand-new<br>
+account.&nbsp;Returns&nbsp;the&nbsp;authenticated&nbsp;flow,&nbsp;or&nbsp;None&nbsp;if&nbsp;the&nbsp;user&nbsp;gave&nbsp;up<br>
+after&nbsp;a&nbsp;failure.</span></dd></dl>
  <dl><dt>async <a name="-receive_loop"><strong>receive_loop</strong></a>(websocket, state)</dt></dl>
  <dl><dt><a name="-render_board"><strong>render_board</strong></a>(board_rows)</dt></dl>
  <dl><dt>async <a name="-send_loop"><strong>send_loop</strong></a>(websocket, state)</dt></dl>

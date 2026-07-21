@@ -7,6 +7,9 @@ __pycache__/
 .coverage
 htmlcov/
 
+# Runtime SQLite database (Phase B persistence - accounts/sessions/ratings)
+*.db
+
 # Virtual environments
 .venv/
 venv/

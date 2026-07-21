@@ -1,14 +1,24 @@
 """Accepts WebSocket connections, reads/writes JSON frames, delegates
-every command to GameService - zero rule logic of its own. Never imports
-kungfu_chess.model, kungfu_chess.rules, or kungfu_chess.realtime directly
-(the architecture plan's forbidden-imports rule); board state only ever
-reaches this module already serialized, via application.dto.
+every command to GameService/AuthenticationService - zero rule logic of
+its own. Never imports kungfu_chess.model, kungfu_chess.rules,
+kungfu_chess.realtime, or kungfu_chess.persistence.sqlite directly (the
+architecture plan's forbidden-imports rule, Master Plan v2 Section 5);
+board state only ever reaches this module already serialized, via
+application.dto, and accounts only ever reach it through
+AuthenticationService.
 
 Phase A has no matchmaking or rooms yet: join_game's only supported mode
 is "quick_local" - the first connection to request it waits, the second
 pairs with it (first = White, second = Black) and a GameSession is
 created immediately. Phases C/E replace this with real matchmaking/room
 assignment without changing anything below the join_game handler itself.
+
+Phase B replaces the password-less "connect" message with the permanent
+CLI login flow (Decision 2): "register" creates an account, "login"
+authenticates and returns a session token (Decision 7 - consumed fully
+once Phase D adds reconnection). GameSession.color_for/white/black are
+still plain display-name strings (unchanged from Phase A) - only the
+identification step gained real credentials.
 """
 
 import asyncio
@@ -16,12 +26,14 @@ import logging
 import uuid
 
 from kungfu_chess.application import dto
+from kungfu_chess.application.auth_service import AuthenticationService, InvalidCredentialsError
 from kungfu_chess.messaging.application_events import (
     GameStartedEvent,
     GameMoveAppliedEvent,
     MoveRejectedEvent,
     GameEndedEvent,
 )
+from kungfu_chess.persistence.repositories import DuplicateUsernameError
 from kungfu_chess.server import schemas
 from kungfu_chess.server.connection_manager import ConnectionManager
 
@@ -29,10 +41,11 @@ logger = logging.getLogger(__name__)
 
 
 class WebSocketGateway:
-    def __init__(self, game_service, message_bus, connection_manager=None):
+    def __init__(self, game_service, message_bus, connection_manager=None, auth_service=None):
         self._game_service = game_service
         self._message_bus = message_bus
         self._connections = connection_manager if connection_manager is not None else ConnectionManager()
+        self._auth_service = auth_service if auth_service is not None else AuthenticationService()
         self._quick_local_waiting_connection_id = None
 
         message_bus.subscribe(GameStartedEvent, self._on_game_started)
@@ -56,7 +69,8 @@ class WebSocketGateway:
     # ---------------------------------------------------------------
 
     _HANDLER_NAMES = {
-        "connect": "_handle_connect",
+        "register": "_handle_register",
+        "login": "_handle_login",
         "join_game": "_handle_join_game",
         "move_request": "_handle_move_request",
         "jump_request": "_handle_jump_request",
@@ -80,8 +94,33 @@ class WebSocketGateway:
 
         await getattr(self, handler_name)(connection_id, websocket, envelope)
 
-    async def _handle_connect(self, connection_id, websocket, envelope):
-        self._connections.set_identity(connection_id, envelope["payload"].get("username"))
+    async def _handle_register(self, connection_id, websocket, envelope):
+        payload = envelope["payload"]
+        try:
+            self._auth_service.register(payload["username"], payload["password"])
+        except DuplicateUsernameError:
+            await self._send(websocket, schemas.make_envelope(
+                "error", {"code": "USERNAME_TAKEN", "message": payload["username"]},
+                correlation_id=envelope["message_id"]))
+            return
+        await self._send(websocket, schemas.make_envelope(
+            "registered", {"username": payload["username"]},
+            correlation_id=envelope["message_id"]))
+
+    async def _handle_login(self, connection_id, websocket, envelope):
+        payload = envelope["payload"]
+        try:
+            token = self._auth_service.login(payload["username"], payload["password"])
+        except InvalidCredentialsError:
+            await self._send(websocket, schemas.make_envelope(
+                "error", {"code": "INVALID_CREDENTIALS"},
+                correlation_id=envelope["message_id"]))
+            return
+        self._connections.set_identity(connection_id, payload["username"])
+        self._connections.set_session_token(connection_id, token)
+        await self._send(websocket, schemas.make_envelope(
+            "login_ok", {"username": payload["username"], "session_token": token},
+            correlation_id=envelope["message_id"]))
 
     async def _handle_ping(self, connection_id, websocket, envelope):
         await self._send(websocket, schemas.make_envelope(

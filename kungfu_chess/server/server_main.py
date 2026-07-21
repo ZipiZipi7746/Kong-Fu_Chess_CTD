@@ -11,12 +11,14 @@ import logging
 import websockets  # pragma: no cover
 
 from kungfu_chess.messaging.application_message_bus import ApplicationMessageBus  # pragma: no cover
+from kungfu_chess.application.auth_service import create_sqlite_backed_service  # pragma: no cover
 from kungfu_chess.application.game_service import GameService  # pragma: no cover
 from kungfu_chess.server.websocket_gateway import WebSocketGateway  # pragma: no cover
 
 HOST = "localhost"  # pragma: no cover
 PORT = 8765  # pragma: no cover
 TICK_INTERVAL_MS = 75  # pragma: no cover
+DB_PATH = "kungfu_chess.db"  # pragma: no cover
 
 
 async def _tick_loop(game_service, tick_interval_ms=TICK_INTERVAL_MS):  # pragma: no cover
@@ -32,13 +34,14 @@ async def _tick_loop(game_service, tick_interval_ms=TICK_INTERVAL_MS):  # pragma
                 await game_service.tick(game_id, tick_interval_ms)
 
 
-async def run(host=HOST, port=PORT):  # pragma: no cover
+async def run(host=HOST, port=PORT, db_path=DB_PATH):  # pragma: no cover
     logging.basicConfig(level=logging.INFO)
     logger = logging.getLogger(__name__)
 
     message_bus = ApplicationMessageBus()
     game_service = GameService(message_bus)
-    gateway = WebSocketGateway(game_service, message_bus)
+    auth_service = create_sqlite_backed_service(db_path)
+    gateway = WebSocketGateway(game_service, message_bus, auth_service=auth_service)
 
     tick_task = asyncio.create_task(_tick_loop(game_service))
     try:

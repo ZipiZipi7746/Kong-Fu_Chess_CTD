@@ -7,6 +7,7 @@ import websockets
 
 from kungfu_chess.model.piece import Piece
 from kungfu_chess.messaging.application_message_bus import ApplicationMessageBus
+from kungfu_chess.application.auth_service import AuthenticationService
 from kungfu_chess.application.game_service import GameService
 from kungfu_chess.server.websocket_gateway import WebSocketGateway
 from kungfu_chess.server import schemas
@@ -14,12 +15,18 @@ from kungfu_chess.server import schemas
 
 RECV_TIMEOUT = 2.0
 
+# A low iteration count keeps this suite fast - AuthenticationService's
+# real default cost (Decision 3) is exercised by Tests/application/
+# test_auth_service.py, not needed again here.
+_FAST_ITERATIONS = 10
+
 
 @contextlib.asynccontextmanager
 async def running_gateway():
     bus = ApplicationMessageBus()
     service = GameService(bus)
-    gateway = WebSocketGateway(service, bus)
+    auth_service = AuthenticationService(pbkdf2_iterations=_FAST_ITERATIONS)
+    gateway = WebSocketGateway(service, bus, auth_service=auth_service)
     # Bound to the literal IPv4 loopback address, not "localhost" - which
     # host "localhost" resolves to (127.0.0.1 vs. ::1) is not guaranteed
     # stable across environments/runs, and an IPv6 host needs bracket
@@ -38,13 +45,81 @@ async def recv(websocket):
     return json.loads(raw)
 
 
+async def register_and_login(websocket, username, password="pw"):
+    """The Phase B CLI login flow (Decision 2), collapsed into one helper
+    for every test below that just needs "some authenticated player" -
+    register then login, discarding both acknowledgements. Authentication
+    itself is exercised directly by TestAuthentication."""
+    await send(websocket, "register", {"username": username, "password": password})
+    await recv(websocket)  # registered
+    await send(websocket, "login", {"username": username, "password": password})
+    return await recv(websocket)  # login_ok
+
+
+class TestAuthentication:
+    @pytest.mark.asyncio
+    async def test_registering_a_new_username_succeeds(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await send(ws, "register", {"username": "alice", "password": "pw"})
+                response = await recv(ws)
+                assert response["type"] == "registered"
+                assert response["payload"]["username"] == "alice"
+
+    @pytest.mark.asyncio
+    async def test_registering_a_taken_username_is_rejected_cleanly(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as first_ws, websockets.connect(url) as second_ws:
+                await send(first_ws, "register", {"username": "alice", "password": "pw1"})
+                await recv(first_ws)
+
+                await send(second_ws, "register", {"username": "alice", "password": "pw2"})
+                response = await recv(second_ws)
+                assert response["type"] == "error"
+                assert response["payload"]["code"] == "USERNAME_TAKEN"
+
+    @pytest.mark.asyncio
+    async def test_login_with_correct_credentials_returns_a_session_token(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await send(ws, "register", {"username": "alice", "password": "correct"})
+                await recv(ws)
+
+                await send(ws, "login", {"username": "alice", "password": "correct"})
+                response = await recv(ws)
+                assert response["type"] == "login_ok"
+                assert response["payload"]["username"] == "alice"
+                assert response["payload"]["session_token"]
+
+    @pytest.mark.asyncio
+    async def test_login_with_wrong_password_is_rejected_cleanly(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await send(ws, "register", {"username": "alice", "password": "correct"})
+                await recv(ws)
+
+                await send(ws, "login", {"username": "alice", "password": "wrong"})
+                response = await recv(ws)
+                assert response["type"] == "error"
+                assert response["payload"]["code"] == "INVALID_CREDENTIALS"
+
+    @pytest.mark.asyncio
+    async def test_login_with_unknown_username_is_rejected_cleanly(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await send(ws, "login", {"username": "nobody", "password": "whatever"})
+                response = await recv(ws)
+                assert response["type"] == "error"
+                assert response["payload"]["code"] == "INVALID_CREDENTIALS"
+
+
 class TestConnectAndJoin:
     @pytest.mark.asyncio
     async def test_first_connector_becomes_white_second_becomes_black(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
 
@@ -64,8 +139,8 @@ class TestConnectAndJoin:
     async def test_state_snapshot_carries_the_standard_starting_board_at_sequence_zero(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
 
@@ -80,8 +155,8 @@ class TestConnectAndJoin:
     async def test_both_players_receive_game_started(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
 
@@ -101,8 +176,8 @@ class TestMoveFlow:
     async def test_legal_move_is_accepted_and_broadcast_to_both_players(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
                 await recv(white_ws)
@@ -131,8 +206,8 @@ class TestMoveFlow:
     async def test_wrong_color_move_is_rejected_to_the_requester_only(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
                 await recv(white_ws)
@@ -154,8 +229,8 @@ class TestMoveFlow:
     async def test_king_capture_broadcasts_game_over_to_both_players(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
                 white_snapshot = await recv(white_ws)
@@ -192,8 +267,8 @@ class TestMoveFlow:
     async def test_legal_jump_by_the_owning_color_makes_the_piece_airborne(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
                 white_snapshot = await recv(white_ws)
@@ -223,8 +298,8 @@ class TestBoardSynchronization:
     async def test_both_players_receive_an_identical_state_snapshot_on_join(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
 
@@ -238,8 +313,8 @@ class TestBoardSynchronization:
     async def test_both_players_receive_an_identical_game_event_for_the_same_move(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "alice"})
-                await send(black_ws, "connect", {"username": "bob"})
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
                 white_snapshot = await recv(white_ws)
@@ -267,7 +342,7 @@ class TestDisconnection:
     async def test_disconnecting_while_waiting_for_a_quick_local_opponent_frees_the_slot(self):
         async with running_gateway() as (gateway, service, url):
             async with websockets.connect(url) as first_ws:
-                await send(first_ws, "connect", {"username": "alice"})
+                await register_and_login(first_ws, "alice")
                 await send(first_ws, "join_game", {"mode": "quick_local"})
                 await asyncio.sleep(0.05)  # let the server process before disconnecting
                 assert gateway._quick_local_waiting_connection_id is not None
@@ -278,8 +353,8 @@ class TestDisconnection:
             # A fresh pair can still be matched afterward - the freed
             # slot isn't left permanently stuck "waiting".
             async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
-                await send(white_ws, "connect", {"username": "carol"})
-                await send(black_ws, "connect", {"username": "dave"})
+                await register_and_login(white_ws, "carol")
+                await register_and_login(black_ws, "dave")
                 await send(white_ws, "join_game", {"mode": "quick_local"})
                 await send(black_ws, "join_game", {"mode": "quick_local"})
                 snapshot = await recv(white_ws)

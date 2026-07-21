@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.server.cli_login_flow</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.cli_login_flow</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Ccli_login_flow.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\cli_login_flow.py</a></td></tr></table>
+    <p><span class="code">Client-side&nbsp;CLI&nbsp;login&nbsp;flow&nbsp;(Master&nbsp;Plan&nbsp;v2,&nbsp;Decision&nbsp;2&nbsp;/&nbsp;Section&nbsp;8's<br>
+Player&nbsp;Session&nbsp;State&nbsp;Machine)&nbsp;-&nbsp;the&nbsp;state&nbsp;machine&nbsp;every&nbsp;client&nbsp;(today:<br>
+reference_client.py;&nbsp;later,&nbsp;the&nbsp;Phase&nbsp;F&nbsp;GUI&nbsp;network&nbsp;client)&nbsp;drives<br>
+before&nbsp;sending&nbsp;any&nbsp;game&nbsp;command.&nbsp;Holds&nbsp;no&nbsp;networking&nbsp;of&nbsp;its&nbsp;own&nbsp;-&nbsp;a<br>
+caller&nbsp;supplies&nbsp;how&nbsp;username/password&nbsp;are&nbsp;actually&nbsp;collected&nbsp;and&nbsp;how<br>
+register/login&nbsp;envelopes&nbsp;are&nbsp;actually&nbsp;sent;&nbsp;this&nbsp;class&nbsp;only&nbsp;enforces<br>
+the&nbsp;sequence&nbsp;username&nbsp;-&gt;&nbsp;password&nbsp;-&gt;&nbsp;authenticated.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="enum.html">enum</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.server.cli_login_flow.html#CliLoginFlow">CliLoginFlow</a>
+</dt></dl>
+</dd>
+<dt class="heading-text"><a href="enum.html#Enum">enum.Enum</a>(<a href="builtins.html#object">builtins.object</a>)
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.server.cli_login_flow.html#LoginState">LoginState</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="CliLoginFlow">class <strong>CliLoginFlow</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor"><span class="code">&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="CliLoginFlow-__init__"><strong>__init__</strong></a>(self)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="CliLoginFlow-mark_authenticated"><strong>mark_authenticated</strong></a>(self, session_token)</dt></dl>
+
+<dl><dt><a name="CliLoginFlow-submit_password"><strong>submit_password</strong></a>(self, password)</dt></dl>
+
+<dl><dt><a name="CliLoginFlow-submit_username"><strong>submit_username</strong></a>(self, username)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="LoginState">class <strong>LoginState</strong></a>(<a href="enum.html#Enum">enum.Enum</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#LoginState">LoginState</a>(*values)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.server.cli_login_flow.html#LoginState">LoginState</a></dd>
+<dd><a href="enum.html#Enum">enum.Enum</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>AUTHENTICATED</strong> = &lt;LoginState.AUTHENTICATED: 'authenticated'&gt;</dl>
+
+<dl><dt><strong>AWAITING_PASSWORD</strong> = &lt;LoginState.AWAITING_PASSWORD: 'awaiting_password'&gt;</dl>
+
+<dl><dt><strong>AWAITING_USERNAME</strong> = &lt;LoginState.AWAITING_USERNAME: 'awaiting_username'&gt;</dl>
+
+<hr>
+Data descriptors inherited from <a href="enum.html#Enum">enum.Enum</a>:<br>
+<dl><dt><strong>name</strong></dt>
+<dd><span class="code">The&nbsp;name&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</span></dd>
+</dl>
+<dl><dt><strong>value</strong></dt>
+<dd><span class="code">The&nbsp;value&nbsp;of&nbsp;the&nbsp;Enum&nbsp;member.</span></dd>
+</dl>
+<hr>
+Static methods inherited from <a href="enum.html#EnumType">enum.EnumType</a>:<br>
+<dl><dt><a name="LoginState-__contains__"><strong>__contains__</strong></a>(value)</dt><dd><span class="code">Return&nbsp;True&nbsp;if&nbsp;`value`&nbsp;is&nbsp;in&nbsp;`cls`.<br>
+&nbsp;<br>
+`value`&nbsp;is&nbsp;in&nbsp;`cls`&nbsp;if:<br>
+1)&nbsp;`value`&nbsp;is&nbsp;a&nbsp;member&nbsp;of&nbsp;`cls`,&nbsp;or<br>
+2)&nbsp;`value`&nbsp;is&nbsp;the&nbsp;value&nbsp;of&nbsp;one&nbsp;of&nbsp;the&nbsp;`cls`'s&nbsp;members.<br>
+3)&nbsp;`value`&nbsp;is&nbsp;a&nbsp;pseudo-member&nbsp;(flags)</span></dd></dl>
+
+<dl><dt><a name="LoginState-__getitem__"><strong>__getitem__</strong></a>(name)</dt><dd><span class="code">Return&nbsp;the&nbsp;member&nbsp;matching&nbsp;`name`.</span></dd></dl>
+
+<dl><dt><a name="LoginState-__iter__"><strong>__iter__</strong></a>()</dt><dd><span class="code">Return&nbsp;members&nbsp;in&nbsp;definition&nbsp;order.</span></dd></dl>
+
+<dl><dt><a name="LoginState-__len__"><strong>__len__</strong></a>()</dt><dd><span class="code">Return&nbsp;the&nbsp;number&nbsp;of&nbsp;members&nbsp;(no&nbsp;aliases)</span></dd></dl>
+
+<hr>
+Readonly properties inherited from <a href="enum.html#EnumType">enum.EnumType</a>:<br>
+<dl><dt><strong>__members__</strong></dt>
+<dd><span class="code">Returns&nbsp;a&nbsp;mapping&nbsp;of&nbsp;member&nbsp;name-&gt;value.<br>
+&nbsp;<br>
+This&nbsp;mapping&nbsp;lists&nbsp;all&nbsp;enum&nbsp;members,&nbsp;including&nbsp;aliases.&nbsp;Note&nbsp;that&nbsp;this<br>
+is&nbsp;a&nbsp;read-only&nbsp;view&nbsp;of&nbsp;the&nbsp;internal&nbsp;mapping.</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

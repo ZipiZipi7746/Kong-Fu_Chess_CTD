@@ -1,17 +1,19 @@
-"""Throwaway Phase A reference client - validates the WebSocket protocol
-end to end from a real process. This is NOT the eventual GUI network
-client (see the architecture plan's Phase F for that staged migration);
-it exists only to drive server_main.py manually for the Part 15
-acceptance walkthrough. Real I/O throughout - excluded from coverage,
-verified by running it, not by unit tests.
+"""Throwaway reference client - validates the WebSocket protocol end to
+end from a real process. This is NOT the eventual GUI network client
+(see the architecture plan's Phase F for that staged migration); it
+exists only to drive server_main.py manually for the Part 15/Master Plan
+v2 Section 14 acceptance walkthroughs. Real I/O throughout - excluded
+from coverage, verified by running it, not by unit tests.
 
-Prompts for a username only (no password - Phase A's staged auth), joins
-the shared quick_local game, and accepts moves as compact algebraic
-shorthand ("e2e4") typed at the prompt - parsed locally into the
-from_row/from_col/to_row/to_col JSON payload the server actually expects.
-The wire protocol itself is JSON throughout; the shorthand is purely this
-client's own input convenience (see the architecture plan's JSON-vs-
-shorthand decision).
+Drives the permanent CLI login flow (Master Plan v2 Decision 2, via
+cli_login_flow.CliLoginFlow): username, then password, then either
+register or login before anything else is possible. Once authenticated,
+joins the shared quick_local game and accepts moves as compact
+algebraic shorthand ("e2e4") typed at the prompt - parsed locally into
+the from_row/from_col/to_row/to_col JSON payload the server actually
+expects. The wire protocol itself is JSON throughout; the shorthand is
+purely this client's own input convenience (see the architecture plan's
+JSON-vs-shorthand decision).
 """
 import asyncio
 import json
@@ -20,6 +22,7 @@ import sys
 import websockets  # pragma: no cover
 
 from kungfu_chess.server import schemas  # pragma: no cover
+from kungfu_chess.server.cli_login_flow import CliLoginFlow  # pragma: no cover
 
 SERVER_URL = "ws://localhost:8765"  # pragma: no cover
 
@@ -93,16 +96,52 @@ async def send_loop(websocket, state):  # pragma: no cover
             game_id=state.get("game_id"))))
 
 
+async def _send_and_await(websocket, type_, payload):  # pragma: no cover
+    await websocket.send(schemas.encode(schemas.make_envelope(type_, payload)))
+    return json.loads(await websocket.recv())
+
+
+async def perform_login(websocket):  # pragma: no cover
+    """Drives CliLoginFlow's username -> password -> authenticated
+    sequence over the wire, offering registration for a brand-new
+    account. Returns the authenticated flow, or None if the user gave up
+    after a failure."""
+    flow = CliLoginFlow()
+    flow.submit_username(input("Username: ").strip())
+    # Plain input(), not getpass.getpass(): on Windows, getpass reads
+    # directly from the console (msvcrt) rather than sys.stdin, so it
+    # hangs forever under any redirected/piped stdin - unacceptable for a
+    # client meant to be scriptable for the acceptance walkthrough.
+    flow.submit_password(input("Password: ").strip())
+
+    if input("New account? [y/N]: ").strip().lower().startswith("y"):
+        response = await _send_and_await(
+            websocket, "register", {"username": flow.username, "password": flow.password})
+        if response["type"] == "error":
+            print(f"Registration failed: {response['payload']['code']}")
+            return None
+        print(f"Registered as {flow.username}.")
+
+    response = await _send_and_await(
+        websocket, "login", {"username": flow.username, "password": flow.password})
+    if response["type"] == "error":
+        print(f"Login failed: {response['payload']['code']}")
+        return None
+    flow.mark_authenticated(response["payload"]["session_token"])
+    return flow
+
+
 async def main():  # pragma: no cover
-    username = input("Username: ").strip()
     state = {"game_id": None, "game_over": False}
 
     async with websockets.connect(SERVER_URL) as websocket:
-        await websocket.send(schemas.encode(schemas.make_envelope(
-            "connect", {"username": username})))
+        flow = await perform_login(websocket)
+        if flow is None:
+            return
+
         await websocket.send(schemas.encode(schemas.make_envelope(
             "join_game", {"mode": "quick_local"})))
-        print(f"Connected as {username}. Waiting for an opponent...")
+        print(f"Logged in as {flow.username}. Waiting for an opponent...")
 
         try:
             await asyncio.gather(

@@ -18,6 +18,11 @@ from kungfu_chess.persistence.in_memory_repositories import (
     InMemorySessionRepository,
     InMemoryUserRepository,
 )
+from kungfu_chess.persistence.sqlite.sqlite_repositories import (
+    SqliteSessionRepository,
+    SqliteUserRepository,
+    connect as _sqlite_connect,
+)
 
 DEFAULT_RATING = 1200
 DEFAULT_PBKDF2_ITERATIONS = 390_000
@@ -62,3 +67,15 @@ class AuthenticationService:
 
     def _verify(self, password, salt, expected_hash):
         return hmac.compare_digest(self._hash(password, salt), expected_hash)
+
+
+def create_sqlite_backed_service(db_path, pbkdf2_iterations=DEFAULT_PBKDF2_ITERATIONS):
+    """The composition root's way to get a real, file-persisted
+    AuthenticationService (Master Plan v2 Section 5): server/server_main.py
+    calls this instead of importing kungfu_chess.persistence.sqlite
+    directly, which the import-boundary rule forbids for any server/
+    module - only application/ is allowed to depend on persistence/."""
+    connection = _sqlite_connect(db_path)
+    return AuthenticationService(
+        SqliteUserRepository(connection), SqliteSessionRepository(connection),
+        pbkdf2_iterations=pbkdf2_iterations)

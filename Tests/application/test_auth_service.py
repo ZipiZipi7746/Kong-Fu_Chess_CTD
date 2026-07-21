@@ -1,6 +1,10 @@
 import pytest
 
-from kungfu_chess.application.auth_service import AuthenticationService, InvalidCredentialsError
+from kungfu_chess.application.auth_service import (
+    AuthenticationService,
+    InvalidCredentialsError,
+    create_sqlite_backed_service,
+)
 from kungfu_chess.persistence.repositories import DuplicateUsernameError
 from kungfu_chess.persistence.in_memory_repositories import (
     InMemoryUserRepository,
@@ -99,3 +103,24 @@ class TestDefaultConfiguration:
         service = AuthenticationService()
         user = service.register("alice", "correct-password")
         assert service.resolve_token(service.login("alice", "correct-password")).user_id == user.user_id
+
+
+class TestCreateSqliteBackedService:
+    def test_register_login_and_resolve_work_against_a_real_sqlite_connection(self):
+        # server_main.py's composition root calls this instead of
+        # importing persistence.sqlite directly (Master Plan v2 Section 5
+        # forbids server/ from importing persistence.sqlite except
+        # through an application/*_service.py).
+        service = create_sqlite_backed_service(":memory:", pbkdf2_iterations=_FAST_ITERATIONS)
+        user = service.register("alice", "correct-password")
+        token = service.login("alice", "correct-password")
+        assert service.resolve_token(token).user_id == user.user_id
+
+    def test_accounts_persist_across_services_sharing_the_same_db_file(self, tmp_path):
+        db_path = str(tmp_path / "kungfu_chess_test.db")
+        first_service = create_sqlite_backed_service(db_path, pbkdf2_iterations=_FAST_ITERATIONS)
+        first_service.register("alice", "correct-password")
+
+        second_service = create_sqlite_backed_service(db_path, pbkdf2_iterations=_FAST_ITERATIONS)
+        token = second_service.login("alice", "correct-password")
+        assert second_service.resolve_token(token).username == "alice"
