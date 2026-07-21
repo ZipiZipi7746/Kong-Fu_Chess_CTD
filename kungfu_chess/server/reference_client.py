@@ -8,12 +8,16 @@ from coverage, verified by running it, not by unit tests.
 Drives the permanent CLI login flow (Master Plan v2 Decision 2, via
 cli_login_flow.CliLoginFlow): username, then password, then either
 register or login before anything else is possible. Once authenticated,
-joins the shared quick_local game and accepts moves as compact
-algebraic shorthand ("e2e4") typed at the prompt - parsed locally into
-the from_row/from_col/to_row/to_col JSON payload the server actually
-expects. The wire protocol itself is JSON throughout; the shorthand is
-purely this client's own input convenience (see the architecture plan's
-JSON-vs-shorthand decision).
+offers a choice between the unrated quick_local game (first connection
+to ask waits, the second pairs with it) and Phase C's rated "play"
+matchmaking queue (+-100 Elo, 1-minute timeout, Decision 5 - typing
+"play" again after a timeout re-enters the queue, since there is no
+auto-retry). Accepts moves as compact algebraic shorthand ("e2e4")
+typed at the prompt - parsed locally into the from_row/from_col/to_row/
+to_col JSON payload the server actually expects. The wire protocol
+itself is JSON throughout; the shorthand is purely this client's own
+input convenience (see the architecture plan's JSON-vs-shorthand
+decision).
 """
 import asyncio
 import json
@@ -67,6 +71,10 @@ async def receive_loop(websocket, state):  # pragma: no cover
         elif msg_type == "game_over":
             print(f"\n[game_over] winner={payload['winner']}")
             state["game_over"] = True
+        elif msg_type == "searching_match":
+            print("\n[searching_match] waiting for a ranked opponent...")
+        elif msg_type == "matchmaking_timeout":
+            print("\n[matchmaking_timeout] no opponent found - type 'play' to search again.")
         elif msg_type == "move_rejected":
             print(f"\n[move_rejected] {payload['reason']}")
         elif msg_type == "error":
@@ -85,6 +93,11 @@ async def send_loop(websocket, state):  # pragma: no cover
             line = await loop.run_in_executor(None, input, "move> ")
         except EOFError:
             return  # stdin closed (e.g. piped input exhausted) - exit quietly
+        if line.strip().lower() == "play":
+            # Decision 5: no auto-retry after a matchmaking timeout - the
+            # player must explicitly search again.
+            await websocket.send(schemas.encode(schemas.make_envelope("play", {})))
+            continue
         move = parse_move(line)
         if move is None:
             print("Type a move like 'e2e4' (from-square to-square), or Ctrl+C to quit.")
@@ -104,9 +117,14 @@ async def main():  # pragma: no cover
         if flow is None:
             return
 
-        await websocket.send(schemas.encode(schemas.make_envelope(
-            "join_game", {"mode": "quick_local"})))
-        print(f"Logged in as {flow.username}. Waiting for an opponent...")
+        mode = input("[Q]uick local or ranked [p]lay? [Q/p]: ").strip().lower()
+        if mode.startswith("p"):
+            await websocket.send(schemas.encode(schemas.make_envelope("play", {})))
+            print(f"Logged in as {flow.username}. Searching for a ranked match...")
+        else:
+            await websocket.send(schemas.encode(schemas.make_envelope(
+                "join_game", {"mode": "quick_local"})))
+            print(f"Logged in as {flow.username}. Waiting for an opponent...")
 
         try:
             await asyncio.gather(

@@ -19,12 +19,16 @@ from&nbsp;coverage,&nbsp;verified&nbsp;by&nbsp;running&nbsp;it,&nbsp;not&nbsp;by
 Drives&nbsp;the&nbsp;permanent&nbsp;CLI&nbsp;login&nbsp;flow&nbsp;(Master&nbsp;Plan&nbsp;v2&nbsp;Decision&nbsp;2,&nbsp;via<br>
 cli_login_flow.CliLoginFlow):&nbsp;username,&nbsp;then&nbsp;password,&nbsp;then&nbsp;either<br>
 register&nbsp;or&nbsp;login&nbsp;before&nbsp;anything&nbsp;else&nbsp;is&nbsp;possible.&nbsp;Once&nbsp;authenticated,<br>
-joins&nbsp;the&nbsp;shared&nbsp;quick_local&nbsp;game&nbsp;and&nbsp;accepts&nbsp;moves&nbsp;as&nbsp;compact<br>
-algebraic&nbsp;shorthand&nbsp;("e2e4")&nbsp;typed&nbsp;at&nbsp;the&nbsp;prompt&nbsp;-&nbsp;parsed&nbsp;locally&nbsp;into<br>
-the&nbsp;from_row/from_col/to_row/to_col&nbsp;JSON&nbsp;payload&nbsp;the&nbsp;server&nbsp;actually<br>
-expects.&nbsp;The&nbsp;wire&nbsp;protocol&nbsp;itself&nbsp;is&nbsp;JSON&nbsp;throughout;&nbsp;the&nbsp;shorthand&nbsp;is<br>
-purely&nbsp;this&nbsp;client's&nbsp;own&nbsp;input&nbsp;convenience&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's<br>
-JSON-vs-shorthand&nbsp;decision).</span></p>
+offers&nbsp;a&nbsp;choice&nbsp;between&nbsp;the&nbsp;unrated&nbsp;quick_local&nbsp;game&nbsp;(first&nbsp;connection<br>
+to&nbsp;ask&nbsp;waits,&nbsp;the&nbsp;second&nbsp;pairs&nbsp;with&nbsp;it)&nbsp;and&nbsp;Phase&nbsp;C's&nbsp;rated&nbsp;"play"<br>
+matchmaking&nbsp;queue&nbsp;(+-100&nbsp;Elo,&nbsp;1-minute&nbsp;timeout,&nbsp;Decision&nbsp;5&nbsp;-&nbsp;typing<br>
+"play"&nbsp;again&nbsp;after&nbsp;a&nbsp;timeout&nbsp;re-enters&nbsp;the&nbsp;queue,&nbsp;since&nbsp;there&nbsp;is&nbsp;no<br>
+auto-retry).&nbsp;Accepts&nbsp;moves&nbsp;as&nbsp;compact&nbsp;algebraic&nbsp;shorthand&nbsp;("e2e4")<br>
+typed&nbsp;at&nbsp;the&nbsp;prompt&nbsp;-&nbsp;parsed&nbsp;locally&nbsp;into&nbsp;the&nbsp;from_row/from_col/to_row/<br>
+to_col&nbsp;JSON&nbsp;payload&nbsp;the&nbsp;server&nbsp;actually&nbsp;expects.&nbsp;The&nbsp;wire&nbsp;protocol<br>
+itself&nbsp;is&nbsp;JSON&nbsp;throughout;&nbsp;the&nbsp;shorthand&nbsp;is&nbsp;purely&nbsp;this&nbsp;client's&nbsp;own<br>
+input&nbsp;convenience&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;JSON-vs-shorthand<br>
+decision).</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">

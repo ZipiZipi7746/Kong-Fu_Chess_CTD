@@ -78,7 +78,9 @@ def _draw_cell_highlights(board_renderer, board, controller, cell_w, cell_h):  #
 async def _await_game_start(websocket, my_username):  # pragma: no cover
     """Blocks until game_started arrives, tracking the game_id and
     initial board along the way. Returns (game_id, board_rows, my_color),
-    or (None, None, None) if the connection closes first."""
+    or (None, None, None) if the connection closes or matchmaking times
+    out (Decision 5: no auto-retry - the caller reports this and exits;
+    the player re-runs the client to search again)."""
     game_id, board_rows = None, None
     async for raw in websocket:
         envelope = json.loads(raw)
@@ -92,6 +94,9 @@ async def _await_game_start(websocket, my_username):  # pragma: no cover
             board_rows = payload["state_snapshot"]["board"]
             my_color = "w" if payload["white"] == my_username else "b"
             return game_id, board_rows, my_color
+        elif msg_type == "matchmaking_timeout":
+            print("No ranked opponent found within the search window.")
+            return None, None, None
     return None, None, None
 
 

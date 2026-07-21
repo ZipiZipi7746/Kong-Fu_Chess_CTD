@@ -13,10 +13,12 @@
 &nbsp;<br>
 Phase&nbsp;F&nbsp;Milestone&nbsp;1's&nbsp;graphical&nbsp;networked&nbsp;client&nbsp;-&nbsp;drives&nbsp;the&nbsp;same<br>
 permanent&nbsp;CLI&nbsp;login&nbsp;flow&nbsp;as&nbsp;server/reference_client.py&nbsp;(via<br>
-server.login_client.perform_login),&nbsp;joins&nbsp;the&nbsp;shared&nbsp;quick_local&nbsp;game,<br>
-then&nbsp;hands&nbsp;off&nbsp;to&nbsp;network_game_loop.run()&nbsp;for&nbsp;the&nbsp;actual&nbsp;graphical<br>
-board.&nbsp;Real&nbsp;I/O&nbsp;throughout&nbsp;-&nbsp;excluded&nbsp;from&nbsp;coverage,&nbsp;verified&nbsp;by<br>
-running&nbsp;it,&nbsp;not&nbsp;by&nbsp;unit&nbsp;tests&nbsp;(same&nbsp;treatment&nbsp;as&nbsp;gui/gui_main.py&nbsp;and<br>
+server.login_client.perform_login),&nbsp;then&nbsp;offers&nbsp;the&nbsp;same&nbsp;choice<br>
+reference_client.py&nbsp;does&nbsp;between&nbsp;the&nbsp;unrated&nbsp;quick_local&nbsp;game&nbsp;and<br>
+Phase&nbsp;C's&nbsp;rated&nbsp;"play"&nbsp;matchmaking&nbsp;queue,&nbsp;before&nbsp;handing&nbsp;off&nbsp;to<br>
+network_game_loop.run()&nbsp;for&nbsp;the&nbsp;actual&nbsp;graphical&nbsp;board.&nbsp;Real&nbsp;I/O<br>
+throughout&nbsp;-&nbsp;excluded&nbsp;from&nbsp;coverage,&nbsp;verified&nbsp;by&nbsp;running&nbsp;it,&nbsp;not&nbsp;by<br>
+unit&nbsp;tests&nbsp;(same&nbsp;treatment&nbsp;as&nbsp;gui/gui_main.py&nbsp;and<br>
 server/reference_client.py).</span></p>
 <p>
 <table class="section">
