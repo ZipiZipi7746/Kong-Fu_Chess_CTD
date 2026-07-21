@@ -8,6 +8,11 @@ import json
 import time
 import uuid
 
+# Master Plan v2, Section 6.2: bumped only when the envelope/payload shape
+# changes in a way an old client couldn't safely ignore - cheap to carry
+# now, expensive to retrofit once real clients exist outside this repo.
+PROTOCOL_VERSION = 1
+
 
 class MalformedMessageError(Exception):
     """Raised by decode() for anything that isn't a well-formed envelope -
@@ -22,6 +27,7 @@ def make_envelope(type_, payload, game_id=None, correlation_id=None, message_id=
         "correlation_id": correlation_id,
         "timestamp": int(time.time() * 1000),
         "game_id": game_id,
+        "protocol_version": PROTOCOL_VERSION,
         "payload": payload,
     }
 
@@ -46,4 +52,5 @@ def decode(raw_text):
     data.setdefault("message_id", None)
     data.setdefault("correlation_id", None)
     data.setdefault("game_id", None)
+    data.setdefault("protocol_version", PROTOCOL_VERSION)
     return data

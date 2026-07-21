@@ -39,6 +39,10 @@ class TestMakeEnvelope:
         assert envelope["game_id"] == "g_1"
         assert envelope["correlation_id"] == "req-1"
 
+    def test_protocol_version_defaults_to_1(self):
+        envelope = schemas.make_envelope("ping", {})
+        assert envelope["protocol_version"] == 1
+
 
 class TestEncodeDecodeRoundTrip:
     def test_encode_produces_valid_json(self):
@@ -74,3 +78,7 @@ class TestDecodeRejectsMalformedInput:
         assert decoded["message_id"] is None
         assert decoded["correlation_id"] is None
         assert decoded["game_id"] is None
+
+    def test_missing_protocol_version_defaults_to_1(self):
+        decoded = schemas.decode(json.dumps({"type": "ping"}))
+        assert decoded["protocol_version"] == 1

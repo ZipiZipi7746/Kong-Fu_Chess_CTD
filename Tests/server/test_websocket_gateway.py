@@ -212,6 +212,56 @@ class TestMoveFlow:
                 assert session.engine.is_airborne(6, 4) is True
 
 
+class TestBoardSynchronization:
+    """Master Plan v2, Section 3.4: both connected clients must always
+    observe byte-for-byte identical state - never independently-computed,
+    "close enough" views of the same game. This is a regression gate: any
+    future change to _broadcast/_handle_join_game/dto.build_state_snapshot
+    that lets the two payloads diverge must fail this test."""
+
+    @pytest.mark.asyncio
+    async def test_both_players_receive_an_identical_state_snapshot_on_join(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await send(white_ws, "connect", {"username": "alice"})
+                await send(black_ws, "connect", {"username": "bob"})
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+
+                white_snapshot = await recv(white_ws)
+                black_snapshot = await recv(black_ws)
+
+                assert white_snapshot["payload"] == black_snapshot["payload"]
+                assert white_snapshot["game_id"] == black_snapshot["game_id"]
+
+    @pytest.mark.asyncio
+    async def test_both_players_receive_an_identical_game_event_for_the_same_move(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await send(white_ws, "connect", {"username": "alice"})
+                await send(black_ws, "connect", {"username": "bob"})
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                game_started = await recv(black_ws)
+                game_id = game_started["game_id"]
+
+                await send(white_ws, "move_request",
+                           {"from_row": 6, "from_col": 4, "to_row": 5, "to_col": 4},
+                           game_id=game_id)
+                await recv(white_ws)  # move_accepted
+
+                await service.tick(game_id, 1000)  # 1 cell, arrives at 1000ms
+
+                white_event = await recv(white_ws)
+                black_event = await recv(black_ws)
+
+                assert white_event["payload"] == black_event["payload"]
+                assert white_event["payload"]["sequence"] == white_snapshot["payload"]["sequence"] + 1
+
+
 class TestDisconnection:
     @pytest.mark.asyncio
     async def test_disconnecting_while_waiting_for_a_quick_local_opponent_frees_the_slot(self):
