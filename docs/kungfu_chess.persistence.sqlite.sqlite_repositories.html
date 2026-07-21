@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.persistence.sqlite.sqlite_repositories</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.persistence.html" class="white">persistence</a>.<a href="kungfu_chess.persistence.sqlite.html" class="white">sqlite</a>.sqlite_repositories</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cpersistence%5Csqlite%5Csqlite_repositories.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\persistence\sqlite\sqlite_repositories.py</a></td></tr></table>
+    <p><span class="code">The&nbsp;only&nbsp;module&nbsp;in&nbsp;this&nbsp;project&nbsp;that&nbsp;imports&nbsp;sqlite3&nbsp;(Master&nbsp;Plan&nbsp;v2,<br>
+Section&nbsp;10.1)&nbsp;-&nbsp;<a href="#SqliteUserRepository">SqliteUserRepository</a>/<a href="#SqliteSessionRepository">SqliteSessionRepository</a>&nbsp;implement<br>
+the&nbsp;same&nbsp;<a href="kungfu_chess.persistence.repositories.html#UserRepository">UserRepository</a>/<a href="kungfu_chess.persistence.repositories.html#SessionRepository">SessionRepository</a>&nbsp;contract&nbsp;as&nbsp;the&nbsp;in-memory<br>
+fakes&nbsp;(persistence/in_memory_repositories.py)&nbsp;and&nbsp;are&nbsp;exercised&nbsp;by&nbsp;the<br>
+identical&nbsp;repository&nbsp;contract&nbsp;test&nbsp;suite<br>
+(Tests/persistence/test_repository_contract.py),&nbsp;so&nbsp;a&nbsp;future&nbsp;call&nbsp;site<br>
+can&nbsp;swap&nbsp;one&nbsp;for&nbsp;the&nbsp;other&nbsp;without&nbsp;a&nbsp;behavior&nbsp;change.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="sqlite3.html">sqlite3</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="kungfu_chess.persistence.repositories.html#SessionRepository">kungfu_chess.persistence.repositories.SessionRepository</a>(<a href="abc.html#ABC">abc.ABC</a>)
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.persistence.sqlite.sqlite_repositories.html#SqliteSessionRepository">SqliteSessionRepository</a>
+</dt></dl>
+</dd>
+<dt class="heading-text"><a href="kungfu_chess.persistence.repositories.html#UserRepository">kungfu_chess.persistence.repositories.UserRepository</a>(<a href="abc.html#ABC">abc.ABC</a>)
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.persistence.sqlite.sqlite_repositories.html#SqliteUserRepository">SqliteUserRepository</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="SqliteSessionRepository">class <strong>SqliteSessionRepository</strong></a>(<a href="kungfu_chess.persistence.repositories.html#SessionRepository">kungfu_chess.persistence.repositories.SessionRepository</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#SqliteSessionRepository">SqliteSessionRepository</a>(connection)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.persistence.sqlite.sqlite_repositories.html#SqliteSessionRepository">SqliteSessionRepository</a></dd>
+<dd><a href="kungfu_chess.persistence.repositories.html#SessionRepository">kungfu_chess.persistence.repositories.SessionRepository</a></dd>
+<dd><a href="abc.html#ABC">abc.ABC</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SqliteSessionRepository-__init__"><strong>__init__</strong></a>(self, connection)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="SqliteSessionRepository-create"><strong>create</strong></a>(self, token, user_id)</dt><dd><span class="code">Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;Session&nbsp;bound&nbsp;to&nbsp;user_id.</span></dd></dl>
+
+<dl><dt><a name="SqliteSessionRepository-delete"><strong>delete</strong></a>(self, token)</dt><dd><span class="code">Remove&nbsp;a&nbsp;session&nbsp;(e.g.&nbsp;on&nbsp;logout);&nbsp;a&nbsp;no-op&nbsp;if&nbsp;already&nbsp;gone.</span></dd></dl>
+
+<dl><dt><a name="SqliteSessionRepository-get_by_token"><strong>get_by_token</strong></a>(self, token)</dt><dd><span class="code">Return&nbsp;the&nbsp;Session,&nbsp;or&nbsp;None&nbsp;if&nbsp;the&nbsp;token&nbsp;is&nbsp;unknown.</span></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__abstractmethods__</strong> = frozenset()</dl>
+
+<hr>
+Data descriptors inherited from <a href="kungfu_chess.persistence.repositories.html#SessionRepository">kungfu_chess.persistence.repositories.SessionRepository</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="SqliteUserRepository">class <strong>SqliteUserRepository</strong></a>(<a href="kungfu_chess.persistence.repositories.html#UserRepository">kungfu_chess.persistence.repositories.UserRepository</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#SqliteUserRepository">SqliteUserRepository</a>(connection)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.persistence.sqlite.sqlite_repositories.html#SqliteUserRepository">SqliteUserRepository</a></dd>
+<dd><a href="kungfu_chess.persistence.repositories.html#UserRepository">kungfu_chess.persistence.repositories.UserRepository</a></dd>
+<dd><a href="abc.html#ABC">abc.ABC</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SqliteUserRepository-__init__"><strong>__init__</strong></a>(self, connection)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="SqliteUserRepository-add"><strong>add</strong></a>(self, username, password_hash, password_salt, rating)</dt><dd><span class="code">Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;User.&nbsp;Raises&nbsp;DuplicateUsernameError&nbsp;if<br>
+username&nbsp;is&nbsp;already&nbsp;taken.</span></dd></dl>
+
+<dl><dt><a name="SqliteUserRepository-get_by_id"><strong>get_by_id</strong></a>(self, user_id)</dt><dd><span class="code">Return&nbsp;the&nbsp;User,&nbsp;or&nbsp;None&nbsp;if&nbsp;no&nbsp;such&nbsp;user_id&nbsp;exists.</span></dd></dl>
+
+<dl><dt><a name="SqliteUserRepository-get_by_username"><strong>get_by_username</strong></a>(self, username)</dt><dd><span class="code">Return&nbsp;the&nbsp;User,&nbsp;or&nbsp;None&nbsp;if&nbsp;no&nbsp;such&nbsp;username&nbsp;exists.</span></dd></dl>
+
+<dl><dt><a name="SqliteUserRepository-update_rating"><strong>update_rating</strong></a>(self, user_id, rating)</dt><dd><span class="code">Persist&nbsp;a&nbsp;new&nbsp;rating&nbsp;value&nbsp;for&nbsp;an&nbsp;existing&nbsp;user.</span></dd></dl>
+
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__abstractmethods__</strong> = frozenset()</dl>
+
+<hr>
+Data descriptors inherited from <a href="kungfu_chess.persistence.repositories.html#UserRepository">kungfu_chess.persistence.repositories.UserRepository</a>:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-connect"><strong>connect</strong></a>(db_path=':memory:')</dt><dd><span class="code">Open&nbsp;a&nbsp;SQLite&nbsp;connection&nbsp;with&nbsp;the&nbsp;schema&nbsp;already&nbsp;applied&nbsp;-&nbsp;the<br>
+single&nbsp;bootstrap&nbsp;entry&nbsp;point&nbsp;every&nbsp;caller&nbsp;(tests,&nbsp;server_main)&nbsp;should<br>
+use&nbsp;instead&nbsp;of&nbsp;calling&nbsp;sqlite3.connect&nbsp;directly.</span></dd></dl>
+</td></tr></table>
+</body></html>

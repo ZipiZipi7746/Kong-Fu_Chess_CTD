@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.application.auth_service</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.application.html" class="white">application</a>.auth_service</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Capplication%5Cauth_service.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\application\auth_service.py</a></td></tr></table>
+    <p><span class="code"><a href="#AuthenticationService">AuthenticationService</a>&nbsp;(Master&nbsp;Plan&nbsp;v2,&nbsp;Section&nbsp;10.1)&nbsp;-&nbsp;the&nbsp;sole&nbsp;owner<br>
+of&nbsp;password&nbsp;hashing&nbsp;and&nbsp;session-token&nbsp;issuance.&nbsp;Depends&nbsp;only&nbsp;on&nbsp;the<br>
+UserRepository/SessionRepository&nbsp;interfaces&nbsp;(persistence.repositories),<br>
+never&nbsp;on&nbsp;a&nbsp;concrete&nbsp;SQLite/in-memory&nbsp;implementation&nbsp;-&nbsp;the&nbsp;concrete<br>
+repository&nbsp;is&nbsp;injected,&nbsp;following&nbsp;this&nbsp;project's&nbsp;established<br>
+param=None&nbsp;-&gt;&nbsp;real&nbsp;default&nbsp;DI&nbsp;convention&nbsp;(GameEngine,&nbsp;GameSession).<br>
+&nbsp;<br>
+Passwords&nbsp;are&nbsp;hashed&nbsp;with&nbsp;PBKDF2-HMAC-SHA256&nbsp;(Decision&nbsp;3),&nbsp;a&nbsp;random<br>
+per-user&nbsp;salt,&nbsp;and&nbsp;a&nbsp;configurable&nbsp;iteration&nbsp;count&nbsp;-&nbsp;never&nbsp;stored&nbsp;or<br>
+compared&nbsp;as&nbsp;plaintext.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="hashlib.html">hashlib</a><br>
+</td><td class="multicolumn"><a href="hmac.html">hmac</a><br>
+</td><td class="multicolumn"><a href="secrets.html">secrets</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#Exception">builtins.Exception</a>(<a href="builtins.html#BaseException">builtins.BaseException</a>)
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.application.auth_service.html#InvalidCredentialsError">InvalidCredentialsError</a>
+</dt></dl>
+</dd>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.application.auth_service.html#AuthenticationService">AuthenticationService</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="AuthenticationService">class <strong>AuthenticationService</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#AuthenticationService">AuthenticationService</a>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user_repository=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;session_repository=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;pbkdf2_iterations=390000<br>
+)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="AuthenticationService-__init__"><strong>__init__</strong></a>(
+    self,
+    user_repository=None,
+    session_repository=None,
+    pbkdf2_iterations=390000
+)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="AuthenticationService-login"><strong>login</strong></a>(self, username, password)</dt></dl>
+
+<dl><dt><a name="AuthenticationService-register"><strong>register</strong></a>(self, username, password)</dt></dl>
+
+<dl><dt><a name="AuthenticationService-resolve_token"><strong>resolve_token</strong></a>(self, token)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="InvalidCredentialsError">class <strong>InvalidCredentialsError</strong></a>(<a href="builtins.html#Exception">builtins.Exception</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code">Raised&nbsp;by&nbsp;login()&nbsp;for&nbsp;an&nbsp;unknown&nbsp;username&nbsp;or&nbsp;a&nbsp;wrong&nbsp;password&nbsp;-<br>
+deliberately&nbsp;the&nbsp;same&nbsp;error&nbsp;for&nbsp;both,&nbsp;so&nbsp;a&nbsp;failed&nbsp;login&nbsp;never<br>
+reveals&nbsp;whether&nbsp;the&nbsp;username&nbsp;itself&nbsp;exists.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.application.auth_service.html#InvalidCredentialsError">InvalidCredentialsError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Static methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><a name="InvalidCredentialsError-__new__"><strong>__new__</strong></a>(*args, **kwargs)<span class="grey"><span class="heading-text"> class method of <a href="builtins.html#Exception">builtins.Exception</a></span></span></dt><dd><span class="code">Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;<a href="builtins.html#object">object</a>.&nbsp;&nbsp;See&nbsp;help(type)&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<hr>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><a name="InvalidCredentialsError-__init__"><strong>__init__</strong></a>(self, /, *args, **kwargs)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="InvalidCredentialsError-__reduce__"><strong>__reduce__</strong></a>(self, /)</dt><dd><span class="code">Helper&nbsp;for&nbsp;pickle.</span></dd></dl>
+
+<dl><dt><a name="InvalidCredentialsError-__repr__"><strong>__repr__</strong></a>(self, /)</dt><dd><span class="code">Return&nbsp;repr(self).</span></dd></dl>
+
+<dl><dt><a name="InvalidCredentialsError-__setstate__"><strong>__setstate__</strong></a>(self, state, /)</dt></dl>
+
+<dl><dt><a name="InvalidCredentialsError-__str__"><strong>__str__</strong></a>(self, /)</dt><dd><span class="code">Return&nbsp;str(self).</span></dd></dl>
+
+<dl><dt><a name="InvalidCredentialsError-add_note"><strong>add_note</strong></a>(self, note, /)</dt><dd><span class="code">Add&nbsp;a&nbsp;note&nbsp;to&nbsp;the&nbsp;exception</span></dd></dl>
+
+<dl><dt><a name="InvalidCredentialsError-with_traceback"><strong>with_traceback</strong></a>(self, tb, /)</dt><dd><span class="code">Set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</span></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+</dl>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__suppress_context__</strong></dt>
+</dl>
+<dl><dt><strong>__traceback__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>DEFAULT_PBKDF2_ITERATIONS</strong> = 390000<br>
+<strong>DEFAULT_RATING</strong> = 1200</td></tr></table>
+</body></html>

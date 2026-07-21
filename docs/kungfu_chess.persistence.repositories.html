@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.persistence.repositories</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.persistence.html" class="white">persistence</a>.repositories</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cpersistence%5Crepositories.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\persistence\repositories.py</a></td></tr></table>
+    <p><span class="code">Repository&nbsp;interfaces&nbsp;(Master&nbsp;Plan&nbsp;v2,&nbsp;Section&nbsp;9/10.1)&nbsp;-&nbsp;the&nbsp;only<br>
+contract&nbsp;application/auth_service.py&nbsp;depends&nbsp;on.&nbsp;Two&nbsp;implementations<br>
+exist:&nbsp;InMemoryUserRepository/InMemorySessionRepository<br>
+(persistence/in_memory_repositories.py,&nbsp;used&nbsp;by&nbsp;tests&nbsp;and&nbsp;any<br>
+environment&nbsp;without&nbsp;SQLite&nbsp;wired&nbsp;in&nbsp;yet)&nbsp;and<br>
+SqliteUserRepository/SqliteSessionRepository<br>
+(persistence/sqlite/sqlite_repositories.py,&nbsp;the&nbsp;only&nbsp;place&nbsp;sqlite3&nbsp;is<br>
+imported&nbsp;anywhere&nbsp;in&nbsp;this&nbsp;project).&nbsp;Both&nbsp;are&nbsp;exercised&nbsp;by&nbsp;the&nbsp;same<br>
+repository&nbsp;contract&nbsp;test&nbsp;suite&nbsp;(Tests/persistence/test_repository_<br>
+contract.py)&nbsp;so&nbsp;a&nbsp;future&nbsp;swap&nbsp;can't&nbsp;silently&nbsp;change&nbsp;behavior.</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="abc.html#ABC">abc.ABC</a>(<a href="builtins.html#object">builtins.object</a>)
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.persistence.repositories.html#SessionRepository">SessionRepository</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.persistence.repositories.html#UserRepository">UserRepository</a>
+</dt></dl>
+</dd>
+<dt class="heading-text"><a href="builtins.html#Exception">builtins.Exception</a>(<a href="builtins.html#BaseException">builtins.BaseException</a>)
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.persistence.repositories.html#DuplicateUsernameError">DuplicateUsernameError</a>
+</dt></dl>
+</dd>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.persistence.repositories.html#Session">Session</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.persistence.repositories.html#User">User</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="DuplicateUsernameError">class <strong>DuplicateUsernameError</strong></a>(<a href="builtins.html#Exception">builtins.Exception</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code">Raised&nbsp;by&nbsp;<a href="#UserRepository">UserRepository</a>.add()&nbsp;when&nbsp;the&nbsp;username&nbsp;is&nbsp;already&nbsp;taken.<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.persistence.repositories.html#DuplicateUsernameError">DuplicateUsernameError</a></dd>
+<dd><a href="builtins.html#Exception">builtins.Exception</a></dd>
+<dd><a href="builtins.html#BaseException">builtins.BaseException</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Static methods inherited from <a href="builtins.html#Exception">builtins.Exception</a>:<br>
+<dl><dt><a name="DuplicateUsernameError-__new__"><strong>__new__</strong></a>(*args, **kwargs)<span class="grey"><span class="heading-text"> class method of <a href="builtins.html#Exception">builtins.Exception</a></span></span></dt><dd><span class="code">Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;<a href="builtins.html#object">object</a>.&nbsp;&nbsp;See&nbsp;help(type)&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<hr>
+Methods inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><a name="DuplicateUsernameError-__init__"><strong>__init__</strong></a>(self, /, *args, **kwargs)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="DuplicateUsernameError-__reduce__"><strong>__reduce__</strong></a>(self, /)</dt><dd><span class="code">Helper&nbsp;for&nbsp;pickle.</span></dd></dl>
+
+<dl><dt><a name="DuplicateUsernameError-__repr__"><strong>__repr__</strong></a>(self, /)</dt><dd><span class="code">Return&nbsp;repr(self).</span></dd></dl>
+
+<dl><dt><a name="DuplicateUsernameError-__setstate__"><strong>__setstate__</strong></a>(self, state, /)</dt></dl>
+
+<dl><dt><a name="DuplicateUsernameError-__str__"><strong>__str__</strong></a>(self, /)</dt><dd><span class="code">Return&nbsp;str(self).</span></dd></dl>
+
+<dl><dt><a name="DuplicateUsernameError-add_note"><strong>add_note</strong></a>(self, note, /)</dt><dd><span class="code">Add&nbsp;a&nbsp;note&nbsp;to&nbsp;the&nbsp;exception</span></dd></dl>
+
+<dl><dt><a name="DuplicateUsernameError-with_traceback"><strong>with_traceback</strong></a>(self, tb, /)</dt><dd><span class="code">Set&nbsp;self.<strong>__traceback__</strong>&nbsp;to&nbsp;tb&nbsp;and&nbsp;return&nbsp;self.</span></dd></dl>
+
+<hr>
+Data descriptors inherited from <a href="builtins.html#BaseException">builtins.BaseException</a>:<br>
+<dl><dt><strong>__cause__</strong></dt>
+</dl>
+<dl><dt><strong>__context__</strong></dt>
+</dl>
+<dl><dt><strong>__dict__</strong></dt>
+</dl>
+<dl><dt><strong>__suppress_context__</strong></dt>
+</dl>
+<dl><dt><strong>__traceback__</strong></dt>
+</dl>
+<dl><dt><strong>args</strong></dt>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="Session">class <strong>Session</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#Session">Session</a>(token:&nbsp;str,&nbsp;user_id:&nbsp;int)&nbsp;-&amp;gt;&nbsp;None<br>
+&nbsp;<br>
+<a href="#Session">Session</a>(token:&nbsp;str,&nbsp;user_id:&nbsp;int)<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="Session-__delattr__"><strong>__delattr__</strong></a>(self, name)</dt><dd><span class="code">Implement&nbsp;delattr(self,&nbsp;name).</span></dd></dl>
+
+<dl><dt><a name="Session-__eq__"><strong>__eq__</strong></a>(self, other)</dt><dd><span class="code">Return&nbsp;self==value.</span></dd></dl>
+
+<dl><dt><a name="Session-__hash__"><strong>__hash__</strong></a>(self)</dt><dd><span class="code">Return&nbsp;hash(self).</span></dd></dl>
+
+<dl><dt><a name="Session-__init__"><strong>__init__</strong></a>(self, token: str, user_id: int) -&gt; None</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="Session-__replace__"><strong>__replace__</strong></a> = _replace(self, /, **changes)<span class="grey"><span class="heading-text"> from <a href="dataclasses.html">dataclasses</a></span></span></dt></dl>
+
+<dl><dt><a name="Session-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><span class="code">Return&nbsp;repr(self).</span></dd></dl>
+
+<dl><dt><a name="Session-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt><dd><span class="code">Implement&nbsp;setattr(self,&nbsp;name,&nbsp;value).</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dataclass_fields__</strong> = {'token': Field(name='token',type=&lt;class 'str'&gt;,default=&lt;d...xy({}),kw_only=False,doc=None,_field_type=_FIELD), 'user_id': Field(name='user_id',type=&lt;class 'int'&gt;,default=...xy({}),kw_only=False,doc=None,_field_type=_FIELD)}</dl>
+
+<dl><dt><strong>__dataclass_params__</strong> = _DataclassParams(init=True,repr=True,eq=True,ord...rue,kw_only=False,slots=False,weakref_slot=False)</dl>
+
+<dl><dt><strong>__match_args__</strong> = ('token', 'user_id')</dl>
+
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="SessionRepository">class <strong>SessionRepository</strong></a>(<a href="abc.html#ABC">abc.ABC</a>)</td></tr>
+    
+<tr><td class="decor title-decor"><span class="code">&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.persistence.repositories.html#SessionRepository">SessionRepository</a></dd>
+<dd><a href="abc.html#ABC">abc.ABC</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="SessionRepository-create"><strong>create</strong></a>(self, token, user_id)</dt><dd><span class="code">Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;<a href="#Session">Session</a>&nbsp;bound&nbsp;to&nbsp;user_id.</span></dd></dl>
+
+<dl><dt><a name="SessionRepository-delete"><strong>delete</strong></a>(self, token)</dt><dd><span class="code">Remove&nbsp;a&nbsp;session&nbsp;(e.g.&nbsp;on&nbsp;logout);&nbsp;a&nbsp;no-op&nbsp;if&nbsp;already&nbsp;gone.</span></dd></dl>
+
+<dl><dt><a name="SessionRepository-get_by_token"><strong>get_by_token</strong></a>(self, token)</dt><dd><span class="code">Return&nbsp;the&nbsp;<a href="#Session">Session</a>,&nbsp;or&nbsp;None&nbsp;if&nbsp;the&nbsp;token&nbsp;is&nbsp;unknown.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__abstractmethods__</strong> = frozenset({'create', 'delete', 'get_by_token'})</dl>
+
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="User">class <strong>User</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#User">User</a>(<br>
+&nbsp;&nbsp;&nbsp;&nbsp;user_id:&nbsp;int,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;username:&nbsp;str,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;password_hash:&nbsp;str,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;password_salt:&nbsp;str,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;rating:&nbsp;int<br>
+)&nbsp;-&amp;gt;&nbsp;None<br>
+&nbsp;<br>
+<a href="#User">User</a>(user_id:&nbsp;int,&nbsp;username:&nbsp;str,&nbsp;password_hash:&nbsp;str,&nbsp;password_salt:&nbsp;str,&nbsp;rating:&nbsp;int)<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="User-__delattr__"><strong>__delattr__</strong></a>(self, name)</dt><dd><span class="code">Implement&nbsp;delattr(self,&nbsp;name).</span></dd></dl>
+
+<dl><dt><a name="User-__eq__"><strong>__eq__</strong></a>(self, other)</dt><dd><span class="code">Return&nbsp;self==value.</span></dd></dl>
+
+<dl><dt><a name="User-__hash__"><strong>__hash__</strong></a>(self)</dt><dd><span class="code">Return&nbsp;hash(self).</span></dd></dl>
+
+<dl><dt><a name="User-__init__"><strong>__init__</strong></a>(
+    self,
+    user_id: int,
+    username: str,
+    password_hash: str,
+    password_salt: str,
+    rating: int
+) -&gt; None</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="User-__replace__"><strong>__replace__</strong></a> = _replace(self, /, **changes)<span class="grey"><span class="heading-text"> from <a href="dataclasses.html">dataclasses</a></span></span></dt></dl>
+
+<dl><dt><a name="User-__repr__"><strong>__repr__</strong></a>(self)</dt><dd><span class="code">Return&nbsp;repr(self).</span></dd></dl>
+
+<dl><dt><a name="User-__setattr__"><strong>__setattr__</strong></a>(self, name, value)</dt><dd><span class="code">Implement&nbsp;setattr(self,&nbsp;name,&nbsp;value).</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__dataclass_fields__</strong> = {'password_hash': Field(name='password_hash',type=&lt;class 'str'&gt;,de...xy({}),kw_only=False,doc=None,_field_type=_FIELD), 'password_salt': Field(name='password_salt',type=&lt;class 'str'&gt;,de...xy({}),kw_only=False,doc=None,_field_type=_FIELD), 'rating': Field(name='rating',type=&lt;class 'int'&gt;,default=&lt;...xy({}),kw_only=False,doc=None,_field_type=_FIELD), 'user_id': Field(name='user_id',type=&lt;class 'int'&gt;,default=...xy({}),kw_only=False,doc=None,_field_type=_FIELD), 'username': Field(name='username',type=&lt;class 'str'&gt;,default...xy({}),kw_only=False,doc=None,_field_type=_FIELD)}</dl>
+
+<dl><dt><strong>__dataclass_params__</strong> = _DataclassParams(init=True,repr=True,eq=True,ord...rue,kw_only=False,slots=False,weakref_slot=False)</dl>
+
+<dl><dt><strong>__match_args__</strong> = ('user_id', 'username', 'password_hash', 'password_salt', 'rating')</dl>
+
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="UserRepository">class <strong>UserRepository</strong></a>(<a href="abc.html#ABC">abc.ABC</a>)</td></tr>
+    
+<tr><td class="decor title-decor"><span class="code">&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>Method resolution order:</dt>
+<dd><a href="kungfu_chess.persistence.repositories.html#UserRepository">UserRepository</a></dd>
+<dd><a href="abc.html#ABC">abc.ABC</a></dd>
+<dd><a href="builtins.html#object">builtins.object</a></dd>
+</dl>
+<hr>
+Methods defined here:<br>
+<dl><dt><a name="UserRepository-add"><strong>add</strong></a>(self, username, password_hash, password_salt, rating)</dt><dd><span class="code">Create&nbsp;and&nbsp;return&nbsp;a&nbsp;new&nbsp;<a href="#User">User</a>.&nbsp;Raises&nbsp;<a href="#DuplicateUsernameError">DuplicateUsernameError</a>&nbsp;if<br>
+username&nbsp;is&nbsp;already&nbsp;taken.</span></dd></dl>
+
+<dl><dt><a name="UserRepository-get_by_id"><strong>get_by_id</strong></a>(self, user_id)</dt><dd><span class="code">Return&nbsp;the&nbsp;<a href="#User">User</a>,&nbsp;or&nbsp;None&nbsp;if&nbsp;no&nbsp;such&nbsp;user_id&nbsp;exists.</span></dd></dl>
+
+<dl><dt><a name="UserRepository-get_by_username"><strong>get_by_username</strong></a>(self, username)</dt><dd><span class="code">Return&nbsp;the&nbsp;<a href="#User">User</a>,&nbsp;or&nbsp;None&nbsp;if&nbsp;no&nbsp;such&nbsp;username&nbsp;exists.</span></dd></dl>
+
+<dl><dt><a name="UserRepository-update_rating"><strong>update_rating</strong></a>(self, user_id, rating)</dt><dd><span class="code">Persist&nbsp;a&nbsp;new&nbsp;rating&nbsp;value&nbsp;for&nbsp;an&nbsp;existing&nbsp;user.</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+<hr>
+Data and other attributes defined here:<br>
+<dl><dt><strong>__abstractmethods__</strong> = frozenset({'add', 'get_by_id', 'get_by_username', 'update_rating'})</dl>
+
+</td></tr></table></td></tr></table>
+</body></html>
