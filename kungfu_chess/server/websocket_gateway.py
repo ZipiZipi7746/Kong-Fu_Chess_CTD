@@ -175,6 +175,19 @@ class WebSocketGateway:
         await self._game_service.handle_jump_request(game_id, identity, payload["row"], payload["col"])
 
     # ---------------------------------------------------------------
+    # Phase F Milestone 1: periodic render-state push, called from
+    # server_main.py's tick loop after each advance_time - not driven by
+    # the ApplicationMessageBus like the events above, since this isn't a
+    # domain occurrence, just a per-tick view of already-published state
+    # (Section 3's board sync guarantee: the same payload, built once, is
+    # sent to every connection in the game).
+    # ---------------------------------------------------------------
+
+    async def broadcast_render_state(self, game_id, session):
+        await self._broadcast(game_id, schemas.make_envelope(
+            "render_state", dto.build_render_state(session), game_id=game_id))
+
+    # ---------------------------------------------------------------
     # ApplicationMessageBus -> outgoing server -> client messages
     #
     # Subscriptions run synchronously (ApplicationMessageBus.publish is

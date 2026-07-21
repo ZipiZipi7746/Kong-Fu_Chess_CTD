@@ -337,6 +337,62 @@ class TestBoardSynchronization:
                 assert white_event["payload"]["sequence"] == white_snapshot["payload"]["sequence"] + 1
 
 
+class TestRenderStateBroadcast:
+    """Phase F Milestone 1: the networked GUI client animates from this
+    periodic broadcast. Same Section 3.4 guarantee as everything else -
+    both connected clients get the identical payload."""
+
+    @pytest.mark.asyncio
+    async def test_broadcast_render_state_sends_an_identical_payload_to_both_players(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+                game_id = white_snapshot["game_id"]
+
+                session = service.get_session(game_id)
+                await gateway.broadcast_render_state(game_id, session)
+
+                white_render_state = await recv(white_ws)
+                black_render_state = await recv(black_ws)
+
+                assert white_render_state["type"] == "render_state"
+                assert white_render_state["payload"] == black_render_state["payload"]
+                assert white_render_state["payload"]["motions"] == []
+
+    @pytest.mark.asyncio
+    async def test_broadcast_render_state_reports_an_in_flight_motion(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)
+                await recv(black_ws)
+                game_id = white_snapshot["game_id"]
+
+                await send(white_ws, "move_request",
+                           {"from_row": 6, "from_col": 4, "to_row": 5, "to_col": 4},
+                           game_id=game_id)
+                await recv(white_ws)  # move_accepted
+
+                session = service.get_session(game_id)
+                await gateway.broadcast_render_state(game_id, session)
+
+                render_state = await recv(white_ws)
+                assert render_state["payload"]["motions"] == [
+                    {"from": [6, 4], "to": [5, 4], "progress": 0.0}]
+
+
 class TestDisconnection:
     @pytest.mark.asyncio
     async def test_disconnecting_while_waiting_for_a_quick_local_opponent_frees_the_slot(self):

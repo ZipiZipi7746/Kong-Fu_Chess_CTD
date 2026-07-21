@@ -21,6 +21,13 @@ a&nbsp;schemas&nbsp;envelope,&nbsp;never&nbsp;touching&nbsp;Board/BoardRenderer&
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
     
 <tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><dl><dt><a name="-build_state_snapshot"><strong>build_state_snapshot</strong></a>(session)</dt></dl>
+<td class="singlecolumn"><dl><dt><a name="-build_render_state"><strong>build_render_state</strong></a>(session)</dt><dd><span class="code">Phase&nbsp;F&nbsp;Milestone&nbsp;1:&nbsp;the&nbsp;periodic&nbsp;broadcast&nbsp;a&nbsp;networked&nbsp;GUI&nbsp;client<br>
+animates&nbsp;from&nbsp;-&nbsp;everything&nbsp;ViewModelRegistry/GameController&nbsp;already<br>
+read&nbsp;locally&nbsp;(has_pending_move_from,&nbsp;is_airborne,&nbsp;cooldown_progress,<br>
+motion_progress,&nbsp;motion_target),&nbsp;serialized&nbsp;the&nbsp;same&nbsp;way<br>
+build_state_snapshot&nbsp;serializes&nbsp;board/game_over/winner.&nbsp;Reads&nbsp;only<br>
+GameEngine's&nbsp;existing&nbsp;public&nbsp;accessor&nbsp;methods&nbsp;-&nbsp;no&nbsp;new&nbsp;engine-layer<br>
+state&nbsp;or&nbsp;behavior.</span></dd></dl>
+ <dl><dt><a name="-build_state_snapshot"><strong>build_state_snapshot</strong></a>(session)</dt></dl>
 </td></tr></table>
 </body></html>
