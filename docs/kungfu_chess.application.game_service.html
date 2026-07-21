@@ -17,7 +17,8 @@
     
 <tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
 <td class="singlecolumn"><table><tr><td class="multicolumn"><a href="itertools.html">itertools</a><br>
-</td><td class="multicolumn"></td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+</td><td class="multicolumn"><a href="kungfu_chess.application.rating_service.html">kungfu_chess.application.rating_service</a><br>
+</td><td class="multicolumn"></td><td class="multicolumn"></td></tr></table></td></tr></table><p>
 <table class="section">
 <tr class="decor index-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
@@ -37,7 +38,7 @@
 <td class="section-title" colspan=3>&nbsp;<br><a name="GameService">class <strong>GameService</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
     
 <tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
-<td class="decor title-decor" colspan=2><span class="code"><a href="#GameService">GameService</a>(message_bus)<br>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameService">GameService</a>(message_bus,&nbsp;user_repository=None)<br>
 &nbsp;<br>
 The&nbsp;single&nbsp;place&nbsp;a&nbsp;network&nbsp;move/jump&nbsp;command&nbsp;becomes&nbsp;a&nbsp;call&nbsp;into<br>
 GameEngine&nbsp;(Part&nbsp;8&nbsp;of&nbsp;the&nbsp;architecture&nbsp;plan)&nbsp;-&nbsp;the&nbsp;server's<br>
@@ -55,7 +56,7 @@ event&nbsp;to&nbsp;translate&nbsp;-&nbsp;GameEngine&nbsp;has&nbsp;no&nbsp;"not&n
 published&nbsp;directly&nbsp;by&nbsp;<a href="#GameService-create_session">create_session</a>()&nbsp;at&nbsp;session-creation&nbsp;time.<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
-<dl><dt><a name="GameService-__init__"><strong>__init__</strong></a>(self, message_bus)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+<dl><dt><a name="GameService-__init__"><strong>__init__</strong></a>(self, message_bus, user_repository=None)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
 <dl><dt><a name="GameService-create_session"><strong>create_session</strong></a>(
     self,
@@ -64,7 +65,8 @@ published&nbsp;directly&nbsp;by&nbsp;<a href="#GameService-create_session">creat
     board=None,
     jump_duration_ms=1000,
     move_cooldown_ms=None,
-    jump_cooldown_ms=None
+    jump_cooldown_ms=None,
+    rated=False
 )</dt></dl>
 
 <dl><dt><a name="GameService-get_session"><strong>get_session</strong></a>(self, game_id)</dt></dl>

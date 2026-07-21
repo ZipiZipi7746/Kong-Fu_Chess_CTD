@@ -8,7 +8,9 @@ from kungfu_chess.messaging.application_events import (
     MoveRejectedEvent,
     GameEndedEvent,
 )
+from kungfu_chess.application import rating_service
 from kungfu_chess.application.game_session import GameSession
+from kungfu_chess.persistence.in_memory_repositories import InMemoryUserRepository
 
 # Maps GameEngine.request_move's own result vocabulary ("game_over",
 # "invalid", "blocked", "scheduled") to the wire-facing reason codes named
@@ -57,19 +59,27 @@ class GameService:
     published directly by create_session() at session-creation time.
     """
 
-    def __init__(self, message_bus):
+    def __init__(self, message_bus, user_repository=None):
         self._message_bus = message_bus
         self._sessions = {}
         self._game_id_counter = itertools.count(1)
+        # Only ever consulted for rated games (Decision 14) - quick_local
+        # games (rated=False, the default) never touch this. Defaults to
+        # a fresh, empty repository so GameService remains constructible
+        # standalone (matching this project's param=None DI convention),
+        # though a real deployment shares the same UserRepository
+        # instance AuthenticationService uses (see server_main.py).
+        self._user_repository = user_repository if user_repository is not None else InMemoryUserRepository()
 
     def create_session(self, white, black, board=None, jump_duration_ms=1000,
-                        move_cooldown_ms=None, jump_cooldown_ms=None):
+                        move_cooldown_ms=None, jump_cooldown_ms=None, rated=False):
         game_id = f"g_{next(self._game_id_counter)}"
         session = GameSession(
             game_id=game_id,
             board=board if board is not None else _standard_starting_board(),
             white=white, black=black, jump_duration_ms=jump_duration_ms,
-            move_cooldown_ms=move_cooldown_ms, jump_cooldown_ms=jump_cooldown_ms)
+            move_cooldown_ms=move_cooldown_ms, jump_cooldown_ms=jump_cooldown_ms,
+            rated=rated)
         session.event_bus.subscribe(self._make_domain_event_translator(session))
         self._sessions[game_id] = session
 
@@ -99,10 +109,24 @@ class GameService:
                     moving_piece=event.moving_piece, captured_piece=event.captured_piece,
                     timestamp_ms=event.timestamp_ms))
             elif isinstance(event, GameOverEvent):
+                if session.rated and not session.rating_applied:
+                    session.rating_applied = True
+                    self._apply_rating(session, event.winner)
                 self._message_bus.publish(GameEndedEvent(
                     game_id=session.game_id, winner=event.winner,
                     timestamp_ms=event.timestamp_ms))
         return translate
+
+    def _apply_rating(self, session, winner):
+        white_user = self._user_repository.get_by_username(session.white)
+        black_user = self._user_repository.get_by_username(session.black)
+        if white_user is None or black_user is None:
+            return  # not real accounts (e.g. a rated session in a test) - nothing to update
+
+        new_white, new_black = rating_service.apply_game_result(
+            white_user.rating, black_user.rating, winner)
+        self._user_repository.update_rating(white_user.user_id, new_white)
+        self._user_repository.update_rating(black_user.user_id, new_black)
 
     async def handle_move_request(self, game_id, requester, from_row, from_col, to_row, to_col):
         session = self._sessions.get(game_id)

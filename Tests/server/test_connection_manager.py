@@ -31,6 +31,22 @@ class TestIdentity:
         assert manager.get_identity("c1") == "alice"
 
 
+class TestFindConnectionByIdentity:
+    def test_finds_the_connection_with_the_given_identity(self):
+        manager = ConnectionManager()
+        manager.register("c1", socket="s1")
+        manager.register("c2", socket="s2")
+        manager.set_identity("c1", "alice")
+        manager.set_identity("c2", "bob")
+        assert manager.find_connection_by_identity("bob") == "c2"
+
+    def test_returns_none_for_an_unknown_identity(self):
+        manager = ConnectionManager()
+        manager.register("c1", socket="s1")
+        manager.set_identity("c1", "alice")
+        assert manager.find_connection_by_identity("nobody") is None
+
+
 class TestSessionToken:
     def test_session_token_defaults_to_none(self):
         manager = ConnectionManager()

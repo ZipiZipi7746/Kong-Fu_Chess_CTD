@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.application.rating_service</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.application.html" class="white">application</a>.rating_service</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Capplication%5Crating_service.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\application\rating_service.py</a></td></tr></table>
+    <p><span class="code">Pure&nbsp;ELO&nbsp;rating&nbsp;functions&nbsp;(Master&nbsp;Plan&nbsp;v2&nbsp;Decision&nbsp;4/Section&nbsp;10.2)&nbsp;-<br>
+no&nbsp;game/session/repository&nbsp;state,&nbsp;no&nbsp;side&nbsp;effects.&nbsp;GameService&nbsp;calls<br>
+these&nbsp;on&nbsp;a&nbsp;completed,&nbsp;rated&nbsp;game's&nbsp;GameEndedEvent;&nbsp;matchmaking_service<br>
+calls&nbsp;expected_score&nbsp;indirectly&nbsp;through&nbsp;nothing&nbsp;at&nbsp;all&nbsp;(matching&nbsp;is<br>
+purely&nbsp;rating-distance&nbsp;based,&nbsp;no&nbsp;odds&nbsp;calculation&nbsp;needed&nbsp;there).<br>
+&nbsp;<br>
+DEFAULT_K_FACTOR&nbsp;follows&nbsp;this&nbsp;project's&nbsp;existing&nbsp;convention&nbsp;of&nbsp;a&nbsp;plain<br>
+class/module-level&nbsp;constant&nbsp;rather&nbsp;than&nbsp;a&nbsp;separate&nbsp;Config&nbsp;class<br>
+hierarchy&nbsp;(see&nbsp;RealTimeArbiter.DEFAULT_MOVE_COOLDOWN_MS,&nbsp;GameController.<br>
+JUMP_DURATION_MS,&nbsp;auth_service.DEFAULT_RATING)&nbsp;-&nbsp;no&nbsp;such&nbsp;Config<br>
+hierarchy&nbsp;exists&nbsp;anywhere&nbsp;else&nbsp;in&nbsp;this&nbsp;codebase,&nbsp;so&nbsp;one&nbsp;wasn't&nbsp;invented<br>
+for&nbsp;this&nbsp;module&nbsp;either.</span></p>
+<p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-apply_game_result"><strong>apply_game_result</strong></a>(white_rating, black_rating, winner, k=32)</dt><dd><span class="code">Returns&nbsp;(new_white_rating,&nbsp;new_black_rating)&nbsp;for&nbsp;a&nbsp;just-completed<br>
+rated&nbsp;game.&nbsp;winner&nbsp;is&nbsp;"w"&nbsp;or&nbsp;"b"&nbsp;-&nbsp;this&nbsp;project&nbsp;has&nbsp;no&nbsp;draw&nbsp;outcome<br>
+(Decision&nbsp;12),&nbsp;so&nbsp;actual&nbsp;is&nbsp;always&nbsp;exactly&nbsp;1.0/0.0&nbsp;for&nbsp;one&nbsp;side&nbsp;and<br>
+the&nbsp;complementary&nbsp;0.0/1.0&nbsp;for&nbsp;the&nbsp;other.</span></dd></dl>
+ <dl><dt><a name="-expected_score"><strong>expected_score</strong></a>(rating_a, rating_b)</dt><dd><span class="code">The&nbsp;standard&nbsp;logistic&nbsp;Elo&nbsp;expected&nbsp;score&nbsp;for&nbsp;a&nbsp;player&nbsp;rated<br>
+rating_a&nbsp;against&nbsp;an&nbsp;opponent&nbsp;rated&nbsp;rating_b&nbsp;-&nbsp;a&nbsp;value&nbsp;in&nbsp;(0,&nbsp;1).</span></dd></dl>
+ <dl><dt><a name="-update_rating"><strong>update_rating</strong></a>(rating, expected, actual, k=32)</dt><dd><span class="code">actual&nbsp;is&nbsp;always&nbsp;exactly&nbsp;1.0&nbsp;(win)&nbsp;or&nbsp;0.0&nbsp;(loss)&nbsp;-&nbsp;Decision&nbsp;12,<br>
+no&nbsp;draws&nbsp;anywhere&nbsp;in&nbsp;this&nbsp;project.&nbsp;Always&nbsp;rounds&nbsp;to&nbsp;the&nbsp;nearest<br>
+int:&nbsp;ratings&nbsp;are&nbsp;whole&nbsp;numbers,&nbsp;never&nbsp;fractional.</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>DEFAULT_K_FACTOR</strong> = 32</td></tr></table>
+</body></html>

@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.application.matchmaking_service</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.application.html" class="white">application</a>.matchmaking_service</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Capplication%5Cmatchmaking_service.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\application\matchmaking_service.py</a></td></tr></table>
+    <p><span class="code"><a href="#MatchmakingService">MatchmakingService</a>&nbsp;(Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;10.2,&nbsp;Decisions&nbsp;5/6/13)&nbsp;-<br>
+the&nbsp;"Play"&nbsp;queue.&nbsp;Deterministic&nbsp;and&nbsp;clock-injected&nbsp;throughout&nbsp;(never<br>
+reads&nbsp;a&nbsp;real&nbsp;clock&nbsp;itself):&nbsp;the&nbsp;caller&nbsp;(server_main.py's&nbsp;tick&nbsp;loop)<br>
+passes&nbsp;now_ms&nbsp;explicitly,&nbsp;the&nbsp;same&nbsp;convention&nbsp;RealTimeArbiter&nbsp;already<br>
+uses&nbsp;for&nbsp;virtual&nbsp;time&nbsp;(Rule&nbsp;9)&nbsp;-&nbsp;this&nbsp;keeps&nbsp;matchmaking&nbsp;timing&nbsp;fully<br>
+testable&nbsp;and&nbsp;repeatable,&nbsp;not&nbsp;dependent&nbsp;on&nbsp;wall-clock&nbsp;timing&nbsp;in&nbsp;a&nbsp;test.<br>
+&nbsp;<br>
+DEFAULT_RATING_BAND/DEFAULT_TIMEOUT_MS&nbsp;are&nbsp;plain&nbsp;module&nbsp;constants,<br>
+matching&nbsp;this&nbsp;project's&nbsp;existing&nbsp;convention&nbsp;(see&nbsp;rating_service.<br>
+DEFAULT_K_FACTOR)&nbsp;rather&nbsp;than&nbsp;a&nbsp;separate&nbsp;Config&nbsp;class&nbsp;hierarchy.</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.application.matchmaking_service.html#MatchmakingService">MatchmakingService</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="MatchmakingService">class <strong>MatchmakingService</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#MatchmakingService">MatchmakingService</a>(rating_band=100,&nbsp;timeout_ms=60000)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="MatchmakingService-__init__"><strong>__init__</strong></a>(self, rating_band=100, timeout_ms=60000)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="MatchmakingService-cancel"><strong>cancel</strong></a>(self, user_id)</dt></dl>
+
+<dl><dt><a name="MatchmakingService-enqueue"><strong>enqueue</strong></a>(self, user_id, rating, now_ms)</dt></dl>
+
+<dl><dt><a name="MatchmakingService-is_queued"><strong>is_queued</strong></a>(self, user_id)</dt></dl>
+
+<dl><dt><a name="MatchmakingService-tick"><strong>tick</strong></a>(self, now_ms)</dt><dd><span class="code">Scans&nbsp;for&nbsp;every&nbsp;currently&nbsp;possible&nbsp;match&nbsp;first,&nbsp;removing<br>
+matched&nbsp;players&nbsp;from&nbsp;the&nbsp;queue,&nbsp;and&nbsp;only&nbsp;then&nbsp;pops&nbsp;whoever&nbsp;is<br>
+left&nbsp;waiting&nbsp;past&nbsp;the&nbsp;timeout&nbsp;(Decision&nbsp;5:&nbsp;no&nbsp;auto-retry,&nbsp;the<br>
+client&nbsp;returns&nbsp;to&nbsp;idle)&nbsp;-&nbsp;a&nbsp;match&nbsp;always&nbsp;wins&nbsp;over&nbsp;a<br>
+simultaneous&nbsp;timeout&nbsp;for&nbsp;the&nbsp;same&nbsp;players,&nbsp;since&nbsp;by&nbsp;the&nbsp;time<br>
+timeouts&nbsp;are&nbsp;checked&nbsp;they're&nbsp;already&nbsp;gone&nbsp;from&nbsp;the&nbsp;queue.&nbsp;No<br>
+threading/locking&nbsp;needed:&nbsp;this&nbsp;whole&nbsp;service&nbsp;is&nbsp;only&nbsp;ever<br>
+called&nbsp;from&nbsp;the&nbsp;single-threaded&nbsp;asyncio&nbsp;tick&nbsp;loop,&nbsp;so&nbsp;this<br>
+ordering&nbsp;alone&nbsp;is&nbsp;what&nbsp;the&nbsp;plan's&nbsp;"atomic&nbsp;claim"&nbsp;concern&nbsp;asks<br>
+for.&nbsp;Returns&nbsp;(matches,&nbsp;timed_out_user_ids).</span></dd></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>DEFAULT_RATING_BAND</strong> = 100<br>
+<strong>DEFAULT_TIMEOUT_MS</strong> = 60000</td></tr></table>
+</body></html>

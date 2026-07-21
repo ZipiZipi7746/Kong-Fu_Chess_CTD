@@ -37,6 +37,12 @@ class ConnectionManager:
     def get_game_id(self, connection_id):
         return self._get(connection_id, "game_id")
 
+    def find_connection_by_identity(self, identity):
+        for connection_id, info in self._connections.items():
+            if info["identity"] == identity:
+                return connection_id
+        return None
+
     def connections_in_game(self, game_id):
         return [
             connection_id for connection_id, info in self._connections.items()

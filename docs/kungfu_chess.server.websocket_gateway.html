@@ -18,11 +18,12 @@ board&nbsp;state&nbsp;only&nbsp;ever&nbsp;reaches&nbsp;this&nbsp;module&nbsp;alr
 application.dto,&nbsp;and&nbsp;accounts&nbsp;only&nbsp;ever&nbsp;reach&nbsp;it&nbsp;through<br>
 AuthenticationService.<br>
 &nbsp;<br>
-Phase&nbsp;A&nbsp;has&nbsp;no&nbsp;matchmaking&nbsp;or&nbsp;rooms&nbsp;yet:&nbsp;join_game's&nbsp;only&nbsp;supported&nbsp;mode<br>
-is&nbsp;"quick_local"&nbsp;-&nbsp;the&nbsp;first&nbsp;connection&nbsp;to&nbsp;request&nbsp;it&nbsp;waits,&nbsp;the&nbsp;second<br>
-pairs&nbsp;with&nbsp;it&nbsp;(first&nbsp;=&nbsp;White,&nbsp;second&nbsp;=&nbsp;Black)&nbsp;and&nbsp;a&nbsp;GameSession&nbsp;is<br>
-created&nbsp;immediately.&nbsp;Phases&nbsp;C/E&nbsp;replace&nbsp;this&nbsp;with&nbsp;real&nbsp;matchmaking/room<br>
-assignment&nbsp;without&nbsp;changing&nbsp;anything&nbsp;below&nbsp;the&nbsp;join_game&nbsp;handler&nbsp;itself.<br>
+Phase&nbsp;A/B's&nbsp;join_game&nbsp;"quick_local"&nbsp;mode&nbsp;remains&nbsp;available&nbsp;for&nbsp;local/<br>
+offline-style&nbsp;testing&nbsp;(the&nbsp;first&nbsp;connection&nbsp;to&nbsp;request&nbsp;it&nbsp;waits,&nbsp;the<br>
+second&nbsp;pairs&nbsp;with&nbsp;it&nbsp;-&nbsp;first&nbsp;=&nbsp;White,&nbsp;second&nbsp;=&nbsp;Black&nbsp;-&nbsp;unrated).&nbsp;Phase<br>
+C&nbsp;adds&nbsp;a&nbsp;separate&nbsp;"play"&nbsp;queue&nbsp;(Decisions&nbsp;5/6/13):&nbsp;matched&nbsp;pairs&nbsp;are<br>
+always&nbsp;rated&nbsp;(Decision&nbsp;14);&nbsp;quick_local&nbsp;is&nbsp;not&nbsp;replaced&nbsp;by&nbsp;it.&nbsp;Phase&nbsp;E<br>
+(rooms)&nbsp;will&nbsp;add&nbsp;a&nbsp;third&nbsp;join&nbsp;path&nbsp;without&nbsp;changing&nbsp;anything&nbsp;below.<br>
 &nbsp;<br>
 Phase&nbsp;B&nbsp;replaces&nbsp;the&nbsp;password-less&nbsp;"connect"&nbsp;message&nbsp;with&nbsp;the&nbsp;permanent<br>
 CLI&nbsp;login&nbsp;flow&nbsp;(Decision&nbsp;2):&nbsp;"register"&nbsp;creates&nbsp;an&nbsp;account,&nbsp;"login"<br>
@@ -65,7 +66,8 @@ identification&nbsp;step&nbsp;gained&nbsp;real&nbsp;credentials.</span></p>
 &nbsp;&nbsp;&nbsp;&nbsp;game_service,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;message_bus,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;connection_manager=None,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;auth_service=None<br>
+&nbsp;&nbsp;&nbsp;&nbsp;auth_service=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;matchmaking_service=None<br>
 )<br>
 &nbsp;<br>
 <br>&nbsp;</span></td></tr>
@@ -76,8 +78,11 @@ identification&nbsp;step&nbsp;gained&nbsp;real&nbsp;credentials.</span></p>
     game_service,
     message_bus,
     connection_manager=None,
-    auth_service=None
+    auth_service=None,
+    matchmaking_service=None
 )</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt>async <a name="WebSocketGateway-advance_matchmaking_clock"><strong>advance_matchmaking_clock</strong></a>(self, ms)</dt></dl>
 
 <dl><dt>async <a name="WebSocketGateway-broadcast_render_state"><strong>broadcast_render_state</strong></a>(self, game_id, session)</dt></dl>
 

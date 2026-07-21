@@ -78,6 +78,17 @@ class TestLogin:
         assert token1 != token2
 
 
+class TestGetUser:
+    def test_get_user_returns_the_registered_user(self):
+        service = make_service()
+        registered = service.register("alice", "correct-password")
+        assert service.get_user("alice").user_id == registered.user_id
+
+    def test_get_user_returns_none_for_an_unknown_username(self):
+        service = make_service()
+        assert service.get_user("nobody") is None
+
+
 class TestResolveToken:
     def test_resolve_token_returns_the_logged_in_user(self):
         service = make_service()
@@ -111,16 +122,23 @@ class TestCreateSqliteBackedService:
         # importing persistence.sqlite directly (Master Plan v2 Section 5
         # forbids server/ from importing persistence.sqlite except
         # through an application/*_service.py).
-        service = create_sqlite_backed_service(":memory:", pbkdf2_iterations=_FAST_ITERATIONS)
+        service, _repository = create_sqlite_backed_service(":memory:", pbkdf2_iterations=_FAST_ITERATIONS)
         user = service.register("alice", "correct-password")
         token = service.login("alice", "correct-password")
         assert service.resolve_token(token).user_id == user.user_id
 
     def test_accounts_persist_across_services_sharing_the_same_db_file(self, tmp_path):
         db_path = str(tmp_path / "kungfu_chess_test.db")
-        first_service = create_sqlite_backed_service(db_path, pbkdf2_iterations=_FAST_ITERATIONS)
+        first_service, _repository = create_sqlite_backed_service(db_path, pbkdf2_iterations=_FAST_ITERATIONS)
         first_service.register("alice", "correct-password")
 
-        second_service = create_sqlite_backed_service(db_path, pbkdf2_iterations=_FAST_ITERATIONS)
+        second_service, _repository = create_sqlite_backed_service(db_path, pbkdf2_iterations=_FAST_ITERATIONS)
         token = second_service.login("alice", "correct-password")
         assert second_service.resolve_token(token).username == "alice"
+
+    def test_the_returned_repository_is_the_same_one_the_service_uses(self):
+        # Phase C's rating application depends on this: GameService must
+        # see the exact accounts AuthenticationService just registered.
+        service, repository = create_sqlite_backed_service(":memory:", pbkdf2_iterations=_FAST_ITERATIONS)
+        user = service.register("alice", "correct-password")
+        assert repository.get_by_username("alice").user_id == user.user_id

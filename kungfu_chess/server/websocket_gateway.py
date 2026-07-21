@@ -7,11 +7,12 @@ board state only ever reaches this module already serialized, via
 application.dto, and accounts only ever reach it through
 AuthenticationService.
 
-Phase A has no matchmaking or rooms yet: join_game's only supported mode
-is "quick_local" - the first connection to request it waits, the second
-pairs with it (first = White, second = Black) and a GameSession is
-created immediately. Phases C/E replace this with real matchmaking/room
-assignment without changing anything below the join_game handler itself.
+Phase A/B's join_game "quick_local" mode remains available for local/
+offline-style testing (the first connection to request it waits, the
+second pairs with it - first = White, second = Black - unrated). Phase
+C adds a separate "play" queue (Decisions 5/6/13): matched pairs are
+always rated (Decision 14); quick_local is not replaced by it. Phase E
+(rooms) will add a third join path without changing anything below.
 
 Phase B replaces the password-less "connect" message with the permanent
 CLI login flow (Decision 2): "register" creates an account, "login"
@@ -27,6 +28,7 @@ import uuid
 
 from kungfu_chess.application import dto
 from kungfu_chess.application.auth_service import AuthenticationService, InvalidCredentialsError
+from kungfu_chess.application.matchmaking_service import MatchmakingService
 from kungfu_chess.messaging.application_events import (
     GameStartedEvent,
     GameMoveAppliedEvent,
@@ -41,12 +43,19 @@ logger = logging.getLogger(__name__)
 
 
 class WebSocketGateway:
-    def __init__(self, game_service, message_bus, connection_manager=None, auth_service=None):
+    def __init__(self, game_service, message_bus, connection_manager=None,
+                 auth_service=None, matchmaking_service=None):
         self._game_service = game_service
         self._message_bus = message_bus
         self._connections = connection_manager if connection_manager is not None else ConnectionManager()
         self._auth_service = auth_service if auth_service is not None else AuthenticationService()
+        self._matchmaking_service = (
+            matchmaking_service if matchmaking_service is not None else MatchmakingService())
         self._quick_local_waiting_connection_id = None
+        # A monotonic counter driven only by advance_matchmaking_clock
+        # (server_main.py's tick loop) - never a real wall clock, same
+        # deterministic-time convention as RealTimeArbiter (Rule 9).
+        self._matchmaking_clock_ms = 0
 
         message_bus.subscribe(GameStartedEvent, self._on_game_started)
         message_bus.subscribe(GameMoveAppliedEvent, self._on_game_move_applied)
@@ -72,6 +81,8 @@ class WebSocketGateway:
         "register": "_handle_register",
         "login": "_handle_login",
         "join_game": "_handle_join_game",
+        "play": "_handle_play",
+        "cancel_matchmaking": "_handle_cancel_matchmaking",
         "move_request": "_handle_move_request",
         "jump_request": "_handle_jump_request",
         "ping": "_handle_ping",
@@ -135,9 +146,35 @@ class WebSocketGateway:
         black_id = connection_id
         self._quick_local_waiting_connection_id = None
 
+        await self._start_game(white_id, black_id, rated=False)
+
+    async def _handle_play(self, connection_id, websocket, envelope):
+        identity = self._connections.get_identity(connection_id)
+        if identity is None:
+            await self._send(websocket, schemas.make_envelope(
+                "error", {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
+            return
+        if self._matchmaking_service.is_queued(identity):
+            return  # already searching - a duplicate "play" is a no-op, not an error
+
+        user = self._auth_service.get_user(identity)
+        if user is None:
+            return  # shouldn't happen - a successful login already implies a real account
+
+        self._matchmaking_service.enqueue(identity, user.rating, now_ms=self._matchmaking_clock_ms)
+        await self._send(websocket, schemas.make_envelope(
+            "searching_match", {}, correlation_id=envelope["message_id"]))
+
+    async def _handle_cancel_matchmaking(self, connection_id, websocket, envelope):
+        identity = self._connections.get_identity(connection_id)
+        if identity is not None:
+            self._matchmaking_service.cancel(identity)
+
+    async def _start_game(self, white_id, black_id, rated):
         session = self._game_service.create_session(
             white=self._connections.get_identity(white_id),
-            black=self._connections.get_identity(black_id))
+            black=self._connections.get_identity(black_id),
+            rated=rated)
 
         self._connections.set_game_id(white_id, session.game_id)
         self._connections.set_game_id(black_id, session.game_id)
@@ -186,6 +223,30 @@ class WebSocketGateway:
     async def broadcast_render_state(self, game_id, session):
         await self._broadcast(game_id, schemas.make_envelope(
             "render_state", dto.build_render_state(session), game_id=game_id))
+
+    # ---------------------------------------------------------------
+    # Phase C: matchmaking clock, advanced by server_main.py's tick loop
+    # independently of any specific game's activity (Decision 5's 1-
+    # minute timeout keeps counting down even if every game is idle).
+    # ---------------------------------------------------------------
+
+    async def advance_matchmaking_clock(self, ms):
+        self._matchmaking_clock_ms += ms
+        matches, timed_out = self._matchmaking_service.tick(self._matchmaking_clock_ms)
+
+        for white_identity, black_identity in matches:
+            white_id = self._connections.find_connection_by_identity(white_identity)
+            black_id = self._connections.find_connection_by_identity(black_identity)
+            if white_id is None or black_id is None:
+                continue  # disconnected between enqueue and match - drop silently
+            await self._start_game(white_id, black_id, rated=True)
+
+        for identity in timed_out:
+            connection_id = self._connections.find_connection_by_identity(identity)
+            if connection_id is None:
+                continue
+            await self._send(self._connections.get_socket(connection_id), schemas.make_envelope(
+                "matchmaking_timeout", {}))
 
     # ---------------------------------------------------------------
     # ApplicationMessageBus -> outgoing server -> client messages

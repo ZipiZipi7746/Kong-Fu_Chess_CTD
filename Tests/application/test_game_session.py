@@ -26,6 +26,17 @@ class TestConstruction:
         session = make_session([["wR", "."]])
         assert session.sequence == 0
 
+    def test_defaults_to_unrated_with_rating_not_yet_applied(self):
+        session = make_session([["wR", "."]])
+        assert session.rated is False
+        assert session.rating_applied is False
+
+    def test_rated_can_be_requested_explicitly(self):
+        session = GameSession(
+            game_id="g_1", board=make_board([["wR", "."]]), white="alice", black="bob",
+            jump_duration_ms=1000, rated=True)
+        assert session.rated is True
+
 
 class TestColorFor:
     def test_white_display_name_maps_to_w(self):

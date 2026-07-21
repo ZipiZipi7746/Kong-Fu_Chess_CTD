@@ -29,13 +29,17 @@ async def _tick_loop(game_service, gateway, tick_interval_ms=TICK_INTERVAL_MS): 
     broadcasts without needing a new client command. Each active tick is
     followed by a render_state broadcast (Phase F Milestone 1) so any
     connected networked GUI client can animate the in-between motion,
-    not just the discrete before/after board states."""
+    not just the discrete before/after board states. The matchmaking
+    clock (Phase C) advances every tick regardless of any game's
+    activity - Decision 5's 1-minute timeout keeps counting down even
+    while every game in progress is idle."""
     while True:
         await asyncio.sleep(tick_interval_ms / 1000)
         for game_id, session in game_service.sessions().items():
             if session.has_pending_activity():
                 await game_service.tick(game_id, tick_interval_ms)
                 await gateway.broadcast_render_state(game_id, session)
+        await gateway.advance_matchmaking_clock(tick_interval_ms)
 
 
 async def run(host=HOST, port=PORT, db_path=DB_PATH):  # pragma: no cover
@@ -43,8 +47,8 @@ async def run(host=HOST, port=PORT, db_path=DB_PATH):  # pragma: no cover
     logger = logging.getLogger(__name__)
 
     message_bus = ApplicationMessageBus()
-    game_service = GameService(message_bus)
-    auth_service = create_sqlite_backed_service(db_path)
+    auth_service, user_repository = create_sqlite_backed_service(db_path)
+    game_service = GameService(message_bus, user_repository=user_repository)
     gateway = WebSocketGateway(game_service, message_bus, auth_service=auth_service)
 
     tick_task = asyncio.create_task(_tick_loop(game_service, gateway))

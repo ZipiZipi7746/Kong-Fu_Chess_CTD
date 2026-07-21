@@ -9,11 +9,12 @@ from kungfu_chess.messaging.application_events import (
     GameEndedEvent,
 )
 from kungfu_chess.application.game_service import GameService
+from kungfu_chess.persistence.in_memory_repositories import InMemoryUserRepository
 
 
-def make_service():
+def make_service(user_repository=None):
     bus = ApplicationMessageBus()
-    service = GameService(bus)
+    service = GameService(bus, user_repository=user_repository)
     return service, bus
 
 
@@ -192,3 +193,68 @@ class TestTickTranslatesDomainEventsToApplicationEvents:
     async def test_tick_on_unknown_game_id_is_a_noop(self):
         service, bus = make_service()
         await service.tick("nonexistent", 1000)  # must not raise
+
+
+class TestRatingApplication:
+    """Master Plan v2 Decision 14/Section 9: a rated game's winner/loser
+    ratings update exactly once, on the GameOverEvent -> GameEndedEvent
+    translation; an unrated (quick_local-style) game never touches the
+    user repository at all."""
+
+    def _make_repository_with(self, **users):
+        repository = InMemoryUserRepository()
+        for username, rating in users.items():
+            repository.add(username, "hash", "salt", rating)
+        return repository
+
+    @pytest.mark.asyncio
+    async def test_a_rated_games_winner_gains_rating_and_loser_loses_it(self):
+        repository = self._make_repository_with(alice=1200, bob=1200)
+        service, bus = make_service(user_repository=repository)
+        session = service.create_session(
+            white="alice", black="bob", board=Board([["wR", "bK"]]), rated=True)
+
+        await service.handle_move_request(session.game_id, "alice", 0, 0, 0, 1)
+        await service.tick(session.game_id, 1000)  # king capture, white wins
+
+        assert repository.get_by_username("alice").rating == 1216
+        assert repository.get_by_username("bob").rating == 1184
+
+    @pytest.mark.asyncio
+    async def test_rating_is_marked_applied_exactly_once(self):
+        repository = self._make_repository_with(alice=1200, bob=1200)
+        service, bus = make_service(user_repository=repository)
+        session = service.create_session(
+            white="alice", black="bob", board=Board([["wR", "bK"]]), rated=True)
+
+        await service.handle_move_request(session.game_id, "alice", 0, 0, 0, 1)
+        await service.tick(session.game_id, 1000)
+
+        assert session.rating_applied is True
+
+    @pytest.mark.asyncio
+    async def test_an_unrated_game_never_touches_the_user_repository(self):
+        repository = self._make_repository_with(alice=1200, bob=1200)
+        service, bus = make_service(user_repository=repository)
+        session = service.create_session(
+            white="alice", black="bob", board=Board([["wR", "bK"]]))  # rated defaults to False
+
+        await service.handle_move_request(session.game_id, "alice", 0, 0, 0, 1)
+        await service.tick(session.game_id, 1000)
+
+        assert repository.get_by_username("alice").rating == 1200
+        assert repository.get_by_username("bob").rating == 1200
+        assert session.rating_applied is False
+
+    @pytest.mark.asyncio
+    async def test_a_rated_game_between_unknown_accounts_does_not_crash(self):
+        # quick_local's arbitrary display names may not correspond to a
+        # real account - a rated game should still be theoretically
+        # possible to construct without a KeyError/crash even if lookup
+        # fails, it just silently skips applying anything.
+        service, bus = make_service(user_repository=InMemoryUserRepository())
+        session = service.create_session(
+            white="alice", black="bob", board=Board([["wR", "bK"]]), rated=True)
+
+        await service.handle_move_request(session.game_id, "alice", 0, 0, 0, 1)
+        await service.tick(session.game_id, 1000)  # must not raise

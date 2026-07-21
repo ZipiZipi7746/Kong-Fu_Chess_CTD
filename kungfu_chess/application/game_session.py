@@ -25,7 +25,7 @@ class GameSession:
     """
 
     def __init__(self, game_id, board, white, black, jump_duration_ms=1000,
-                 move_cooldown_ms=None, jump_cooldown_ms=None):
+                 move_cooldown_ms=None, jump_cooldown_ms=None, rated=False):
         self.game_id = game_id
         self.white = white
         self.black = black
@@ -35,6 +35,12 @@ class GameSession:
             move_cooldown_ms=move_cooldown_ms, jump_cooldown_ms=jump_cooldown_ms)
         self.lock = asyncio.Lock()
         self.sequence = 0
+        # Master Plan v2 Section 10.2/Section 9: Play-originated games are
+        # rated (Decision 14), quick_local games are not. rating_applied
+        # guards exactly-once rating application on game end - see
+        # GameService._apply_rating.
+        self.rated = rated
+        self.rating_applied = False
 
     def color_for(self, display_name):
         if display_name == self.white:

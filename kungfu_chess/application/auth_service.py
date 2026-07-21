@@ -54,6 +54,9 @@ class AuthenticationService:
         self._sessions.create(token, user.user_id)
         return token
 
+    def get_user(self, username):
+        return self._users.get_by_username(username)
+
     def resolve_token(self, token):
         session = self._sessions.get_by_token(token)
         if session is None:
@@ -74,8 +77,16 @@ def create_sqlite_backed_service(db_path, pbkdf2_iterations=DEFAULT_PBKDF2_ITERA
     AuthenticationService (Master Plan v2 Section 5): server/server_main.py
     calls this instead of importing kungfu_chess.persistence.sqlite
     directly, which the import-boundary rule forbids for any server/
-    module - only application/ is allowed to depend on persistence/."""
+    module - only application/ is allowed to depend on persistence/.
+
+    Returns (auth_service, user_repository) - the repository is exposed
+    too so the composition root can inject the *same* UserRepository
+    into GameService (Phase C rating application needs to see the exact
+    accounts AuthenticationService just registered/logged in, not a
+    second, disconnected in-memory copy)."""
     connection = _sqlite_connect(db_path)
-    return AuthenticationService(
-        SqliteUserRepository(connection), SqliteSessionRepository(connection),
+    user_repository = SqliteUserRepository(connection)
+    auth_service = AuthenticationService(
+        user_repository, SqliteSessionRepository(connection),
         pbkdf2_iterations=pbkdf2_iterations)
+    return auth_service, user_repository

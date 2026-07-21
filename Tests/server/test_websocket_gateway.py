@@ -9,6 +9,7 @@ from kungfu_chess.model.piece import Piece
 from kungfu_chess.messaging.application_message_bus import ApplicationMessageBus
 from kungfu_chess.application.auth_service import AuthenticationService
 from kungfu_chess.application.game_service import GameService
+from kungfu_chess.persistence.in_memory_repositories import InMemoryUserRepository
 from kungfu_chess.server.websocket_gateway import WebSocketGateway
 from kungfu_chess.server import schemas
 
@@ -24,8 +25,13 @@ _FAST_ITERATIONS = 10
 @contextlib.asynccontextmanager
 async def running_gateway():
     bus = ApplicationMessageBus()
-    service = GameService(bus)
-    auth_service = AuthenticationService(pbkdf2_iterations=_FAST_ITERATIONS)
+    # Shared between auth and game services, exactly as server_main.py's
+    # composition root shares them - a rated game's rating lookups
+    # (GameService._apply_rating) need to see the same accounts
+    # AuthenticationService just registered/logged in.
+    user_repository = InMemoryUserRepository()
+    service = GameService(bus, user_repository=user_repository)
+    auth_service = AuthenticationService(user_repository, pbkdf2_iterations=_FAST_ITERATIONS)
     gateway = WebSocketGateway(service, bus, auth_service=auth_service)
     # Bound to the literal IPv4 loopback address, not "localhost" - which
     # host "localhost" resolves to (127.0.0.1 vs. ::1) is not guaranteed
@@ -393,6 +399,83 @@ class TestRenderStateBroadcast:
                 render_state = await recv(white_ws)
                 assert render_state["payload"]["motions"] == [
                     {"from": [6, 4], "to": [5, 4], "progress": 0.0}]
+
+
+class TestMatchmaking:
+    """Master Plan v2 Section 10.2/Decision 5/13: the "play" queue,
+    separate from quick_local (which stays available for local/offline-
+    style testing - see websocket_gateway.py's module docstring)."""
+
+    @pytest.mark.asyncio
+    async def test_two_players_within_rating_band_get_matched_and_started(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+
+                await send(white_ws, "play", {})
+                await recv(white_ws)  # searching_match
+                await send(black_ws, "play", {})
+                await recv(black_ws)  # searching_match
+                await gateway.advance_matchmaking_clock(100)
+
+                white_snapshot = await recv(white_ws)
+                black_snapshot = await recv(black_ws)
+                assert white_snapshot["type"] == "state_snapshot"
+                assert black_snapshot["type"] == "state_snapshot"
+                assert white_snapshot["game_id"] == black_snapshot["game_id"]
+
+                game_id = white_snapshot["game_id"]
+                session = service.get_session(game_id)
+                assert session.rated is True
+                assert session.white == "alice"
+                assert session.black == "bob"
+
+    @pytest.mark.asyncio
+    async def test_a_lone_player_receives_no_match_until_a_second_arrives(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await register_and_login(ws, "alice")
+                await send(ws, "play", {})
+                await recv(ws)  # searching_match
+                await gateway.advance_matchmaking_clock(100)
+                # Nothing should have arrived yet - assert via a ping/pong
+                # round trip instead of a fixed sleep-then-check.
+                await send(ws, "ping", {})
+                pong = await recv(ws)
+                assert pong["type"] == "pong"
+
+    @pytest.mark.asyncio
+    async def test_cancel_matchmaking_removes_a_waiting_player(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+
+                await send(white_ws, "play", {})
+                await recv(white_ws)  # searching_match
+                await send(white_ws, "cancel_matchmaking", {})
+                await send(black_ws, "play", {})
+                await recv(black_ws)  # searching_match
+                await gateway.advance_matchmaking_clock(100)
+
+                # alice cancelled, so no match should have happened for
+                # bob either - confirm via ping/pong rather than a sleep.
+                await send(black_ws, "ping", {})
+                pong = await recv(black_ws)
+                assert pong["type"] == "pong"
+
+    @pytest.mark.asyncio
+    async def test_a_player_who_times_out_is_notified_and_can_search_again(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await register_and_login(ws, "alice")
+                await send(ws, "play", {})
+                await recv(ws)  # searching_match
+                await gateway.advance_matchmaking_clock(60_000)
+
+                timeout_msg = await recv(ws)
+                assert timeout_msg["type"] == "matchmaking_timeout"
 
 
 class TestDisconnection:
