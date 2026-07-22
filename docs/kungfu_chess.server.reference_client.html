@@ -28,7 +28,14 @@ typed&nbsp;at&nbsp;the&nbsp;prompt&nbsp;-&nbsp;parsed&nbsp;locally&nbsp;into&nbs
 to_col&nbsp;JSON&nbsp;payload&nbsp;the&nbsp;server&nbsp;actually&nbsp;expects.&nbsp;The&nbsp;wire&nbsp;protocol<br>
 itself&nbsp;is&nbsp;JSON&nbsp;throughout;&nbsp;the&nbsp;shorthand&nbsp;is&nbsp;purely&nbsp;this&nbsp;client's&nbsp;own<br>
 input&nbsp;convenience&nbsp;(see&nbsp;the&nbsp;architecture&nbsp;plan's&nbsp;JSON-vs-shorthand<br>
-decision).</span></p>
+decision).<br>
+&nbsp;<br>
+Phase&nbsp;D&nbsp;(Decision&nbsp;7):&nbsp;if&nbsp;the&nbsp;connection&nbsp;drops&nbsp;mid-game,&nbsp;this&nbsp;process<br>
+automatically&nbsp;reconnects&nbsp;using&nbsp;the&nbsp;session&nbsp;token&nbsp;it&nbsp;already&nbsp;holds&nbsp;in<br>
+memory&nbsp;(no&nbsp;re-login)&nbsp;-&nbsp;the&nbsp;server&nbsp;is&nbsp;the&nbsp;sole&nbsp;authority&nbsp;on&nbsp;whether<br>
+reconnection&nbsp;is&nbsp;still&nbsp;possible&nbsp;(within&nbsp;the&nbsp;20-second&nbsp;grace&nbsp;window),&nbsp;so<br>
+this&nbsp;client&nbsp;just&nbsp;keeps&nbsp;retrying&nbsp;until&nbsp;either&nbsp;it&nbsp;succeeds&nbsp;or&nbsp;the&nbsp;server<br>
+reports&nbsp;there&nbsp;is&nbsp;nothing&nbsp;left&nbsp;to&nbsp;reconnect&nbsp;to.</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">

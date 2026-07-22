@@ -18,6 +18,13 @@ to_col JSON payload the server actually expects. The wire protocol
 itself is JSON throughout; the shorthand is purely this client's own
 input convenience (see the architecture plan's JSON-vs-shorthand
 decision).
+
+Phase D (Decision 7): if the connection drops mid-game, this process
+automatically reconnects using the session token it already holds in
+memory (no re-login) - the server is the sole authority on whether
+reconnection is still possible (within the 20-second grace window), so
+this client just keeps retrying until either it succeeds or the server
+reports there is nothing left to reconnect to.
 """
 import asyncio
 import json
@@ -109,30 +116,75 @@ async def send_loop(websocket, state):  # pragma: no cover
             game_id=state.get("game_id"))))
 
 
+async def _attempt_reconnect(websocket, session_token):  # pragma: no cover
+    await websocket.send(schemas.encode(schemas.make_envelope(
+        "reconnect", {"session_token": session_token})))
+    response = json.loads(await websocket.recv())
+    if response["type"] == "error":
+        print(f"Reconnect failed: {response['payload']['code']}")
+        return None
+    print("Reconnected.")
+    render_board(response["payload"]["board"])
+    return response.get("game_id")
+
+
+async def _play_session(websocket, state):  # pragma: no cover
+    """Runs receive_loop/send_loop concurrently until either ends,
+    cancelling whichever is still running - unlike a plain
+    asyncio.gather, this never leaves an orphaned task (e.g. send_loop
+    still blocked on input()) running against a connection main() is
+    about to replace with a reconnect attempt. Re-raises whichever
+    exception ended the session, so main() can distinguish "the
+    connection dropped" (reconnect) from "the user quit" (exit)."""
+    tasks = [
+        asyncio.create_task(receive_loop(websocket, state)),
+        asyncio.create_task(send_loop(websocket, state)),
+    ]
+    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+    for task in pending:
+        task.cancel()
+    for task in done:
+        exc = task.exception()
+        if exc is not None:
+            raise exc
+
+
 async def main():  # pragma: no cover
-    state = {"game_id": None, "game_over": False}
+    session_token = None
 
-    async with websockets.connect(SERVER_URL) as websocket:
-        flow = await perform_login(websocket)
-        if flow is None:
-            return
-
-        mode = input("[Q]uick local or ranked [p]lay? [Q/p]: ").strip().lower()
-        if mode.startswith("p"):
-            await websocket.send(schemas.encode(schemas.make_envelope("play", {})))
-            print(f"Logged in as {flow.username}. Searching for a ranked match...")
-        else:
-            await websocket.send(schemas.encode(schemas.make_envelope(
-                "join_game", {"mode": "quick_local"})))
-            print(f"Logged in as {flow.username}. Waiting for an opponent...")
-
+    while True:
+        state = {"game_id": None, "game_over": False}
         try:
-            await asyncio.gather(
-                receive_loop(websocket, state),
-                send_loop(websocket, state),
-            )
-        except (websockets.exceptions.ConnectionClosed, KeyboardInterrupt):
-            pass
+            async with websockets.connect(SERVER_URL) as websocket:
+                if session_token is not None:
+                    game_id = await _attempt_reconnect(websocket, session_token)
+                    if game_id is None:
+                        return
+                    state["game_id"] = game_id
+                else:
+                    flow = await perform_login(websocket)
+                    if flow is None:
+                        return
+                    session_token = flow.session_token
+
+                    mode = input("[Q]uick local or ranked [p]lay? [Q/p]: ").strip().lower()
+                    if mode.startswith("p"):
+                        await websocket.send(schemas.encode(schemas.make_envelope("play", {})))
+                        print(f"Logged in as {flow.username}. Searching for a ranked match...")
+                    else:
+                        await websocket.send(schemas.encode(schemas.make_envelope(
+                            "join_game", {"mode": "quick_local"})))
+                        print(f"Logged in as {flow.username}. Waiting for an opponent...")
+
+                await _play_session(websocket, state)
+                return  # send_loop/receive_loop ended cleanly (EOF, game over) - done
+        except websockets.exceptions.ConnectionClosed:
+            if state["game_over"] or session_token is None:
+                return
+            print("\nConnection lost - attempting to reconnect...")
+            continue
+        except KeyboardInterrupt:
+            return
 
 
 if __name__ == "__main__":  # pragma: no cover
