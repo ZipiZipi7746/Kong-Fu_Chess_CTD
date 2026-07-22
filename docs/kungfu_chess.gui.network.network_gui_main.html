@@ -11,22 +11,32 @@
 <td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cnetwork_gui_main.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\network_gui_main.py</a></td></tr></table>
     <p><span class="code">Entrypoint:&nbsp;python&nbsp;-m&nbsp;kungfu_chess.gui.network.network_gui_main<br>
 &nbsp;<br>
-Phase&nbsp;F&nbsp;Milestone&nbsp;1's&nbsp;graphical&nbsp;networked&nbsp;client&nbsp;-&nbsp;covers&nbsp;every&nbsp;join<br>
-path&nbsp;server/reference_client.py&nbsp;already&nbsp;does:&nbsp;the&nbsp;permanent&nbsp;CLI&nbsp;login<br>
-flow&nbsp;(server.login_client.perform_login),&nbsp;then&nbsp;a&nbsp;choice&nbsp;between&nbsp;the<br>
-unrated&nbsp;quick_local&nbsp;game,&nbsp;Phase&nbsp;C's&nbsp;rated&nbsp;"play"&nbsp;queue,&nbsp;and&nbsp;Phase&nbsp;E's<br>
-rooms&nbsp;(create&nbsp;one&nbsp;and&nbsp;wait,&nbsp;or&nbsp;join&nbsp;one&nbsp;-&nbsp;as&nbsp;the&nbsp;second&nbsp;player&nbsp;or&nbsp;a<br>
-read-only&nbsp;spectator,&nbsp;decided&nbsp;by&nbsp;the&nbsp;server,&nbsp;not&nbsp;the&nbsp;client),&nbsp;before<br>
-handing&nbsp;off&nbsp;to&nbsp;network_game_loop.run()&nbsp;for&nbsp;the&nbsp;actual&nbsp;graphical&nbsp;board.<br>
-Real&nbsp;I/O&nbsp;throughout&nbsp;-&nbsp;excluded&nbsp;from&nbsp;coverage,&nbsp;verified&nbsp;by&nbsp;running&nbsp;it,<br>
-not&nbsp;by&nbsp;unit&nbsp;tests&nbsp;(same&nbsp;treatment&nbsp;as&nbsp;gui/gui_main.py&nbsp;and<br>
+Phase&nbsp;F&nbsp;Milestone&nbsp;2:&nbsp;replaces&nbsp;every&nbsp;console&nbsp;input()-driven&nbsp;prompt<br>
+(login,&nbsp;mode&nbsp;selection,&nbsp;room&nbsp;code&nbsp;entry,&nbsp;waiting&nbsp;status)&nbsp;with&nbsp;real<br>
+graphical&nbsp;screens&nbsp;rendered&nbsp;in&nbsp;the&nbsp;same&nbsp;cv2&nbsp;window&nbsp;the&nbsp;board&nbsp;itself<br>
+uses&nbsp;-&nbsp;a&nbsp;Home/Login&nbsp;screen,&nbsp;a&nbsp;Menu&nbsp;screen&nbsp;(quick_local&nbsp;/&nbsp;ranked&nbsp;play&nbsp;/<br>
+create&nbsp;room&nbsp;/&nbsp;join&nbsp;room,&nbsp;with&nbsp;the&nbsp;player's&nbsp;username&nbsp;and&nbsp;Elo&nbsp;rating<br>
+shown),&nbsp;and&nbsp;a&nbsp;Waiting&nbsp;screen&nbsp;(status&nbsp;text&nbsp;+&nbsp;Cancel),&nbsp;before&nbsp;handing<br>
+off&nbsp;to&nbsp;network_game_loop.run()&nbsp;for&nbsp;the&nbsp;actual&nbsp;graphical&nbsp;board.&nbsp;See<br>
+gui/network/screens.py&nbsp;(click/keyboard&nbsp;logic)&nbsp;and<br>
+gui/network/screen_rendering.py&nbsp;(pure&nbsp;draw&nbsp;layout)&nbsp;for&nbsp;the&nbsp;reusable<br>
+pieces;&nbsp;gui/network/screen_loop.py&nbsp;is&nbsp;the&nbsp;real&nbsp;I/O&nbsp;(cv2&nbsp;window,&nbsp;mouse,<br>
+keyboard)&nbsp;that&nbsp;drives&nbsp;them.<br>
+&nbsp;<br>
+Covers&nbsp;every&nbsp;join&nbsp;path&nbsp;server/reference_client.py's&nbsp;text&nbsp;version&nbsp;does:<br>
+quick_local,&nbsp;ranked&nbsp;play,&nbsp;and&nbsp;Phase&nbsp;E&nbsp;rooms&nbsp;(create/join,&nbsp;as&nbsp;the&nbsp;second<br>
+player&nbsp;or&nbsp;a&nbsp;read-only&nbsp;spectator&nbsp;-&nbsp;decided&nbsp;by&nbsp;the&nbsp;server,&nbsp;never&nbsp;the<br>
+client).&nbsp;Real&nbsp;I/O&nbsp;throughout&nbsp;-&nbsp;excluded&nbsp;from&nbsp;coverage,&nbsp;verified&nbsp;by<br>
+running&nbsp;it,&nbsp;not&nbsp;by&nbsp;unit&nbsp;tests&nbsp;(same&nbsp;treatment&nbsp;as&nbsp;gui/gui_main.py&nbsp;and<br>
 server/reference_client.py).<br>
 &nbsp;<br>
 Phase&nbsp;D&nbsp;(Decision&nbsp;7):&nbsp;mirrors&nbsp;reference_client.py's&nbsp;automatic<br>
 reconnect&nbsp;-&nbsp;if&nbsp;the&nbsp;connection&nbsp;drops&nbsp;mid-game,&nbsp;a&nbsp;fresh&nbsp;connection&nbsp;is<br>
 opened&nbsp;and&nbsp;"reconnect"&nbsp;sent&nbsp;with&nbsp;the&nbsp;session&nbsp;token&nbsp;already&nbsp;held&nbsp;in<br>
 memory&nbsp;(no&nbsp;re-login),&nbsp;resuming&nbsp;network_game_loop.run()&nbsp;via&nbsp;its<br>
-`resume`&nbsp;parameter&nbsp;rather&nbsp;than&nbsp;repeating&nbsp;the&nbsp;join&nbsp;handshake.</span></p>
+`resume`&nbsp;parameter&nbsp;rather&nbsp;than&nbsp;repeating&nbsp;the&nbsp;join&nbsp;screens.&nbsp;Reconnection<br>
+itself&nbsp;is&nbsp;not&nbsp;yet&nbsp;graphical&nbsp;(console&nbsp;status&nbsp;prints&nbsp;only)&nbsp;-&nbsp;a&nbsp;fast-<br>
+follow,&nbsp;not&nbsp;part&nbsp;of&nbsp;this&nbsp;pass's&nbsp;Home/Login/Menu&nbsp;screen&nbsp;scope.</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -35,12 +45,14 @@ memory&nbsp;(no&nbsp;re-login),&nbsp;resuming&nbsp;network_game_loop.run()&nbsp;
 <tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
 <td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
 <a href="json.html">json</a><br>
-</td><td class="multicolumn"><a href="kungfu_chess.gui.network.network_game_loop.html">kungfu_chess.gui.network.network_game_loop</a><br>
-<a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
-</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+<a href="kungfu_chess.gui.network.network_game_loop.html">kungfu_chess.gui.network.network_game_loop</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
+<a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+<a href="kungfu_chess.gui.network.screen_loop.html">kungfu_chess.gui.network.screen_loop</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.gui.network.screen_rendering.html">kungfu_chess.gui.network.screen_rendering</a><br>
 <a href="sys.html">sys</a><br>
-</td><td class="multicolumn"><a href="websockets.html">websockets</a><br>
-</td></tr></table></td></tr></table><p>
+<a href="websockets.html">websockets</a><br>
+</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
 <table class="section">
 <tr class="decor functions-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>

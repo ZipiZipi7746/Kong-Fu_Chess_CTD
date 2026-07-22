@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.network.widgets</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.network.html" class="white">network</a>.widgets</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cwidgets.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\widgets.py</a></td></tr></table>
+    <p><span class="code">Minimal,&nbsp;framework-free&nbsp;UI&nbsp;primitives&nbsp;for&nbsp;the&nbsp;graphical&nbsp;login/menu<br>
+screens&nbsp;(gui/network/screens.py)&nbsp;-&nbsp;pure&nbsp;logic&nbsp;only,&nbsp;no&nbsp;cv2/rendering<br>
+here,&nbsp;matching&nbsp;gui/hud/hud.py's&nbsp;own&nbsp;"pure&nbsp;layout,&nbsp;never&nbsp;draws&nbsp;itself"<br>
+convention.&nbsp;A&nbsp;<a href="#TextField">TextField</a>&nbsp;holds&nbsp;a&nbsp;text&nbsp;buffer&nbsp;and&nbsp;simple&nbsp;edit&nbsp;operations<br>
+(no&nbsp;cursor&nbsp;positioning/selection&nbsp;-&nbsp;append/backspace&nbsp;only,&nbsp;sufficient<br>
+for&nbsp;a&nbsp;username/password/room-code&nbsp;field);&nbsp;a&nbsp;<a href="#Button">Button</a>&nbsp;is&nbsp;just&nbsp;a<br>
+hit-testable&nbsp;rectangle&nbsp;plus&nbsp;a&nbsp;label.</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.gui.network.widgets.html#Button">Button</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.gui.network.widgets.html#TextField">TextField</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="Button">class <strong>Button</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#Button">Button</a>(label,&nbsp;x,&nbsp;y,&nbsp;width,&nbsp;height)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="Button-__init__"><strong>__init__</strong></a>(self, label, x, y, width, height)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="Button-contains_point"><strong>contains_point</strong></a>(self, px, py)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="TextField">class <strong>TextField</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#TextField">TextField</a>(label,&nbsp;masked=False)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="TextField-__init__"><strong>__init__</strong></a>(self, label, masked=False)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="TextField-clear"><strong>clear</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="TextField-display_text"><strong>display_text</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="TextField-handle_backspace"><strong>handle_backspace</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="TextField-handle_char"><strong>handle_char</strong></a>(self, char)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

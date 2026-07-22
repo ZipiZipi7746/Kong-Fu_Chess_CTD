@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.network.screen_rendering</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.network.html" class="white">network</a>.screen_rendering</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cscreen_rendering.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\screen_rendering.py</a></td></tr></table>
+    <p><span class="code">Pure&nbsp;draw-instruction&nbsp;layout&nbsp;for&nbsp;the&nbsp;graphical&nbsp;login/menu/waiting<br>
+screens&nbsp;-&nbsp;each&nbsp;function&nbsp;returns&nbsp;what&nbsp;to&nbsp;draw&nbsp;and&nbsp;where,&nbsp;never&nbsp;draws<br>
+anything&nbsp;itself&nbsp;(matching&nbsp;gui/hud/hud.py's&nbsp;own&nbsp;convention&nbsp;elsewhere&nbsp;in<br>
+this&nbsp;project).&nbsp;Returns&nbsp;a&nbsp;list&nbsp;of&nbsp;instructions,&nbsp;each&nbsp;either<br>
+("rect",&nbsp;x,&nbsp;y,&nbsp;w,&nbsp;h,&nbsp;color)&nbsp;or&nbsp;("text",&nbsp;text,&nbsp;x,&nbsp;y,&nbsp;color)&nbsp;-&nbsp;the&nbsp;real<br>
+screen&nbsp;loop&nbsp;(screen_loop.py)&nbsp;is&nbsp;the&nbsp;only&nbsp;place&nbsp;that&nbsp;turns&nbsp;these&nbsp;into<br>
+actual&nbsp;ImgRenderer&nbsp;calls.</span></p>
+<p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt><a name="-render_login_screen"><strong>render_login_screen</strong></a>(screen)</dt></dl>
+ <dl><dt><a name="-render_menu_screen"><strong>render_menu_screen</strong></a>(screen, username, rating)</dt></dl>
+ <dl><dt><a name="-render_waiting_screen"><strong>render_waiting_screen</strong></a>(screen)</dt></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>BUTTON_COLOR</strong> = (70, 130, 70, 255)<br>
+<strong>ERROR_COLOR</strong> = (80, 80, 220, 255)<br>
+<strong>FIELD_BG_COLOR</strong> = (60, 60, 60, 255)<br>
+<strong>FIELD_FOCUSED_COLOR</strong> = (150, 90, 90, 255)<br>
+<strong>LABEL_COLOR</strong> = (200, 200, 200, 255)<br>
+<strong>TEXT_COLOR</strong> = (255, 255, 255, 255)</td></tr></table>
+</body></html>

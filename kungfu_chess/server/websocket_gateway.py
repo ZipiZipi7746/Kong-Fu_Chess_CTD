@@ -222,8 +222,10 @@ class WebSocketGateway:
         logger.info(
             "login succeeded for %s", payload["username"],
             extra={"message_id": envelope["message_id"], "session_token_hash": hash_token(token)})
+        user = self._auth_service.get_user(payload["username"])
         await self._send(websocket, schemas.make_envelope(
-            protocol.LOGIN_OK, {"username": payload["username"], "session_token": token},
+            protocol.LOGIN_OK,
+            {"username": payload["username"], "session_token": token, "rating": user.rating},
             correlation_id=envelope["message_id"]))
 
     async def _handle_ping(self, connection_id, websocket, envelope):

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.network.screens</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.network.html" class="white">network</a>.screens</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cscreens.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\screens.py</a></td></tr></table>
+    <p><span class="code">Pure&nbsp;logic&nbsp;for&nbsp;each&nbsp;pre-game&nbsp;graphical&nbsp;screen&nbsp;(login,&nbsp;menu,&nbsp;waiting)&nbsp;-<br>
+click/keyboard&nbsp;handling&nbsp;and&nbsp;layout&nbsp;positions&nbsp;only,&nbsp;no&nbsp;cv2/rendering<br>
+here&nbsp;(gui/network/screen_rendering.py&nbsp;owns&nbsp;drawing,&nbsp;matching&nbsp;gui/hud/<br>
+hud.py's&nbsp;own&nbsp;"pure&nbsp;layout,&nbsp;never&nbsp;draws&nbsp;itself"&nbsp;convention&nbsp;elsewhere&nbsp;in<br>
+this&nbsp;project).&nbsp;Button&nbsp;doubles&nbsp;as&nbsp;a&nbsp;generic&nbsp;hit-testable&nbsp;rectangle&nbsp;here,<br>
+used&nbsp;both&nbsp;for&nbsp;real&nbsp;buttons&nbsp;and&nbsp;for&nbsp;a&nbsp;TextField's&nbsp;invisible&nbsp;click<br>
+region&nbsp;-&nbsp;the&nbsp;same&nbsp;rect&nbsp;that&nbsp;positions&nbsp;it&nbsp;for&nbsp;drawing&nbsp;also&nbsp;decides<br>
+whether&nbsp;a&nbsp;click&nbsp;landed&nbsp;on&nbsp;it,&nbsp;exactly&nbsp;how&nbsp;BoardMapper/cell_to_pixel<br>
+already&nbsp;share&nbsp;position&nbsp;math&nbsp;between&nbsp;hit-testing&nbsp;and&nbsp;rendering<br>
+elsewhere&nbsp;in&nbsp;this&nbsp;codebase.<br>
+&nbsp;<br>
+Each&nbsp;handle_click&nbsp;returns&nbsp;a&nbsp;symbolic&nbsp;action&nbsp;string&nbsp;(or&nbsp;None)&nbsp;-&nbsp;the&nbsp;real<br>
+I/O&nbsp;screen&nbsp;loop&nbsp;(screen_loop.py)&nbsp;is&nbsp;the&nbsp;only&nbsp;place&nbsp;that&nbsp;turns&nbsp;an&nbsp;action<br>
+into&nbsp;an&nbsp;actual&nbsp;network&nbsp;request&nbsp;or&nbsp;a&nbsp;screen&nbsp;transition.</span></p>
+<p>
+<table class="section">
+<tr class="decor index-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Classes</strong></td></tr>
+    
+<tr><td class="decor index-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl>
+<dt class="heading-text"><a href="builtins.html#object">builtins.object</a>
+</dt><dd>
+<dl>
+<dt class="heading-text"><a href="kungfu_chess.gui.network.screens.html#LoginScreen">LoginScreen</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.gui.network.screens.html#MenuScreen">MenuScreen</a>
+</dt><dt class="heading-text"><a href="kungfu_chess.gui.network.screens.html#WaitingScreen">WaitingScreen</a>
+</dt></dl>
+</dd>
+</dl>
+ <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="LoginScreen">class <strong>LoginScreen</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#LoginScreen">LoginScreen</a>(content_w,&nbsp;content_h)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="LoginScreen-__init__"><strong>__init__</strong></a>(self, content_w, content_h)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="LoginScreen-handle_backspace"><strong>handle_backspace</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="LoginScreen-handle_char"><strong>handle_char</strong></a>(self, char)</dt></dl>
+
+<dl><dt><a name="LoginScreen-handle_click"><strong>handle_click</strong></a>(self, x, y)</dt></dl>
+
+<dl><dt><a name="LoginScreen-handle_tab"><strong>handle_tab</strong></a>(self)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="MenuScreen">class <strong>MenuScreen</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#MenuScreen">MenuScreen</a>(content_w,&nbsp;content_h)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="MenuScreen-__init__"><strong>__init__</strong></a>(self, content_w, content_h)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="MenuScreen-handle_backspace"><strong>handle_backspace</strong></a>(self)</dt></dl>
+
+<dl><dt><a name="MenuScreen-handle_char"><strong>handle_char</strong></a>(self, char)</dt></dl>
+
+<dl><dt><a name="MenuScreen-handle_click"><strong>handle_click</strong></a>(self, x, y)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table> <p>
+<table class="section">
+<tr class="decor title-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><a name="WaitingScreen">class <strong>WaitingScreen</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
+    
+<tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#WaitingScreen">WaitingScreen</a>(content_w,&nbsp;content_h,&nbsp;status_text)<br>
+&nbsp;<br>
+<br>&nbsp;</span></td></tr>
+<tr><td>&nbsp;</td>
+<td class="singlecolumn">Methods defined here:<br>
+<dl><dt><a name="WaitingScreen-__init__"><strong>__init__</strong></a>(self, content_w, content_h, status_text)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="WaitingScreen-handle_click"><strong>handle_click</strong></a>(self, x, y)</dt></dl>
+
+<hr>
+Data descriptors defined here:<br>
+<dl><dt><strong>__dict__</strong></dt>
+<dd><span class="code">dictionary&nbsp;for&nbsp;instance&nbsp;variables</span></dd>
+</dl>
+<dl><dt><strong>__weakref__</strong></dt>
+<dd><span class="code">list&nbsp;of&nbsp;weak&nbsp;references&nbsp;to&nbsp;the&nbsp;object</span></dd>
+</dl>
+</td></tr></table></td></tr></table>
+</body></html>

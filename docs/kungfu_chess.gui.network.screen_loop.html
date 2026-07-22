@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.gui.network.screen_loop</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.gui.html" class="white">gui</a>.<a href="kungfu_chess.gui.network.html" class="white">network</a>.screen_loop</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cgui%5Cnetwork%5Cscreen_loop.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\gui\network\screen_loop.py</a></td></tr></table>
+    <p><span class="code">Real&nbsp;I/O:&nbsp;the&nbsp;graphical&nbsp;login/menu/waiting&nbsp;screen&nbsp;loop&nbsp;-&nbsp;pragma:&nbsp;no<br>
+cover&nbsp;throughout,&nbsp;same&nbsp;treatment&nbsp;as&nbsp;gui/game_loop.py&nbsp;and<br>
+gui/network/network_game_loop.py.&nbsp;Runs&nbsp;the&nbsp;same&nbsp;cv2&nbsp;window&nbsp;(WINDOW_NAME,<br>
+reused&nbsp;from&nbsp;gui/game_loop.py)&nbsp;through&nbsp;the&nbsp;pre-game&nbsp;screens&nbsp;(login&nbsp;-&gt;<br>
+menu&nbsp;-&gt;&nbsp;waiting)&nbsp;before&nbsp;handing&nbsp;off&nbsp;to&nbsp;network_game_loop.run()&nbsp;for&nbsp;the<br>
+actual&nbsp;board.<br>
+&nbsp;<br>
+Keyboard&nbsp;input&nbsp;uses&nbsp;cv2.waitKey()'s&nbsp;raw&nbsp;ASCII-range&nbsp;key&nbsp;codes&nbsp;(printable<br>
+chars,&nbsp;Backspace=8,&nbsp;Tab=9,&nbsp;Esc=27)&nbsp;-&nbsp;basic&nbsp;but&nbsp;sufficient&nbsp;for&nbsp;username/<br>
+password/room-code&nbsp;entry;&nbsp;no&nbsp;cursor&nbsp;positioning,&nbsp;text&nbsp;selection,&nbsp;or&nbsp;IME<br>
+support.</span></p>
+<p>
+<table class="section">
+<tr class="decor pkg-content-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Modules</strong></td></tr>
+    
+<tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
+</td><td class="multicolumn"><a href="cv2.html">cv2</a><br>
+</td><td class="multicolumn"><a href="numpy.html">numpy</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.gui.network.screen_rendering.html">kungfu_chess.gui.network.screen_rendering</a><br>
+</td></tr></table></td></tr></table><p>
+<table class="section">
+<tr class="decor functions-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
+    
+<tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><dl><dt>async <a name="-run_screen"><strong>run_screen</strong></a>(screen, render_fn, *render_args)</dt><dd><span class="code">Draws&nbsp;`screen`&nbsp;via&nbsp;render_fn(screen,&nbsp;*render_args)&nbsp;every&nbsp;frame,<br>
+routes&nbsp;left-clicks&nbsp;to&nbsp;screen.handle_click&nbsp;and&nbsp;keyboard&nbsp;to<br>
+handle_char/handle_backspace/handle_tab&nbsp;(whichever&nbsp;the&nbsp;screen<br>
+defines),&nbsp;and&nbsp;returns&nbsp;the&nbsp;first&nbsp;non-None&nbsp;action&nbsp;handle_click<br>
+produces&nbsp;-&nbsp;or&nbsp;None&nbsp;if&nbsp;the&nbsp;window&nbsp;was&nbsp;closed&nbsp;(ESC).</span></dd></dl>
+ <dl><dt>async <a name="-run_waiting_screen"><strong>run_waiting_screen</strong></a>(screen, network_task)</dt><dd><span class="code">Draws&nbsp;a&nbsp;WaitingScreen&nbsp;every&nbsp;frame&nbsp;until&nbsp;either&nbsp;the&nbsp;user&nbsp;clicks<br>
+Cancel&nbsp;or&nbsp;`network_task`&nbsp;(an&nbsp;already-created&nbsp;asyncio.Task&nbsp;awaiting<br>
+the&nbsp;actual&nbsp;server&nbsp;response)&nbsp;completes&nbsp;-&nbsp;whichever&nbsp;happens&nbsp;first.<br>
+Returns&nbsp;("completed",&nbsp;network_task's&nbsp;result)&nbsp;or&nbsp;("cancelled",&nbsp;None).</span></dd></dl>
+</td></tr></table><p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>BACKGROUND_COLOR</strong> = (30, 30, 30, 255)<br>
+<strong>CONTENT_H</strong> = 600<br>
+<strong>CONTENT_W</strong> = 800<br>
+<strong>WINDOW_NAME</strong> = 'Kung Fu Chess'</td></tr></table>
+</body></html>

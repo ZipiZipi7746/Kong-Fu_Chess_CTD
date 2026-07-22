@@ -96,6 +96,7 @@ class TestAuthentication:
                 assert response["type"] == "login_ok"
                 assert response["payload"]["username"] == "alice"
                 assert response["payload"]["session_token"]
+                assert response["payload"]["rating"] == 1200
 
     @pytest.mark.asyncio
     async def test_login_with_wrong_password_is_rejected_cleanly(self):
