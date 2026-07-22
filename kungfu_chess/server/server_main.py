@@ -13,12 +13,14 @@ import websockets  # pragma: no cover
 from kungfu_chess.messaging.application_message_bus import ApplicationMessageBus  # pragma: no cover
 from kungfu_chess.application.auth_service import create_sqlite_backed_service  # pragma: no cover
 from kungfu_chess.application.game_service import GameService  # pragma: no cover
+from kungfu_chess.server.logging_config import configure_logging  # pragma: no cover
 from kungfu_chess.server.websocket_gateway import WebSocketGateway  # pragma: no cover
 
 HOST = "localhost"  # pragma: no cover
 PORT = 8765  # pragma: no cover
 TICK_INTERVAL_MS = 75  # pragma: no cover
 DB_PATH = "kungfu_chess.db"  # pragma: no cover
+LOG_PATH = "kungfu_chess_server.log"  # pragma: no cover
 
 
 async def _tick_loop(game_service, gateway, tick_interval_ms=TICK_INTERVAL_MS):  # pragma: no cover
@@ -45,8 +47,8 @@ async def _tick_loop(game_service, gateway, tick_interval_ms=TICK_INTERVAL_MS): 
         await gateway.advance_connection_clock(tick_interval_ms)
 
 
-async def run(host=HOST, port=PORT, db_path=DB_PATH):  # pragma: no cover
-    logging.basicConfig(level=logging.INFO)
+async def run(host=HOST, port=PORT, db_path=DB_PATH, log_path=LOG_PATH):  # pragma: no cover
+    configure_logging(log_path)
     logger = logging.getLogger(__name__)
 
     message_bus = ApplicationMessageBus()

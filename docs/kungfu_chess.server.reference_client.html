@@ -35,7 +35,14 @@ automatically&nbsp;reconnects&nbsp;using&nbsp;the&nbsp;session&nbsp;token&nbsp;i
 memory&nbsp;(no&nbsp;re-login)&nbsp;-&nbsp;the&nbsp;server&nbsp;is&nbsp;the&nbsp;sole&nbsp;authority&nbsp;on&nbsp;whether<br>
 reconnection&nbsp;is&nbsp;still&nbsp;possible&nbsp;(within&nbsp;the&nbsp;20-second&nbsp;grace&nbsp;window),&nbsp;so<br>
 this&nbsp;client&nbsp;just&nbsp;keeps&nbsp;retrying&nbsp;until&nbsp;either&nbsp;it&nbsp;succeeds&nbsp;or&nbsp;the&nbsp;server<br>
-reports&nbsp;there&nbsp;is&nbsp;nothing&nbsp;left&nbsp;to&nbsp;reconnect&nbsp;to.</span></p>
+reports&nbsp;there&nbsp;is&nbsp;nothing&nbsp;left&nbsp;to&nbsp;reconnect&nbsp;to.<br>
+&nbsp;<br>
+Phase&nbsp;E&nbsp;(Decision&nbsp;11):&nbsp;mirrors&nbsp;the&nbsp;server's&nbsp;own&nbsp;NDJSON&nbsp;structured<br>
+logging&nbsp;convention&nbsp;(kungfu_chess.server.logging_config)&nbsp;into&nbsp;a&nbsp;local<br>
+client-side&nbsp;log&nbsp;file&nbsp;-&nbsp;the&nbsp;same&nbsp;JSON-line&nbsp;shape,&nbsp;the&nbsp;same&nbsp;message_id<br>
+correlation&nbsp;field,&nbsp;and&nbsp;the&nbsp;same&nbsp;hash_token&nbsp;one-way&nbsp;hashing&nbsp;(never&nbsp;the<br>
+plaintext&nbsp;session&nbsp;token)&nbsp;-&nbsp;since&nbsp;this&nbsp;client&nbsp;is&nbsp;the&nbsp;example&nbsp;every<br>
+future&nbsp;client&nbsp;implementation&nbsp;follows.</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -44,16 +51,18 @@ reports&nbsp;there&nbsp;is&nbsp;nothing&nbsp;left&nbsp;to&nbsp;reconnect&nbsp;to
 <tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
 <td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
 <a href="json.html">json</a><br>
-</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
-<a href="sys.html">sys</a><br>
-</td><td class="multicolumn"><a href="websockets.html">websockets</a><br>
+</td><td class="multicolumn"><a href="logging.html">logging</a><br>
+<a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+</td><td class="multicolumn"><a href="sys.html">sys</a><br>
+<a href="websockets.html">websockets</a><br>
 </td><td class="multicolumn"></td></tr></table></td></tr></table><p>
 <table class="section">
 <tr class="decor functions-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
     
 <tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><dl><dt>async <a name="-main"><strong>main</strong></a>()</dt></dl>
+<td class="singlecolumn"><dl><dt><a name="-configure_client_logging"><strong>configure_client_logging</strong></a>(log_path='kungfu_chess_client.log')</dt></dl>
+ <dl><dt>async <a name="-main"><strong>main</strong></a>()</dt></dl>
  <dl><dt><a name="-parse_move"><strong>parse_move</strong></a>(text)</dt></dl>
  <dl><dt>async <a name="-receive_loop"><strong>receive_loop</strong></a>(websocket, state)</dt></dl>
  <dl><dt><a name="-render_board"><strong>render_board</strong></a>(board_rows)</dt></dl>
@@ -65,5 +74,7 @@ reports&nbsp;there&nbsp;is&nbsp;nothing&nbsp;left&nbsp;to&nbsp;reconnect&nbsp;to
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
     
 <tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><strong>SERVER_URL</strong> = 'ws://localhost:8765'</td></tr></table>
+<td class="singlecolumn"><strong>LOG_PATH</strong> = 'kungfu_chess_client.log'<br>
+<strong>SERVER_URL</strong> = 'ws://localhost:8765'<br>
+<strong>logger</strong> = &lt;VerboseLogger kungfu_chess.client (WARNING)&gt;</td></tr></table>
 </body></html>

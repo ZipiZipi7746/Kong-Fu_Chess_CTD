@@ -68,6 +68,7 @@ from kungfu_chess.messaging.application_events import (
 from kungfu_chess.persistence.repositories import DuplicateUsernameError
 from kungfu_chess.server import schemas
 from kungfu_chess.server.connection_manager import ConnectionManager
+from kungfu_chess.server.logging_config import hash_token
 
 logger = logging.getLogger(__name__)
 
@@ -185,6 +186,9 @@ class WebSocketGateway:
                 correlation_id=envelope["message_id"]))
             return
 
+        logger.debug(
+            "dispatching %s", envelope["type"],
+            extra={"message_id": envelope["message_id"], "game_id": envelope["game_id"]})
         await getattr(self, handler_name)(connection_id, websocket, envelope)
 
     async def _handle_register(self, connection_id, websocket, envelope):
@@ -211,6 +215,9 @@ class WebSocketGateway:
             return
         self._connections.set_identity(connection_id, payload["username"])
         self._connections.set_session_token(connection_id, token)
+        logger.info(
+            "login succeeded for %s", payload["username"],
+            extra={"message_id": envelope["message_id"], "session_token_hash": hash_token(token)})
         await self._send(websocket, schemas.make_envelope(
             "login_ok", {"username": payload["username"], "session_token": token},
             correlation_id=envelope["message_id"]))
@@ -222,6 +229,9 @@ class WebSocketGateway:
     async def _handle_reconnect(self, connection_id, websocket, envelope):
         token = envelope["payload"].get("session_token")
         user = self._auth_service.resolve_token(token) if token else None
+        logger.info(
+            "reconnect attempt", extra={
+                "message_id": envelope["message_id"], "session_token_hash": hash_token(token)})
         if user is None:
             await self._send(websocket, schemas.make_envelope(
                 "error", {"code": "NO_RECONNECTABLE_GAME"}, correlation_id=envelope["message_id"]))

@@ -25,17 +25,36 @@ memory (no re-login) - the server is the sole authority on whether
 reconnection is still possible (within the 20-second grace window), so
 this client just keeps retrying until either it succeeds or the server
 reports there is nothing left to reconnect to.
+
+Phase E (Decision 11): mirrors the server's own NDJSON structured
+logging convention (kungfu_chess.server.logging_config) into a local
+client-side log file - the same JSON-line shape, the same message_id
+correlation field, and the same hash_token one-way hashing (never the
+plaintext session token) - since this client is the example every
+future client implementation follows.
 """
 import asyncio
 import json
+import logging
 import sys
 
 import websockets  # pragma: no cover
 
 from kungfu_chess.server import schemas  # pragma: no cover
+from kungfu_chess.server.logging_config import NdjsonFormatter, hash_token  # pragma: no cover
 from kungfu_chess.server.login_client import perform_login  # pragma: no cover
 
 SERVER_URL = "ws://localhost:8765"  # pragma: no cover
+LOG_PATH = "kungfu_chess_client.log"  # pragma: no cover
+
+logger = logging.getLogger("kungfu_chess.client")  # pragma: no cover
+
+
+def configure_client_logging(log_path=LOG_PATH):  # pragma: no cover
+    handler = logging.FileHandler(log_path)
+    handler.setFormatter(NdjsonFormatter())
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
 
 def square_to_cell(square):  # pragma: no cover
@@ -65,6 +84,10 @@ async def receive_loop(websocket, state):  # pragma: no cover
 
         if envelope.get("game_id"):
             state["game_id"] = envelope["game_id"]
+
+        logger.info(
+            "received %s", msg_type,
+            extra={"message_id": envelope.get("message_id"), "game_id": envelope.get("game_id")})
 
         if msg_type == "state_snapshot":
             print(f"\n[state_snapshot] sequence={payload['sequence']}")
@@ -110,13 +133,18 @@ async def send_loop(websocket, state):  # pragma: no cover
             print("Type a move like 'e2e4' (from-square to-square), or Ctrl+C to quit.")
             continue
         from_row, from_col, to_row, to_col = move
-        await websocket.send(schemas.encode(schemas.make_envelope(
+        envelope = schemas.make_envelope(
             "move_request",
             {"from_row": from_row, "from_col": from_col, "to_row": to_row, "to_col": to_col},
-            game_id=state.get("game_id"))))
+            game_id=state.get("game_id"))
+        logger.info(
+            "sending move_request", extra={
+                "message_id": envelope["message_id"], "game_id": envelope["game_id"]})
+        await websocket.send(schemas.encode(envelope))
 
 
 async def _attempt_reconnect(websocket, session_token):  # pragma: no cover
+    logger.info("attempting reconnect", extra={"session_token_hash": hash_token(session_token)})
     await websocket.send(schemas.encode(schemas.make_envelope(
         "reconnect", {"session_token": session_token})))
     response = json.loads(await websocket.recv())
@@ -166,6 +194,9 @@ async def main():  # pragma: no cover
                     if flow is None:
                         return
                     session_token = flow.session_token
+                    logger.info(
+                        "logged in as %s", flow.username,
+                        extra={"session_token_hash": hash_token(session_token)})
 
                     mode = input("[Q]uick local or ranked [p]lay? [Q/p]: ").strip().lower()
                     if mode.startswith("p"):
@@ -188,6 +219,7 @@ async def main():  # pragma: no cover
 
 
 if __name__ == "__main__":  # pragma: no cover
+    configure_client_logging()
     try:
         asyncio.run(main())
     except KeyboardInterrupt:
