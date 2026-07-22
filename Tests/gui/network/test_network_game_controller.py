@@ -117,6 +117,32 @@ class TestClickToMove:
         assert controller.selected is None
 
 
+class TestSpectatorMode:
+    """Phase E: a spectator has my_color=None (the server assigns no
+    color to a read-only observer) - no special-casing needed anywhere
+    in this class, since token[0] (always "w" or "b") can never equal
+    None, so every selection/move/jump attempt is already a no-op."""
+
+    def test_clicking_any_piece_never_selects_anything(self):
+        controller, spy = make_controller(my_color=None)
+        controller.click(6, 4, STARTING_ROWS)  # a white piece
+        assert controller.selected is None
+        controller.click(1, 4, STARTING_ROWS)  # a black piece
+        assert controller.selected is None
+
+    def test_no_move_request_is_ever_sent(self):
+        controller, spy = make_controller(my_color=None)
+        controller.click(6, 4, STARTING_ROWS)
+        controller.click(4, 4, STARTING_ROWS)
+        assert spy.move_requests == []
+
+    def test_jumping_any_piece_sends_nothing(self):
+        controller, spy = make_controller(my_color=None)
+        controller.jump(6, 4, STARTING_ROWS)
+        controller.jump(1, 4, STARTING_ROWS)
+        assert spy.jump_requests == []
+
+
 class TestJump:
     def test_jumping_my_own_piece_sends_a_jump_request(self):
         controller, spy = make_controller(my_color="w")

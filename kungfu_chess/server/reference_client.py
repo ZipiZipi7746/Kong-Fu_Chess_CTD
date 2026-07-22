@@ -40,11 +40,11 @@ import sys
 
 import websockets  # pragma: no cover
 
-from kungfu_chess.server import schemas  # pragma: no cover
+from kungfu_chess.server import protocol, schemas  # pragma: no cover
 from kungfu_chess.server.logging_config import NdjsonFormatter, hash_token  # pragma: no cover
 from kungfu_chess.server.login_client import perform_login  # pragma: no cover
+from kungfu_chess.server.network_config import SERVER_URL  # pragma: no cover
 
-SERVER_URL = "ws://localhost:8765"  # pragma: no cover
 LOG_PATH = "kungfu_chess_client.log"  # pragma: no cover
 
 logger = logging.getLogger("kungfu_chess.client")  # pragma: no cover
@@ -89,27 +89,29 @@ async def receive_loop(websocket, state):  # pragma: no cover
             "received %s", msg_type,
             extra={"message_id": envelope.get("message_id"), "game_id": envelope.get("game_id")})
 
-        if msg_type == "state_snapshot":
+        if msg_type == protocol.STATE_SNAPSHOT:
             print(f"\n[state_snapshot] sequence={payload['sequence']}")
             render_board(payload["board"])
-        elif msg_type == "game_started":
+        elif msg_type == protocol.GAME_STARTED:
             print(f"\n[game_started] white={payload['white']} black={payload['black']}")
             render_board(payload["state_snapshot"]["board"])
-        elif msg_type == "game_event":
+        elif msg_type == protocol.GAME_EVENT:
             captured = f" captured {payload['captured']}" if payload["captured"] else ""
             print(f"\n[game_event] {payload['kind']}: {payload['from']} -> {payload['to']}{captured}")
-        elif msg_type == "game_over":
+        elif msg_type == protocol.GAME_OVER:
             print(f"\n[game_over] winner={payload['winner']}")
             state["game_over"] = True
-        elif msg_type == "searching_match":
+        elif msg_type == protocol.SEARCHING_MATCH:
             print("\n[searching_match] waiting for a ranked opponent...")
-        elif msg_type == "matchmaking_timeout":
+        elif msg_type == protocol.MATCHMAKING_TIMEOUT:
             print("\n[matchmaking_timeout] no opponent found - type 'play' to search again.")
-        elif msg_type == "move_rejected":
+        elif msg_type == protocol.PLAYER_DISCONNECTED:
+            print(f"\n[player_disconnected] opponent has {payload['grace_period_ms'] // 1000}s to reconnect.")
+        elif msg_type == protocol.MOVE_REJECTED:
             print(f"\n[move_rejected] {payload['reason']}")
-        elif msg_type == "error":
+        elif msg_type == protocol.ERROR:
             print(f"\n[error] {payload['code']}: {payload.get('message', '')}")
-        elif msg_type in ("move_accepted", "pong"):
+        elif msg_type in (protocol.MOVE_ACCEPTED, protocol.PONG):
             pass
         else:
             print(f"\n[{msg_type}] {payload}")
@@ -126,7 +128,7 @@ async def send_loop(websocket, state):  # pragma: no cover
         if line.strip().lower() == "play":
             # Decision 5: no auto-retry after a matchmaking timeout - the
             # player must explicitly search again.
-            await websocket.send(schemas.encode(schemas.make_envelope("play", {})))
+            await websocket.send(schemas.encode(schemas.make_envelope(protocol.PLAY, {})))
             continue
         move = parse_move(line)
         if move is None:
@@ -134,7 +136,7 @@ async def send_loop(websocket, state):  # pragma: no cover
             continue
         from_row, from_col, to_row, to_col = move
         envelope = schemas.make_envelope(
-            "move_request",
+            protocol.MOVE_REQUEST,
             {"from_row": from_row, "from_col": from_col, "to_row": to_row, "to_col": to_col},
             game_id=state.get("game_id"))
         logger.info(
@@ -146,9 +148,9 @@ async def send_loop(websocket, state):  # pragma: no cover
 async def _attempt_reconnect(websocket, session_token):  # pragma: no cover
     logger.info("attempting reconnect", extra={"session_token_hash": hash_token(session_token)})
     await websocket.send(schemas.encode(schemas.make_envelope(
-        "reconnect", {"session_token": session_token})))
+        protocol.RECONNECT, {"session_token": session_token})))
     response = json.loads(await websocket.recv())
-    if response["type"] == "error":
+    if response["type"] == protocol.ERROR:
         print(f"Reconnect failed: {response['payload']['code']}")
         return None
     print("Reconnected.")
@@ -200,11 +202,11 @@ async def main():  # pragma: no cover
 
                     mode = input("[Q]uick local or ranked [p]lay? [Q/p]: ").strip().lower()
                     if mode.startswith("p"):
-                        await websocket.send(schemas.encode(schemas.make_envelope("play", {})))
+                        await websocket.send(schemas.encode(schemas.make_envelope(protocol.PLAY, {})))
                         print(f"Logged in as {flow.username}. Searching for a ranked match...")
                     else:
                         await websocket.send(schemas.encode(schemas.make_envelope(
-                            "join_game", {"mode": "quick_local"})))
+                            protocol.JOIN_GAME, {"mode": "quick_local"})))
                         print(f"Logged in as {flow.username}. Waiting for an opponent...")
 
                 await _play_session(websocket, state)

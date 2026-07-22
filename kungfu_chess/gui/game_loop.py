@@ -49,6 +49,7 @@ from kungfu_chess.gui.geometry.legal_moves import legal_destinations  # pragma: 
 from kungfu_chess.gui.hud.observers import MovesLogObserver, ScoreObserver  # pragma: no cover
 from kungfu_chess.gui.animation.sprite_library import SpriteLibrary  # pragma: no cover
 from kungfu_chess.gui.animation.view_model_registry import ViewModelRegistry  # pragma: no cover
+from kungfu_chess.gui.gui_config import DEFAULT_BOARD_IMAGE_PATH, DEFAULT_PIECES_ROOT  # pragma: no cover
 from kungfu_chess.input.board_mapper import BoardMapper  # pragma: no cover
 from kungfu_chess.input.controller import GameController  # pragma: no cover
 
@@ -135,8 +136,8 @@ def _draw_game_over_overlay(renderer, controller, board_x, image_w, image_h):  #
         renderer.draw_text(text, x, y, font_size=1.2, color=GAME_OVER_TEXT_COLOR, thickness=3)
 
 
-def run(board, board_image_path="assets/board.png",  # pragma: no cover
-        pieces_root="assets/pieces_mine"):
+def run(board, board_image_path=DEFAULT_BOARD_IMAGE_PATH,  # pragma: no cover
+        pieces_root=DEFAULT_PIECES_ROOT):
     # TODO(design): Object construction (Img, EventBus, observers,
     # GameEngine, GameController, SpriteLibrary, ViewModelRegistry) and
     # the cv2 window/event-loop setup below all happen inline in this one

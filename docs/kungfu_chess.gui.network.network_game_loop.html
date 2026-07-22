@@ -26,7 +26,17 @@ authority,&nbsp;Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;1).<br>
 Never&nbsp;imports&nbsp;kungfu_chess.rules/realtime&nbsp;for&nbsp;decision-making&nbsp;-&nbsp;Board/<br>
 Piece&nbsp;are&nbsp;used&nbsp;here&nbsp;purely&nbsp;as&nbsp;inert,&nbsp;already-tested&nbsp;rendering&nbsp;data<br>
 containers&nbsp;(exactly&nbsp;how&nbsp;BoardRenderer/ViewModelRegistry&nbsp;already&nbsp;treat<br>
-them),&nbsp;never&nbsp;to&nbsp;compute&nbsp;legality&nbsp;or&nbsp;timing&nbsp;locally.</span></p>
+them),&nbsp;never&nbsp;to&nbsp;compute&nbsp;legality&nbsp;or&nbsp;timing&nbsp;locally.<br>
+&nbsp;<br>
+Covers&nbsp;every&nbsp;join&nbsp;path&nbsp;the&nbsp;text&nbsp;reference_client.py&nbsp;already&nbsp;does:<br>
+quick_local,&nbsp;ranked&nbsp;play,&nbsp;and&nbsp;Phase&nbsp;E&nbsp;rooms&nbsp;(as&nbsp;the&nbsp;creator/White,<br>
+the&nbsp;second&nbsp;joiner/Black,&nbsp;or&nbsp;a&nbsp;read-only&nbsp;spectator&nbsp;-&nbsp;my_color&nbsp;is&nbsp;None<br>
+for&nbsp;a&nbsp;spectator,&nbsp;which&nbsp;NetworkGameController&nbsp;already&nbsp;handles&nbsp;correctly<br>
+with&nbsp;no&nbsp;special-casing:&nbsp;no&nbsp;token&nbsp;ever&nbsp;equals&nbsp;None).&nbsp;Also&nbsp;mirrors<br>
+reference_client.py's&nbsp;Phase&nbsp;D&nbsp;auto-reconnect&nbsp;(network_gui_main.py&nbsp;drives<br>
+the&nbsp;retry&nbsp;loop;&nbsp;<a href="#-run">run</a>()'s&nbsp;optional&nbsp;`resume`&nbsp;parameter&nbsp;lets&nbsp;it&nbsp;skip<br>
+straight&nbsp;back&nbsp;into&nbsp;the&nbsp;render&nbsp;loop&nbsp;with&nbsp;the&nbsp;already-known&nbsp;game_id/<br>
+board_rows/my_color&nbsp;instead&nbsp;of&nbsp;re-running&nbsp;the&nbsp;join&nbsp;handshake).</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -37,20 +47,39 @@ them),&nbsp;never&nbsp;to&nbsp;compute&nbsp;legality&nbsp;or&nbsp;timing&nbsp;lo
 <a href="cv2.html">cv2</a><br>
 </td><td class="multicolumn"><a href="json.html">json</a><br>
 <a href="numpy.html">numpy</a><br>
-</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
-<a href="time.html">time</a><br>
-</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+</td><td class="multicolumn"><a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
+<a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+</td><td class="multicolumn"><a href="time.html">time</a><br>
+</td></tr></table></td></tr></table><p>
 <table class="section">
 <tr class="decor functions-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
     
 <tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><dl><dt>async <a name="-run"><strong>run</strong></a>(
+<td class="singlecolumn"><dl><dt>async <a name="-await_fresh_game_start"><strong>await_fresh_game_start</strong></a>(websocket, my_username)</dt><dd><span class="code">Blocks&nbsp;until&nbsp;game_started&nbsp;arrives,&nbsp;tracking&nbsp;the&nbsp;game_id&nbsp;and<br>
+initial&nbsp;board&nbsp;along&nbsp;the&nbsp;way&nbsp;-&nbsp;used&nbsp;for&nbsp;quick_local,&nbsp;ranked&nbsp;play,&nbsp;a<br>
+room's&nbsp;creator&nbsp;(White)&nbsp;waiting&nbsp;for&nbsp;a&nbsp;second&nbsp;joiner,&nbsp;and&nbsp;a&nbsp;room's<br>
+second&nbsp;joiner&nbsp;(Black)&nbsp;once&nbsp;join_game_as_room&nbsp;has&nbsp;confirmed&nbsp;that<br>
+role.&nbsp;Returns&nbsp;(game_id,&nbsp;board_rows,&nbsp;my_color),&nbsp;or&nbsp;(None,&nbsp;None,&nbsp;None)<br>
+if&nbsp;the&nbsp;connection&nbsp;closes&nbsp;or&nbsp;matchmaking&nbsp;times&nbsp;out&nbsp;(Decision&nbsp;5:&nbsp;no<br>
+auto-retry&nbsp;-&nbsp;the&nbsp;caller&nbsp;reports&nbsp;this&nbsp;and&nbsp;exits).</span></dd></dl>
+ <dl><dt>async <a name="-join_game_as_room"><strong>join_game_as_room</strong></a>(websocket, room_id, my_username)</dt><dd><span class="code">Sends&nbsp;join_room&nbsp;and&nbsp;returns&nbsp;(game_id,&nbsp;board_rows,&nbsp;my_color)&nbsp;once<br>
+the&nbsp;join&nbsp;is&nbsp;fully&nbsp;resolved&nbsp;-&nbsp;my_color&nbsp;is&nbsp;"b"&nbsp;for&nbsp;the&nbsp;second&nbsp;joiner<br>
+(who&nbsp;also&nbsp;starts&nbsp;the&nbsp;game,&nbsp;same&nbsp;as&nbsp;await_fresh_game_start)&nbsp;or&nbsp;None<br>
+for&nbsp;a&nbsp;spectator&nbsp;(a&nbsp;read-only&nbsp;observer;&nbsp;NetworkGameController&nbsp;already<br>
+handles&nbsp;my_color=None&nbsp;correctly&nbsp;with&nbsp;no&nbsp;special-casing).&nbsp;Returns<br>
+(None,&nbsp;None,&nbsp;None)&nbsp;on&nbsp;a&nbsp;rejected&nbsp;join_room&nbsp;(unknown&nbsp;room,&nbsp;spectator<br>
+cap&nbsp;reached).</span></dd></dl>
+ <dl><dt>async <a name="-run"><strong>run</strong></a>(
     websocket,
     my_username,
     board_image_path='assets/board.png',
-    pieces_root='assets/pieces_mine'
-)</dt></dl>
+    pieces_root='assets/pieces_mine',
+    resume=None
+)</dt><dd><span class="code">resume,&nbsp;if&nbsp;given,&nbsp;is&nbsp;(game_id,&nbsp;board_rows,&nbsp;my_color)&nbsp;already<br>
+known&nbsp;from&nbsp;a&nbsp;prior&nbsp;session&nbsp;on&nbsp;this&nbsp;same&nbsp;logical&nbsp;connection&nbsp;(Phase&nbsp;D<br>
+reconnect,&nbsp;driven&nbsp;by&nbsp;network_gui_main.py)&nbsp;-&nbsp;skips&nbsp;the&nbsp;join<br>
+handshake&nbsp;entirely&nbsp;and&nbsp;re-enters&nbsp;the&nbsp;render&nbsp;loop&nbsp;directly.</span></dd></dl>
 </td></tr></table><p>
 <table class="section">
 <tr class="decor data-decor heading-text">
@@ -58,6 +87,8 @@ them),&nbsp;never&nbsp;to&nbsp;compute&nbsp;legality&nbsp;or&nbsp;timing&nbsp;lo
     
 <tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
 <td class="singlecolumn"><strong>COOLDOWN_COLOR</strong> = (0, 170, 255, 140)<br>
+<strong>DEFAULT_BOARD_IMAGE_PATH</strong> = 'assets/board.png'<br>
+<strong>DEFAULT_PIECES_ROOT</strong> = 'assets/pieces_mine'<br>
 <strong>PANEL_WIDTH</strong> = 220<br>
 <strong>SELECTED_COLOR</strong> = (0, 215, 255, 130)<br>
 <strong>WINDOW_NAME</strong> = 'Kung Fu Chess'</td></tr></table>

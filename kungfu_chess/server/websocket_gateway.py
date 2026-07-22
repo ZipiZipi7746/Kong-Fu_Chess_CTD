@@ -44,6 +44,10 @@ connections_in_game, not a special case. A spectator's move_request is
 already rejected with no new authorization code: GameSession.color_for
 returns None for anyone who isn't white/black, and
 GameService.handle_move_request already rejects a None color.
+
+Every wire message type name is imported from server.protocol rather
+than re-typed here as a string literal, so this module and every client
+can never silently drift on the spelling of a message type.
 """
 
 import asyncio
@@ -66,7 +70,7 @@ from kungfu_chess.messaging.application_events import (
     GameEndedEvent,
 )
 from kungfu_chess.persistence.repositories import DuplicateUsernameError
-from kungfu_chess.server import schemas
+from kungfu_chess.server import protocol, schemas
 from kungfu_chess.server.connection_manager import ConnectionManager
 from kungfu_chess.server.logging_config import hash_token
 
@@ -145,7 +149,7 @@ class WebSocketGateway:
         # Every other connection in the game - players and spectators
         # alike (Phase E) - is notified, not just "the opponent".
         notice = schemas.make_envelope(
-            "player_disconnected",
+            protocol.PLAYER_DISCONNECTED,
             {"grace_period_ms": self._connection_service.grace_period_ms},
             game_id=game_id)
         for other_id in self._connections.connections_in_game(game_id):
@@ -158,17 +162,17 @@ class WebSocketGateway:
     # ---------------------------------------------------------------
 
     _HANDLER_NAMES = {
-        "register": "_handle_register",
-        "login": "_handle_login",
-        "reconnect": "_handle_reconnect",
-        "join_game": "_handle_join_game",
-        "play": "_handle_play",
-        "cancel_matchmaking": "_handle_cancel_matchmaking",
-        "create_room": "_handle_create_room",
-        "join_room": "_handle_join_room",
-        "move_request": "_handle_move_request",
-        "jump_request": "_handle_jump_request",
-        "ping": "_handle_ping",
+        protocol.REGISTER: "_handle_register",
+        protocol.LOGIN: "_handle_login",
+        protocol.RECONNECT: "_handle_reconnect",
+        protocol.JOIN_GAME: "_handle_join_game",
+        protocol.PLAY: "_handle_play",
+        protocol.CANCEL_MATCHMAKING: "_handle_cancel_matchmaking",
+        protocol.CREATE_ROOM: "_handle_create_room",
+        protocol.JOIN_ROOM: "_handle_join_room",
+        protocol.MOVE_REQUEST: "_handle_move_request",
+        protocol.JUMP_REQUEST: "_handle_jump_request",
+        protocol.PING: "_handle_ping",
     }
 
     async def _dispatch(self, connection_id, websocket, raw):
@@ -176,13 +180,13 @@ class WebSocketGateway:
             envelope = schemas.decode(raw)
         except schemas.MalformedMessageError as exc:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "MALFORMED_MESSAGE", "message": str(exc)}))
+                protocol.ERROR, {"code": "MALFORMED_MESSAGE", "message": str(exc)}))
             return
 
         handler_name = self._HANDLER_NAMES.get(envelope["type"])
         if handler_name is None:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "UNKNOWN_MESSAGE_TYPE", "message": envelope["type"]},
+                protocol.ERROR, {"code": "UNKNOWN_MESSAGE_TYPE", "message": envelope["type"]},
                 correlation_id=envelope["message_id"]))
             return
 
@@ -197,11 +201,11 @@ class WebSocketGateway:
             self._auth_service.register(payload["username"], payload["password"])
         except DuplicateUsernameError:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "USERNAME_TAKEN", "message": payload["username"]},
+                protocol.ERROR, {"code": "USERNAME_TAKEN", "message": payload["username"]},
                 correlation_id=envelope["message_id"]))
             return
         await self._send(websocket, schemas.make_envelope(
-            "registered", {"username": payload["username"]},
+            protocol.REGISTERED, {"username": payload["username"]},
             correlation_id=envelope["message_id"]))
 
     async def _handle_login(self, connection_id, websocket, envelope):
@@ -210,7 +214,7 @@ class WebSocketGateway:
             token = self._auth_service.login(payload["username"], payload["password"])
         except InvalidCredentialsError:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "INVALID_CREDENTIALS"},
+                protocol.ERROR, {"code": "INVALID_CREDENTIALS"},
                 correlation_id=envelope["message_id"]))
             return
         self._connections.set_identity(connection_id, payload["username"])
@@ -219,12 +223,12 @@ class WebSocketGateway:
             "login succeeded for %s", payload["username"],
             extra={"message_id": envelope["message_id"], "session_token_hash": hash_token(token)})
         await self._send(websocket, schemas.make_envelope(
-            "login_ok", {"username": payload["username"], "session_token": token},
+            protocol.LOGIN_OK, {"username": payload["username"], "session_token": token},
             correlation_id=envelope["message_id"]))
 
     async def _handle_ping(self, connection_id, websocket, envelope):
         await self._send(websocket, schemas.make_envelope(
-            "pong", {}, correlation_id=envelope["message_id"]))
+            protocol.PONG, {}, correlation_id=envelope["message_id"]))
 
     async def _handle_reconnect(self, connection_id, websocket, envelope):
         token = envelope["payload"].get("session_token")
@@ -234,14 +238,16 @@ class WebSocketGateway:
                 "message_id": envelope["message_id"], "session_token_hash": hash_token(token)})
         if user is None:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "NO_RECONNECTABLE_GAME"}, correlation_id=envelope["message_id"]))
+                protocol.ERROR, {"code": "NO_RECONNECTABLE_GAME"},
+                correlation_id=envelope["message_id"]))
             return
 
         game_id = self._connection_service.reconnect(user.username)
         session = self._game_service.get_session(game_id) if game_id is not None else None
         if session is None:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "NO_RECONNECTABLE_GAME"}, correlation_id=envelope["message_id"]))
+                protocol.ERROR, {"code": "NO_RECONNECTABLE_GAME"},
+                correlation_id=envelope["message_id"]))
             return
 
         self._connections.set_identity(connection_id, user.username)
@@ -252,7 +258,7 @@ class WebSocketGateway:
         # exact same guarantee _start_game already gives a fresh join
         # (Section 3.1).
         await self._send(websocket, schemas.make_envelope(
-            "state_snapshot", dto.build_state_snapshot(session), game_id=game_id))
+            protocol.STATE_SNAPSHOT, dto.build_state_snapshot(session), game_id=game_id))
 
     async def _handle_join_game(self, connection_id, websocket, envelope):
         if self._quick_local_waiting_connection_id is None:
@@ -269,7 +275,7 @@ class WebSocketGateway:
         identity = self._connections.get_identity(connection_id)
         if identity is None:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
+                protocol.ERROR, {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
             return
         if self._matchmaking_service.is_queued(identity):
             return  # already searching - a duplicate "play" is a no-op, not an error
@@ -280,7 +286,7 @@ class WebSocketGateway:
 
         self._matchmaking_service.enqueue(identity, user.rating, now_ms=self._matchmaking_clock_ms)
         await self._send(websocket, schemas.make_envelope(
-            "searching_match", {}, correlation_id=envelope["message_id"]))
+            protocol.SEARCHING_MATCH, {}, correlation_id=envelope["message_id"]))
 
     async def _handle_cancel_matchmaking(self, connection_id, websocket, envelope):
         identity = self._connections.get_identity(connection_id)
@@ -291,19 +297,20 @@ class WebSocketGateway:
         identity = self._connections.get_identity(connection_id)
         if identity is None:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
+                protocol.ERROR, {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
             return
 
         room = self._room_service.create_room(identity)
         self._connections.set_room_id(connection_id, room.room_id)
         await self._send(websocket, schemas.make_envelope(
-            "room_created", {"room_id": room.room_id}, correlation_id=envelope["message_id"]))
+            protocol.ROOM_CREATED, {"room_id": room.room_id},
+            correlation_id=envelope["message_id"]))
 
     async def _handle_join_room(self, connection_id, websocket, envelope):
         identity = self._connections.get_identity(connection_id)
         if identity is None:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
+                protocol.ERROR, {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
             return
 
         room_id = envelope["payload"].get("room_id")
@@ -311,14 +318,23 @@ class WebSocketGateway:
             role = self._room_service.join_room(room_id, identity)
         except RoomNotFoundError:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "ROOM_NOT_FOUND"}, correlation_id=envelope["message_id"]))
+                protocol.ERROR, {"code": "ROOM_NOT_FOUND"}, correlation_id=envelope["message_id"]))
             return
         except SpectatorCapExceededError:
             await self._send(websocket, schemas.make_envelope(
-                "error", {"code": "SPECTATOR_CAP_EXCEEDED"}, correlation_id=envelope["message_id"]))
+                protocol.ERROR, {"code": "SPECTATOR_CAP_EXCEEDED"},
+                correlation_id=envelope["message_id"]))
             return
 
         self._connections.set_room_id(connection_id, room_id)
+
+        # Sent immediately, before anything else: "black" and "spectator"
+        # both otherwise start with an identical state_snapshot, and a
+        # client has no other way to tell which one it just became -
+        # whether to wait for a following game_started (black) or treat
+        # the snapshot itself as the finish line (spectator).
+        await self._send(websocket, schemas.make_envelope(
+            protocol.ROOM_JOINED, {"role": role}, correlation_id=envelope["message_id"]))
 
         if role == "black":
             room = self._room_service.get_room(room_id)
@@ -339,7 +355,7 @@ class WebSocketGateway:
             return
         self._connections.set_game_id(connection_id, game_id)
         await self._send(websocket, schemas.make_envelope(
-            "state_snapshot", dto.build_state_snapshot(session), game_id=game_id))
+            protocol.STATE_SNAPSHOT, dto.build_state_snapshot(session), game_id=game_id))
 
     async def _start_game(self, white_id, black_id, rated):
         session = self._game_service.create_session(
@@ -351,7 +367,7 @@ class WebSocketGateway:
         self._connections.set_game_id(black_id, session.game_id)
 
         snapshot_envelope = schemas.make_envelope(
-            "state_snapshot", dto.build_state_snapshot(session), game_id=session.game_id)
+            protocol.STATE_SNAPSHOT, dto.build_state_snapshot(session), game_id=session.game_id)
         await self._send(self._connections.get_socket(white_id), snapshot_envelope)
         await self._send(self._connections.get_socket(black_id), snapshot_envelope)
         return session
@@ -374,7 +390,7 @@ class WebSocketGateway:
         if result == "scheduled":
             session = self._game_service.get_session(game_id)
             response = schemas.make_envelope(
-                "move_accepted", {"sequence": session.sequence if session else 0},
+                protocol.MOVE_ACCEPTED, {"sequence": session.sequence if session else 0},
                 game_id=game_id, correlation_id=message_id)
             # Only a genuinely scheduled move is cached: a rejected
             # attempt is harmless to reprocess (it just gets rejected
@@ -405,7 +421,7 @@ class WebSocketGateway:
 
     async def broadcast_render_state(self, game_id, session):
         await self._broadcast(game_id, schemas.make_envelope(
-            "render_state", dto.build_render_state(session), game_id=game_id))
+            protocol.RENDER_STATE, dto.build_render_state(session), game_id=game_id))
 
     # ---------------------------------------------------------------
     # Phase C: matchmaking clock, advanced by server_main.py's tick loop
@@ -429,7 +445,7 @@ class WebSocketGateway:
             if connection_id is None:
                 continue
             await self._send(self._connections.get_socket(connection_id), schemas.make_envelope(
-                "matchmaking_timeout", {}))
+                protocol.MATCHMAKING_TIMEOUT, {}))
 
     # ---------------------------------------------------------------
     # Phase D: connection/reconnection clock, advanced by server_main.py's
@@ -468,7 +484,7 @@ class WebSocketGateway:
             "state_snapshot": dto.build_state_snapshot(session),
         }
         await self._broadcast(event.game_id, schemas.make_envelope(
-            "game_started", payload, game_id=event.game_id))
+            protocol.GAME_STARTED, payload, game_id=event.game_id))
 
     def _on_game_move_applied(self, event):
         asyncio.create_task(self._broadcast_move(event))
@@ -488,14 +504,14 @@ class WebSocketGateway:
             "sequence": session.sequence,
         }
         await self._broadcast(event.game_id, schemas.make_envelope(
-            "game_event", payload, game_id=event.game_id))
+            protocol.GAME_EVENT, payload, game_id=event.game_id))
 
     def _on_game_ended(self, event):
         asyncio.create_task(self._broadcast_game_ended(event))
 
     async def _broadcast_game_ended(self, event):
         await self._broadcast(event.game_id, schemas.make_envelope(
-            "game_over", {"winner": event.winner, "reason": event.reason},
+            protocol.GAME_OVER, {"winner": event.winner, "reason": event.reason},
             game_id=event.game_id))
 
     def _on_move_rejected(self, event):
@@ -506,7 +522,7 @@ class WebSocketGateway:
         if connection_id is None:
             return
         await self._send(self._connections.get_socket(connection_id), schemas.make_envelope(
-            "move_rejected", {"reason": event.reason}, game_id=event.game_id))
+            protocol.MOVE_REJECTED, {"reason": event.reason}, game_id=event.game_id))
 
     def _find_connection(self, game_id, identity):
         for connection_id in self._connections.connections_in_game(game_id):

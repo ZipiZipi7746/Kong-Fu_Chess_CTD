@@ -1,6 +1,5 @@
 import itertools
 
-from kungfu_chess.io.board_parser import BoardParser
 from kungfu_chess.engine.events import GameOverEvent, MoveResolvedEvent
 from kungfu_chess.messaging.application_events import (
     GameStartedEvent,
@@ -10,6 +9,7 @@ from kungfu_chess.messaging.application_events import (
 )
 from kungfu_chess.application import rating_service
 from kungfu_chess.application.game_session import GameSession
+from kungfu_chess.model.starting_position import standard_starting_board
 from kungfu_chess.persistence.in_memory_repositories import InMemoryUserRepository
 
 # Maps GameEngine.request_move's own result vocabulary ("game_over",
@@ -22,24 +22,6 @@ _MOVE_REJECTION_REASONS = {
     "blocked": "BLOCKED",
     "game_over": "GAME_OVER",
 }
-
-_STANDARD_STARTING_BOARD_LINES = [
-    "Board:",
-    "bR bN bB bQ bK bB bN bR",
-    "bP bP bP bP bP bP bP bP",
-    ". . . . . . . .",
-    ". . . . . . . .",
-    ". . . . . . . .",
-    ". . . . . . . .",
-    "wP wP wP wP wP wP wP wP",
-    "wR wN wB wQ wK wB wN wR",
-    "Commands:",
-]
-
-
-def _standard_starting_board():
-    board, _commands = BoardParser().parse(_STANDARD_STARTING_BOARD_LINES)
-    return board
 
 
 class GameService:
@@ -76,7 +58,7 @@ class GameService:
         game_id = f"g_{next(self._game_id_counter)}"
         session = GameSession(
             game_id=game_id,
-            board=board if board is not None else _standard_starting_board(),
+            board=board if board is not None else standard_starting_board(),
             white=white, black=black, jump_duration_ms=jump_duration_ms,
             move_cooldown_ms=move_cooldown_ms, jump_cooldown_ms=jump_cooldown_ms,
             rated=rated)

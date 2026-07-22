@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.server.protocol</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.protocol</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Cprotocol.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\protocol.py</a></td></tr></table>
+    <p><span class="code">Wire&nbsp;protocol&nbsp;message-type&nbsp;vocabulary&nbsp;-&nbsp;the&nbsp;single&nbsp;source&nbsp;of&nbsp;truth<br>
+for&nbsp;every&nbsp;message&nbsp;type&nbsp;name.&nbsp;WebSocketGateway._HANDLER_NAMES&nbsp;imports<br>
+these&nbsp;instead&nbsp;of&nbsp;re-typing&nbsp;the&nbsp;string&nbsp;literals,&nbsp;and&nbsp;so&nbsp;does&nbsp;every<br>
+client&nbsp;(reference_client.py,&nbsp;login_client.py,&nbsp;gui/network/*.py)&nbsp;when<br>
+constructing&nbsp;an&nbsp;envelope&nbsp;-&nbsp;server&nbsp;and&nbsp;client&nbsp;can&nbsp;no&nbsp;longer&nbsp;silently<br>
+drift&nbsp;on&nbsp;the&nbsp;spelling&nbsp;of&nbsp;a&nbsp;message&nbsp;type,&nbsp;since&nbsp;both&nbsp;sides&nbsp;import&nbsp;the<br>
+same&nbsp;constant.<br>
+&nbsp;<br>
+Values&nbsp;themselves&nbsp;are&nbsp;unchanged&nbsp;from&nbsp;before&nbsp;this&nbsp;module&nbsp;existed&nbsp;(this<br>
+is&nbsp;a&nbsp;pure&nbsp;refactor&nbsp;-&nbsp;see&nbsp;Tests/server/test_websocket_gateway.py,&nbsp;which<br>
+still&nbsp;asserts&nbsp;on&nbsp;the&nbsp;literal&nbsp;wire&nbsp;strings,&nbsp;since&nbsp;that&nbsp;is&nbsp;what&nbsp;actually<br>
+crosses&nbsp;the&nbsp;network&nbsp;and&nbsp;is&nbsp;what&nbsp;those&nbsp;tests&nbsp;are&nbsp;exercising).</span></p>
+<p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>CANCEL_MATCHMAKING</strong> = 'cancel_matchmaking'<br>
+<strong>CREATE_ROOM</strong> = 'create_room'<br>
+<strong>ERROR</strong> = 'error'<br>
+<strong>GAME_EVENT</strong> = 'game_event'<br>
+<strong>GAME_OVER</strong> = 'game_over'<br>
+<strong>GAME_STARTED</strong> = 'game_started'<br>
+<strong>JOIN_GAME</strong> = 'join_game'<br>
+<strong>JOIN_ROOM</strong> = 'join_room'<br>
+<strong>JUMP_REQUEST</strong> = 'jump_request'<br>
+<strong>LOGIN</strong> = 'login'<br>
+<strong>LOGIN_OK</strong> = 'login_ok'<br>
+<strong>MATCHMAKING_TIMEOUT</strong> = 'matchmaking_timeout'<br>
+<strong>MOVE_ACCEPTED</strong> = 'move_accepted'<br>
+<strong>MOVE_REJECTED</strong> = 'move_rejected'<br>
+<strong>MOVE_REQUEST</strong> = 'move_request'<br>
+<strong>PING</strong> = 'ping'<br>
+<strong>PLAY</strong> = 'play'<br>
+<strong>PLAYER_DISCONNECTED</strong> = 'player_disconnected'<br>
+<strong>PONG</strong> = 'pong'<br>
+<strong>RECONNECT</strong> = 'reconnect'<br>
+<strong>REGISTER</strong> = 'register'<br>
+<strong>REGISTERED</strong> = 'registered'<br>
+<strong>RENDER_STATE</strong> = 'render_state'<br>
+<strong>ROOM_CREATED</strong> = 'room_created'<br>
+<strong>ROOM_JOINED</strong> = 'room_joined'<br>
+<strong>SEARCHING_MATCH</strong> = 'searching_match'<br>
+<strong>STATE_SNAPSHOT</strong> = 'state_snapshot'</td></tr></table>
+</body></html>

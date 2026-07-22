@@ -14,10 +14,11 @@ from kungfu_chess.messaging.application_message_bus import ApplicationMessageBus
 from kungfu_chess.application.auth_service import create_sqlite_backed_service  # pragma: no cover
 from kungfu_chess.application.game_service import GameService  # pragma: no cover
 from kungfu_chess.server.logging_config import configure_logging  # pragma: no cover
+from kungfu_chess.server.network_config import DEFAULT_HOST, DEFAULT_PORT  # pragma: no cover
 from kungfu_chess.server.websocket_gateway import WebSocketGateway  # pragma: no cover
 
-HOST = "localhost"  # pragma: no cover
-PORT = 8765  # pragma: no cover
+HOST = DEFAULT_HOST  # pragma: no cover
+PORT = DEFAULT_PORT  # pragma: no cover
 TICK_INTERVAL_MS = 75  # pragma: no cover
 DB_PATH = "kungfu_chess.db"  # pragma: no cover
 LOG_PATH = "kungfu_chess_server.log"  # pragma: no cover

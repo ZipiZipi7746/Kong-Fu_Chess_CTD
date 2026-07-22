@@ -691,6 +691,10 @@ class TestRooms:
                 room_id = created["payload"]["room_id"]
 
                 await send(black_ws, "join_room", {"room_id": room_id})
+                room_joined = await recv(black_ws)
+                assert room_joined["type"] == "room_joined"
+                assert room_joined["payload"]["role"] == "black"
+
                 white_snapshot = await recv(white_ws)
                 black_snapshot = await recv(black_ws)
 
@@ -717,13 +721,17 @@ class TestRooms:
                 room_id = created["payload"]["room_id"]
 
                 await send(black_ws, "join_room", {"room_id": room_id})
+                await recv(black_ws)  # room_joined
                 white_snapshot = await recv(white_ws)
-                await recv(black_ws)
+                await recv(black_ws)  # state_snapshot
                 await recv(white_ws)  # game_started
                 await recv(black_ws)  # game_started
                 game_id = white_snapshot["game_id"]
 
                 await send(spectator_ws, "join_room", {"room_id": room_id})
+                room_joined = await recv(spectator_ws)
+                assert room_joined["type"] == "room_joined"
+                assert room_joined["payload"]["role"] == "spectator"
                 spectator_snapshot = await recv(spectator_ws)
 
                 assert spectator_snapshot["type"] == "state_snapshot"
@@ -744,13 +752,15 @@ class TestRooms:
                 room_id = created["payload"]["room_id"]
 
                 await send(black_ws, "join_room", {"room_id": room_id})
+                await recv(black_ws)  # room_joined
                 white_snapshot = await recv(white_ws)
-                await recv(black_ws)
+                await recv(black_ws)  # state_snapshot
                 await recv(white_ws)  # game_started
                 await recv(black_ws)  # game_started
                 game_id = white_snapshot["game_id"]
 
                 await send(spectator_ws, "join_room", {"room_id": room_id})
+                await recv(spectator_ws)  # room_joined
                 await recv(spectator_ws)  # state_snapshot catch-up
 
                 await send(white_ws, "move_request",
@@ -782,13 +792,15 @@ class TestRooms:
                 room_id = created["payload"]["room_id"]
 
                 await send(black_ws, "join_room", {"room_id": room_id})
+                await recv(black_ws)  # room_joined
                 white_snapshot = await recv(white_ws)
-                await recv(black_ws)
+                await recv(black_ws)  # state_snapshot
                 await recv(white_ws)  # game_started
                 await recv(black_ws)  # game_started
                 game_id = white_snapshot["game_id"]
 
                 await send(spectator_ws, "join_room", {"room_id": room_id})
+                await recv(spectator_ws)  # room_joined
                 await recv(spectator_ws)
 
                 await send(spectator_ws, "move_request",
@@ -824,12 +836,14 @@ class TestRooms:
                 room_id = created["payload"]["room_id"]
 
                 await send(black_ws, "join_room", {"room_id": room_id})
+                await recv(black_ws)  # room_joined
                 await recv(white_ws)  # state_snapshot
                 await recv(black_ws)  # state_snapshot
                 await recv(white_ws)  # game_started
                 await recv(black_ws)  # game_started
 
                 await send(spectator_ws, "join_room", {"room_id": room_id})
+                await recv(spectator_ws)  # room_joined
                 await recv(spectator_ws)
 
                 await black_ws.close()

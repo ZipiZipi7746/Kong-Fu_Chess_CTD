@@ -54,7 +54,11 @@ alike"&nbsp;-&nbsp;a&nbsp;spectator&nbsp;connection&nbsp;is&nbsp;just&nbsp;anoth
 connections_in_game,&nbsp;not&nbsp;a&nbsp;special&nbsp;case.&nbsp;A&nbsp;spectator's&nbsp;move_request&nbsp;is<br>
 already&nbsp;rejected&nbsp;with&nbsp;no&nbsp;new&nbsp;authorization&nbsp;code:&nbsp;GameSession.color_for<br>
 returns&nbsp;None&nbsp;for&nbsp;anyone&nbsp;who&nbsp;isn't&nbsp;white/black,&nbsp;and<br>
-GameService.handle_move_request&nbsp;already&nbsp;rejects&nbsp;a&nbsp;None&nbsp;color.</span></p>
+GameService.handle_move_request&nbsp;already&nbsp;rejects&nbsp;a&nbsp;None&nbsp;color.<br>
+&nbsp;<br>
+Every&nbsp;wire&nbsp;message&nbsp;type&nbsp;name&nbsp;is&nbsp;imported&nbsp;from&nbsp;server.protocol&nbsp;rather<br>
+than&nbsp;re-typed&nbsp;here&nbsp;as&nbsp;a&nbsp;string&nbsp;literal,&nbsp;so&nbsp;this&nbsp;module&nbsp;and&nbsp;every&nbsp;client<br>
+can&nbsp;never&nbsp;silently&nbsp;drift&nbsp;on&nbsp;the&nbsp;spelling&nbsp;of&nbsp;a&nbsp;message&nbsp;type.</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -64,8 +68,9 @@ GameService.handle_move_request&nbsp;already&nbsp;rejects&nbsp;a&nbsp;None&nbsp;
 <td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
 <a href="kungfu_chess.application.dto.html">kungfu_chess.application.dto</a><br>
 </td><td class="multicolumn"><a href="logging.html">logging</a><br>
-<a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
-</td><td class="multicolumn"><a href="uuid.html">uuid</a><br>
+<a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+<a href="uuid.html">uuid</a><br>
 </td><td class="multicolumn"></td></tr></table></td></tr></table><p>
 <table class="section">
 <tr class="decor index-decor heading-text">

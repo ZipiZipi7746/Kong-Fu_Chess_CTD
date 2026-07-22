@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Python: module kungfu_chess.server.network_config</title>
+</head><body>
+
+<table class="heading">
+<tr class="heading-text decor">
+<td class="title">&nbsp;<br><strong class="title"><a href="kungfu_chess.html" class="white">kungfu_chess</a>.<a href="kungfu_chess.server.html" class="white">server</a>.network_config</strong></td>
+<td class="extra"><a href=".">index</a><br><a href="file:c%3A%5Cusers%5Cuser1%5Cdesktop%5Cprogramming%5Cbootcamp_vast%5Cctd%5Ckong-fu%20chess%20after%201%20refactoring%5Ckungfu_chess%5Cserver%5Cnetwork_config.py">c:\users\user1\desktop\programming\bootcamp_vast\ctd\kong-fu chess after 1 refactoring\kungfu_chess\server\network_config.py</a></td></tr></table>
+    <p><span class="code">Centralized&nbsp;networking&nbsp;configuration&nbsp;-&nbsp;the&nbsp;single&nbsp;place&nbsp;"where&nbsp;the<br>
+server&nbsp;lives"&nbsp;is&nbsp;defined.&nbsp;server_main.py&nbsp;imports&nbsp;this&nbsp;to&nbsp;bind;&nbsp;every<br>
+client&nbsp;(reference_client.py,&nbsp;network_gui_main.py)&nbsp;imports&nbsp;it&nbsp;to&nbsp;dial&nbsp;-<br>
+previously&nbsp;these&nbsp;were&nbsp;three&nbsp;independent&nbsp;hardcoded&nbsp;copies&nbsp;of&nbsp;the&nbsp;same<br>
+host/port&nbsp;that&nbsp;could&nbsp;silently&nbsp;drift&nbsp;apart.</span></p>
+<p>
+<table class="section">
+<tr class="decor data-decor heading-text">
+<td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
+    
+<tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
+<td class="singlecolumn"><strong>DEFAULT_HOST</strong> = 'localhost'<br>
+<strong>DEFAULT_PORT</strong> = 8765<br>
+<strong>SERVER_URL</strong> = 'ws://localhost:8765'</td></tr></table>
+</body></html>

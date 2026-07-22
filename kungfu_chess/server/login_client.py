@@ -7,7 +7,7 @@ per client."""
 
 import json
 
-from kungfu_chess.server import schemas  # pragma: no cover
+from kungfu_chess.server import protocol, schemas  # pragma: no cover
 from kungfu_chess.server.cli_login_flow import CliLoginFlow  # pragma: no cover
 
 
@@ -31,15 +31,15 @@ async def perform_login(websocket):  # pragma: no cover
 
     if input("New account? [y/N]: ").strip().lower().startswith("y"):
         response = await _send_and_await(
-            websocket, "register", {"username": flow.username, "password": flow.password})
-        if response["type"] == "error":
+            websocket, protocol.REGISTER, {"username": flow.username, "password": flow.password})
+        if response["type"] == protocol.ERROR:
             print(f"Registration failed: {response['payload']['code']}")
             return None
         print(f"Registered as {flow.username}.")
 
     response = await _send_and_await(
-        websocket, "login", {"username": flow.username, "password": flow.password})
-    if response["type"] == "error":
+        websocket, protocol.LOGIN, {"username": flow.username, "password": flow.password})
+    if response["type"] == protocol.ERROR:
         print(f"Login failed: {response['payload']['code']}")
         return None
     flow.mark_authenticated(response["payload"]["session_token"])

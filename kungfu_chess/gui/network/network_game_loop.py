@@ -16,6 +16,16 @@ Never imports kungfu_chess.rules/realtime for decision-making - Board/
 Piece are used here purely as inert, already-tested rendering data
 containers (exactly how BoardRenderer/ViewModelRegistry already treat
 them), never to compute legality or timing locally.
+
+Covers every join path the text reference_client.py already does:
+quick_local, ranked play, and Phase E rooms (as the creator/White,
+the second joiner/Black, or a read-only spectator - my_color is None
+for a spectator, which NetworkGameController already handles correctly
+with no special-casing: no token ever equals None). Also mirrors
+reference_client.py's Phase D auto-reconnect (network_gui_main.py drives
+the retry loop; run()'s optional `resume` parameter lets it skip
+straight back into the render loop with the already-known game_id/
+board_rows/my_color instead of re-running the join handshake).
 """
 import asyncio
 import json
@@ -42,6 +52,7 @@ from kungfu_chess.gui.geometry.board_geometry import (  # pragma: no cover
     derive_cell_size,
     letterbox_screen_to_image,
 )
+from kungfu_chess.gui.gui_config import DEFAULT_BOARD_IMAGE_PATH, DEFAULT_PIECES_ROOT  # pragma: no cover
 from kungfu_chess.gui.rendering.img_adapter import Img  # pragma: no cover
 from kungfu_chess.gui.rendering.img_renderer import ImgRenderer  # pragma: no cover
 from kungfu_chess.gui.hud.observers import MovesLogObserver, ScoreObserver  # pragma: no cover
@@ -50,7 +61,7 @@ from kungfu_chess.gui.animation.view_model_registry import ViewModelRegistry  # 
 from kungfu_chess.input.board_mapper import BoardMapper  # pragma: no cover
 from kungfu_chess.gui.network.network_engine_view import NetworkEngineView  # pragma: no cover
 from kungfu_chess.gui.network.network_game_controller import NetworkGameController  # pragma: no cover
-from kungfu_chess.server import schemas  # pragma: no cover
+from kungfu_chess.server import protocol, schemas  # pragma: no cover
 
 
 def _draw_cell_highlights(board_renderer, board, controller, cell_w, cell_h):  # pragma: no cover
@@ -75,12 +86,14 @@ def _draw_cell_highlights(board_renderer, board, controller, cell_w, cell_h):  #
             board_renderer.draw_highlight(sx, sy, (cell_w, cell_h), SELECTED_COLOR)
 
 
-async def _await_game_start(websocket, my_username):  # pragma: no cover
+async def await_fresh_game_start(websocket, my_username):  # pragma: no cover
     """Blocks until game_started arrives, tracking the game_id and
-    initial board along the way. Returns (game_id, board_rows, my_color),
-    or (None, None, None) if the connection closes or matchmaking times
-    out (Decision 5: no auto-retry - the caller reports this and exits;
-    the player re-runs the client to search again)."""
+    initial board along the way - used for quick_local, ranked play, a
+    room's creator (White) waiting for a second joiner, and a room's
+    second joiner (Black) once join_game_as_room has confirmed that
+    role. Returns (game_id, board_rows, my_color), or (None, None, None)
+    if the connection closes or matchmaking times out (Decision 5: no
+    auto-retry - the caller reports this and exits)."""
     game_id, board_rows = None, None
     async for raw in websocket:
         envelope = json.loads(raw)
@@ -88,16 +101,43 @@ async def _await_game_start(websocket, my_username):  # pragma: no cover
         if envelope.get("game_id"):
             game_id = envelope["game_id"]
 
-        if msg_type == "state_snapshot":
+        if msg_type == protocol.STATE_SNAPSHOT:
             board_rows = payload["board"]
-        elif msg_type == "game_started":
+        elif msg_type == protocol.GAME_STARTED:
             board_rows = payload["state_snapshot"]["board"]
             my_color = "w" if payload["white"] == my_username else "b"
             return game_id, board_rows, my_color
-        elif msg_type == "matchmaking_timeout":
+        elif msg_type == protocol.MATCHMAKING_TIMEOUT:
             print("No ranked opponent found within the search window.")
             return None, None, None
     return None, None, None
+
+
+async def join_game_as_room(websocket, room_id, my_username):  # pragma: no cover
+    """Sends join_room and returns (game_id, board_rows, my_color) once
+    the join is fully resolved - my_color is "b" for the second joiner
+    (who also starts the game, same as await_fresh_game_start) or None
+    for a spectator (a read-only observer; NetworkGameController already
+    handles my_color=None correctly with no special-casing). Returns
+    (None, None, None) on a rejected join_room (unknown room, spectator
+    cap reached)."""
+    await websocket.send(schemas.encode(schemas.make_envelope(
+        protocol.JOIN_ROOM, {"room_id": room_id})))
+    ack = json.loads(await websocket.recv())
+    if ack["type"] == protocol.ERROR:
+        print(f"Could not join room: {ack['payload']['code']}")
+        return None, None, None
+
+    role = ack["payload"]["role"]
+    if role == "black":
+        return await await_fresh_game_start(websocket, my_username)
+
+    # role == "spectator": the game is already running - the very next
+    # message is the catch-up state_snapshot itself (never a
+    # game_started, which was already broadcast to the two players
+    # earlier), and there is no color to assign.
+    snapshot = json.loads(await websocket.recv())
+    return snapshot["game_id"], snapshot["payload"]["board"], None
 
 
 async def _receive_loop(websocket, state, engine_view, moves_log, score):  # pragma: no cover
@@ -107,10 +147,10 @@ async def _receive_loop(websocket, state, engine_view, moves_log, score):  # pra
         if envelope.get("game_id"):
             state["game_id"] = envelope["game_id"]
 
-        if msg_type in ("state_snapshot", "render_state"):
+        if msg_type in (protocol.STATE_SNAPSHOT, protocol.RENDER_STATE):
             state["board_rows"] = payload["board"]
             engine_view.update(payload)
-        elif msg_type == "game_event":
+        elif msg_type == protocol.GAME_EVENT:
             moving_piece = Piece.parse(payload["moving_piece"])
             captured_piece = Piece.parse(payload["captured"]) if payload["captured"] else None
             event = MoveResolvedEvent(
@@ -118,8 +158,10 @@ async def _receive_loop(websocket, state, engine_view, moves_log, score):  # pra
                 moving_piece, captured_piece, timestamp_ms=payload.get("timestamp_ms", 0))
             moves_log(event)
             score(event)
-        elif msg_type in ("move_rejected", "error"):
+        elif msg_type in (protocol.MOVE_REJECTED, protocol.ERROR):
             print(f"[{msg_type}] {payload}")
+        elif msg_type == protocol.PLAYER_DISCONNECTED:
+            print(f"[player_disconnected] opponent has {payload['grace_period_ms'] // 1000}s to reconnect.")
 
 
 async def _render_loop(state, controller, moves_log, score,  # pragma: no cover
@@ -211,25 +253,32 @@ async def _render_loop(state, controller, moves_log, score,  # pragma: no cover
     cv2.destroyAllWindows()
 
 
-async def run(websocket, my_username, board_image_path="assets/board.png",  # pragma: no cover
-               pieces_root="assets/pieces_mine"):
-    game_id, board_rows, my_color = await _await_game_start(websocket, my_username)
-    if board_rows is None:
-        print("Connection closed before the game started.")
-        return
+async def run(websocket, my_username, board_image_path=DEFAULT_BOARD_IMAGE_PATH,  # pragma: no cover
+               pieces_root=DEFAULT_PIECES_ROOT, resume=None):
+    """resume, if given, is (game_id, board_rows, my_color) already
+    known from a prior session on this same logical connection (Phase D
+    reconnect, driven by network_gui_main.py) - skips the join
+    handshake entirely and re-enters the render loop directly."""
+    if resume is not None:
+        game_id, board_rows, my_color = resume
+    else:
+        game_id, board_rows, my_color = await await_fresh_game_start(websocket, my_username)
+        if board_rows is None:
+            print("Connection closed before the game started.")
+            return
 
     state = {"board_rows": board_rows, "game_id": game_id}
     engine_view = NetworkEngineView()
 
     def send_move_request(from_row, from_col, to_row, to_col):
         asyncio.create_task(websocket.send(schemas.encode(schemas.make_envelope(
-            "move_request",
+            protocol.MOVE_REQUEST,
             {"from_row": from_row, "from_col": from_col, "to_row": to_row, "to_col": to_col},
             game_id=state["game_id"]))))
 
     def send_jump_request(row, col):
         asyncio.create_task(websocket.send(schemas.encode(schemas.make_envelope(
-            "jump_request", {"row": row, "col": col}, game_id=state["game_id"]))))
+            protocol.JUMP_REQUEST, {"row": row, "col": col}, game_id=state["game_id"]))))
 
     controller = NetworkGameController(my_color, send_move_request, send_jump_request, engine=engine_view)
     moves_log = MovesLogObserver(len(board_rows))
@@ -239,6 +288,10 @@ async def run(websocket, my_username, board_image_path="assets/board.png",  # pr
         asyncio.create_task(_receive_loop(websocket, state, engine_view, moves_log, score)),
         asyncio.create_task(_render_loop(state, controller, moves_log, score, board_image_path, pieces_root)),
     ]
-    _done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+    done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
     for task in pending:
         task.cancel()
+    for task in done:
+        exc = task.exception()
+        if exc is not None:
+            raise exc
