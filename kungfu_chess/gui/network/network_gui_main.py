@@ -23,12 +23,21 @@ Phase D (Decision 7): mirrors reference_client.py's automatic
 reconnect - if the connection drops mid-game, a fresh connection is
 opened and "reconnect" sent with the session token already held in
 memory (no re-login), resuming network_game_loop.run() via its
-`resume` parameter rather than repeating the join screens. Reconnection
-itself is not yet graphical (console status prints only) - a fast-
-follow, not part of this pass's Home/Login/Menu screen scope.
+`resume` parameter rather than repeating the join screens. The wait
+itself is graphical too (a WaitingScreen reading "Connection lost -
+reconnecting...", the same widget the menu's own waits use), racing the
+handshake against a Cancel click exactly like every other wait in this
+module.
+
+Phase E (Decision 11): mirrors reference_client.py's client-side NDJSON
+logging (kungfu_chess.server.logging_config) onto the same
+"kungfu_chess.client" logger - login and reconnect attempts are logged
+here; per-message send/receive logging lives in network_game_loop.py,
+since that is where those events actually happen.
 """
 import asyncio
 import json
+import logging
 import sys
 
 import websockets  # pragma: no cover
@@ -36,7 +45,19 @@ import websockets  # pragma: no cover
 from kungfu_chess.gui.network import network_game_loop, screen_loop, screen_rendering  # pragma: no cover
 from kungfu_chess.gui.network.screens import LoginScreen, MenuScreen, WaitingScreen  # pragma: no cover
 from kungfu_chess.server import protocol, schemas  # pragma: no cover
+from kungfu_chess.server.logging_config import NdjsonFormatter, hash_token  # pragma: no cover
 from kungfu_chess.server.network_config import SERVER_URL  # pragma: no cover
+
+LOG_PATH = "kungfu_chess_gui_client.log"  # pragma: no cover
+
+logger = logging.getLogger("kungfu_chess.client")  # pragma: no cover
+
+
+def configure_client_logging(log_path=LOG_PATH):  # pragma: no cover
+    handler = logging.FileHandler(log_path)
+    handler.setFormatter(NdjsonFormatter())
+    logger.addHandler(handler)
+    logger.setLevel(logging.INFO)
 
 
 async def _do_login(websocket):  # pragma: no cover
@@ -69,6 +90,9 @@ async def _do_login(websocket):  # pragma: no cover
             continue
 
         payload = response["payload"]
+        logger.info(
+            "logged in as %s", payload["username"],
+            extra={"session_token_hash": hash_token(payload["session_token"])})
         return payload["username"], payload["session_token"], payload["rating"]
 
 
@@ -127,15 +151,31 @@ async def _choose_and_join(websocket, my_username, my_rating):  # pragma: no cov
         # cancelled, timed out, or rejected - back to the menu screen
 
 
-async def _attempt_reconnect(websocket, session_token):  # pragma: no cover
+async def _do_reconnect_handshake(websocket, session_token):  # pragma: no cover
+    logger.info("attempting reconnect", extra={"session_token_hash": hash_token(session_token)})
     await websocket.send(schemas.encode(schemas.make_envelope(
         protocol.RECONNECT, {"session_token": session_token})))
     response = json.loads(await websocket.recv())
     if response["type"] == protocol.ERROR:
         print(f"Reconnect failed: {response['payload']['code']}")
         return None
-    print("Reconnected.")
     return response["game_id"], response["payload"]["board"]
+
+
+async def _attempt_reconnect(websocket, session_token):  # pragma: no cover
+    """Shows a graphical "Connection lost - reconnecting..." screen
+    (reusing WaitingScreen/run_waiting_screen exactly like the menu's
+    own waits do) while the reconnect handshake races a Cancel click.
+    Returns (game_id, board_rows), or None if the user cancelled, the
+    handshake failed (e.g. the grace period already elapsed), or the
+    window was closed."""
+    screen = WaitingScreen(
+        screen_loop.CONTENT_W, screen_loop.CONTENT_H, "Connection lost - reconnecting...")
+    task = asyncio.create_task(_do_reconnect_handshake(websocket, session_token))
+    status, result = await screen_loop.run_waiting_screen(screen, task)
+    if status != "completed":
+        return None
+    return result
 
 
 async def main():  # pragma: no cover
@@ -165,16 +205,22 @@ async def main():  # pragma: no cover
                 await network_game_loop.run(
                     websocket, my_username, resume=(game_id, board_rows, my_color))
                 return  # the render loop ended cleanly (ESC, game over) - done
-        except websockets.exceptions.ConnectionClosed:
+        except (websockets.exceptions.ConnectionClosed, OSError):
+            # OSError also covers the server being briefly unreachable
+            # (e.g. connection refused) while this client tries to
+            # reconnect - not just an already-established connection
+            # dropping mid-game.
             if session_token is None:
                 return
             print("Connection lost - attempting to reconnect...")
+            await asyncio.sleep(1)
             continue
         except KeyboardInterrupt:
             return
 
 
 if __name__ == "__main__":  # pragma: no cover
+    configure_client_logging()
     try:
         asyncio.run(main())
     except KeyboardInterrupt:

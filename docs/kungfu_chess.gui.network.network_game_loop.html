@@ -36,7 +36,13 @@ with&nbsp;no&nbsp;special-casing:&nbsp;no&nbsp;token&nbsp;ever&nbsp;equals&nbsp;
 reference_client.py's&nbsp;Phase&nbsp;D&nbsp;auto-reconnect&nbsp;(network_gui_main.py&nbsp;drives<br>
 the&nbsp;retry&nbsp;loop;&nbsp;<a href="#-run">run</a>()'s&nbsp;optional&nbsp;`resume`&nbsp;parameter&nbsp;lets&nbsp;it&nbsp;skip<br>
 straight&nbsp;back&nbsp;into&nbsp;the&nbsp;render&nbsp;loop&nbsp;with&nbsp;the&nbsp;already-known&nbsp;game_id/<br>
-board_rows/my_color&nbsp;instead&nbsp;of&nbsp;re-running&nbsp;the&nbsp;join&nbsp;handshake).</span></p>
+board_rows/my_color&nbsp;instead&nbsp;of&nbsp;re-running&nbsp;the&nbsp;join&nbsp;handshake).<br>
+&nbsp;<br>
+Phase&nbsp;E&nbsp;(Decision&nbsp;11):&nbsp;logs&nbsp;every&nbsp;received&nbsp;message&nbsp;and&nbsp;every&nbsp;outgoing<br>
+move/jump&nbsp;request&nbsp;on&nbsp;the&nbsp;same&nbsp;"kungfu_chess.client"&nbsp;logger<br>
+network_gui_main.py&nbsp;configures&nbsp;at&nbsp;startup&nbsp;-&nbsp;mirrors&nbsp;reference_client.py's<br>
+receive_loop/send_loop&nbsp;logging&nbsp;exactly&nbsp;(message_id/game_id&nbsp;correlation<br>
+fields,&nbsp;never&nbsp;a&nbsp;plaintext&nbsp;session&nbsp;token).</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -46,10 +52,11 @@ board_rows/my_color&nbsp;instead&nbsp;of&nbsp;re-running&nbsp;the&nbsp;join&nbsp
 <td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
 <a href="cv2.html">cv2</a><br>
 </td><td class="multicolumn"><a href="json.html">json</a><br>
-<a href="numpy.html">numpy</a><br>
-</td><td class="multicolumn"><a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
-<a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
-</td><td class="multicolumn"><a href="time.html">time</a><br>
+<a href="logging.html">logging</a><br>
+</td><td class="multicolumn"><a href="numpy.html">numpy</a><br>
+<a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
+<a href="time.html">time</a><br>
 </td></tr></table></td></tr></table><p>
 <table class="section">
 <tr class="decor functions-decor heading-text">
@@ -91,5 +98,6 @@ handshake&nbsp;entirely&nbsp;and&nbsp;re-enters&nbsp;the&nbsp;render&nbsp;loop&n
 <strong>DEFAULT_PIECES_ROOT</strong> = 'assets/pieces_mine'<br>
 <strong>PANEL_WIDTH</strong> = 220<br>
 <strong>SELECTED_COLOR</strong> = (0, 215, 255, 130)<br>
-<strong>WINDOW_NAME</strong> = 'Kung Fu Chess'</td></tr></table>
+<strong>WINDOW_NAME</strong> = 'Kung Fu Chess'<br>
+<strong>logger</strong> = &lt;VerboseLogger kungfu_chess.client (WARNING)&gt;</td></tr></table>
 </body></html>

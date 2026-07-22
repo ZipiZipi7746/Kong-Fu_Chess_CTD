@@ -34,9 +34,17 @@ Phase&nbsp;D&nbsp;(Decision&nbsp;7):&nbsp;mirrors&nbsp;reference_client.py's&nbs
 reconnect&nbsp;-&nbsp;if&nbsp;the&nbsp;connection&nbsp;drops&nbsp;mid-game,&nbsp;a&nbsp;fresh&nbsp;connection&nbsp;is<br>
 opened&nbsp;and&nbsp;"reconnect"&nbsp;sent&nbsp;with&nbsp;the&nbsp;session&nbsp;token&nbsp;already&nbsp;held&nbsp;in<br>
 memory&nbsp;(no&nbsp;re-login),&nbsp;resuming&nbsp;network_game_loop.run()&nbsp;via&nbsp;its<br>
-`resume`&nbsp;parameter&nbsp;rather&nbsp;than&nbsp;repeating&nbsp;the&nbsp;join&nbsp;screens.&nbsp;Reconnection<br>
-itself&nbsp;is&nbsp;not&nbsp;yet&nbsp;graphical&nbsp;(console&nbsp;status&nbsp;prints&nbsp;only)&nbsp;-&nbsp;a&nbsp;fast-<br>
-follow,&nbsp;not&nbsp;part&nbsp;of&nbsp;this&nbsp;pass's&nbsp;Home/Login/Menu&nbsp;screen&nbsp;scope.</span></p>
+`resume`&nbsp;parameter&nbsp;rather&nbsp;than&nbsp;repeating&nbsp;the&nbsp;join&nbsp;screens.&nbsp;The&nbsp;wait<br>
+itself&nbsp;is&nbsp;graphical&nbsp;too&nbsp;(a&nbsp;WaitingScreen&nbsp;reading&nbsp;"Connection&nbsp;lost&nbsp;-<br>
+reconnecting...",&nbsp;the&nbsp;same&nbsp;widget&nbsp;the&nbsp;menu's&nbsp;own&nbsp;waits&nbsp;use),&nbsp;racing&nbsp;the<br>
+handshake&nbsp;against&nbsp;a&nbsp;Cancel&nbsp;click&nbsp;exactly&nbsp;like&nbsp;every&nbsp;other&nbsp;wait&nbsp;in&nbsp;this<br>
+module.<br>
+&nbsp;<br>
+Phase&nbsp;E&nbsp;(Decision&nbsp;11):&nbsp;mirrors&nbsp;reference_client.py's&nbsp;client-side&nbsp;NDJSON<br>
+logging&nbsp;(kungfu_chess.server.logging_config)&nbsp;onto&nbsp;the&nbsp;same<br>
+"kungfu_chess.client"&nbsp;logger&nbsp;-&nbsp;login&nbsp;and&nbsp;reconnect&nbsp;attempts&nbsp;are&nbsp;logged<br>
+here;&nbsp;per-message&nbsp;send/receive&nbsp;logging&nbsp;lives&nbsp;in&nbsp;network_game_loop.py,<br>
+since&nbsp;that&nbsp;is&nbsp;where&nbsp;those&nbsp;events&nbsp;actually&nbsp;happen.</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -45,25 +53,29 @@ follow,&nbsp;not&nbsp;part&nbsp;of&nbsp;this&nbsp;pass's&nbsp;Home/Login/Menu&nb
 <tr><td class="decor pkg-content-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
 <td class="singlecolumn"><table><tr><td class="multicolumn"><a href="asyncio.html">asyncio</a><br>
 <a href="json.html">json</a><br>
-<a href="kungfu_chess.gui.network.network_game_loop.html">kungfu_chess.gui.network.network_game_loop</a><br>
-</td><td class="multicolumn"><a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
+<a href="logging.html">logging</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.gui.network.network_game_loop.html">kungfu_chess.gui.network.network_game_loop</a><br>
+<a href="kungfu_chess.server.protocol.html">kungfu_chess.server.protocol</a><br>
 <a href="kungfu_chess.server.schemas.html">kungfu_chess.server.schemas</a><br>
-<a href="kungfu_chess.gui.network.screen_loop.html">kungfu_chess.gui.network.screen_loop</a><br>
-</td><td class="multicolumn"><a href="kungfu_chess.gui.network.screen_rendering.html">kungfu_chess.gui.network.screen_rendering</a><br>
+</td><td class="multicolumn"><a href="kungfu_chess.gui.network.screen_loop.html">kungfu_chess.gui.network.screen_loop</a><br>
+<a href="kungfu_chess.gui.network.screen_rendering.html">kungfu_chess.gui.network.screen_rendering</a><br>
 <a href="sys.html">sys</a><br>
-<a href="websockets.html">websockets</a><br>
-</td><td class="multicolumn"></td></tr></table></td></tr></table><p>
+</td><td class="multicolumn"><a href="websockets.html">websockets</a><br>
+</td></tr></table></td></tr></table><p>
 <table class="section">
 <tr class="decor functions-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Functions</strong></td></tr>
     
 <tr><td class="decor functions-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><dl><dt>async <a name="-main"><strong>main</strong></a>()</dt></dl>
+<td class="singlecolumn"><dl><dt><a name="-configure_client_logging"><strong>configure_client_logging</strong></a>(log_path='kungfu_chess_gui_client.log')</dt></dl>
+ <dl><dt>async <a name="-main"><strong>main</strong></a>()</dt></dl>
 </td></tr></table><p>
 <table class="section">
 <tr class="decor data-decor heading-text">
 <td class="section-title" colspan=3>&nbsp;<br><strong class="bigsection">Data</strong></td></tr>
     
 <tr><td class="decor data-decor"><span class="code">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
-<td class="singlecolumn"><strong>SERVER_URL</strong> = 'ws://localhost:8765'</td></tr></table>
+<td class="singlecolumn"><strong>LOG_PATH</strong> = 'kungfu_chess_gui_client.log'<br>
+<strong>SERVER_URL</strong> = 'ws://localhost:8765'<br>
+<strong>logger</strong> = &lt;VerboseLogger kungfu_chess.client (WARNING)&gt;</td></tr></table>
 </body></html>

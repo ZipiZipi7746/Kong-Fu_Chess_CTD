@@ -26,9 +26,16 @@ reference_client.py's Phase D auto-reconnect (network_gui_main.py drives
 the retry loop; run()'s optional `resume` parameter lets it skip
 straight back into the render loop with the already-known game_id/
 board_rows/my_color instead of re-running the join handshake).
+
+Phase E (Decision 11): logs every received message and every outgoing
+move/jump request on the same "kungfu_chess.client" logger
+network_gui_main.py configures at startup - mirrors reference_client.py's
+receive_loop/send_loop logging exactly (message_id/game_id correlation
+fields, never a plaintext session token).
 """
 import asyncio
 import json
+import logging
 import time
 
 import cv2  # pragma: no cover
@@ -62,6 +69,8 @@ from kungfu_chess.input.board_mapper import BoardMapper  # pragma: no cover
 from kungfu_chess.gui.network.network_engine_view import NetworkEngineView  # pragma: no cover
 from kungfu_chess.gui.network.network_game_controller import NetworkGameController  # pragma: no cover
 from kungfu_chess.server import protocol, schemas  # pragma: no cover
+
+logger = logging.getLogger("kungfu_chess.client")  # pragma: no cover
 
 
 def _draw_cell_highlights(board_renderer, board, controller, cell_w, cell_h):  # pragma: no cover
@@ -146,6 +155,10 @@ async def _receive_loop(websocket, state, engine_view, moves_log, score):  # pra
         msg_type, payload = envelope["type"], envelope["payload"]
         if envelope.get("game_id"):
             state["game_id"] = envelope["game_id"]
+
+        logger.info(
+            "received %s", msg_type,
+            extra={"message_id": envelope.get("message_id"), "game_id": envelope.get("game_id")})
 
         if msg_type in (protocol.STATE_SNAPSHOT, protocol.RENDER_STATE):
             state["board_rows"] = payload["board"]
@@ -271,14 +284,22 @@ async def run(websocket, my_username, board_image_path=DEFAULT_BOARD_IMAGE_PATH,
     engine_view = NetworkEngineView()
 
     def send_move_request(from_row, from_col, to_row, to_col):
-        asyncio.create_task(websocket.send(schemas.encode(schemas.make_envelope(
+        envelope = schemas.make_envelope(
             protocol.MOVE_REQUEST,
             {"from_row": from_row, "from_col": from_col, "to_row": to_row, "to_col": to_col},
-            game_id=state["game_id"]))))
+            game_id=state["game_id"])
+        logger.info(
+            "sending move_request",
+            extra={"message_id": envelope["message_id"], "game_id": envelope["game_id"]})
+        asyncio.create_task(websocket.send(schemas.encode(envelope)))
 
     def send_jump_request(row, col):
-        asyncio.create_task(websocket.send(schemas.encode(schemas.make_envelope(
-            protocol.JUMP_REQUEST, {"row": row, "col": col}, game_id=state["game_id"]))))
+        envelope = schemas.make_envelope(
+            protocol.JUMP_REQUEST, {"row": row, "col": col}, game_id=state["game_id"])
+        logger.info(
+            "sending jump_request",
+            extra={"message_id": envelope["message_id"], "game_id": envelope["game_id"]})
+        asyncio.create_task(websocket.send(schemas.encode(envelope)))
 
     controller = NetworkGameController(my_color, send_move_request, send_jump_request, engine=engine_view)
     moves_log = MovesLogObserver(len(board_rows))
