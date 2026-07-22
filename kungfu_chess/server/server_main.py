@@ -30,9 +30,11 @@ async def _tick_loop(game_service, gateway, tick_interval_ms=TICK_INTERVAL_MS): 
     followed by a render_state broadcast (Phase F Milestone 1) so any
     connected networked GUI client can animate the in-between motion,
     not just the discrete before/after board states. The matchmaking
-    clock (Phase C) advances every tick regardless of any game's
-    activity - Decision 5's 1-minute timeout keeps counting down even
-    while every game in progress is idle."""
+    clock (Phase C) and the connection/reconnection clock (Phase D) both
+    advance every tick regardless of any game's activity - Decision 5's
+    1-minute matchmaking timeout and Decision 7's 20-second disconnect
+    grace period both keep counting down even while every game in
+    progress is idle."""
     while True:
         await asyncio.sleep(tick_interval_ms / 1000)
         for game_id, session in game_service.sessions().items():
@@ -40,6 +42,7 @@ async def _tick_loop(game_service, gateway, tick_interval_ms=TICK_INTERVAL_MS): 
                 await game_service.tick(game_id, tick_interval_ms)
                 await gateway.broadcast_render_state(game_id, session)
         await gateway.advance_matchmaking_clock(tick_interval_ms)
+        await gateway.advance_connection_clock(tick_interval_ms)
 
 
 async def run(host=HOST, port=PORT, db_path=DB_PATH):  # pragma: no cover

@@ -691,4 +691,67 @@ class TestGameOverEventPublishing:
         engine.request_move(0, 0, 0, 1)
         engine.advance_time(1000)
 
+
+class TestForceWin:
+    """Master Plan v2 Section 10.3/Decision 7: a disconnect-timeout
+    forfeit ends the game the exact same way any other win does - via
+    GameOverEvent - without any arrival triggering it."""
+
+    def test_sets_game_over_and_winner(self):
+        board = make_board([["wR", "bK"]])
+        engine = GameEngine(board, jump_duration_ms=1000)
+
+        engine.force_win("b")
+
+        assert engine.game_over is True
+        assert engine.winner == "b"
+
+    def test_publishes_a_game_over_event(self):
+        board = make_board([["wR", "bK"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.force_win("b")
+
+        assert len(received) == 1
+        assert isinstance(received[0], GameOverEvent)
+        assert received[0].winner == "b"
+
+    def test_the_published_event_has_reason_forfeit_not_king_capture(self):
+        board = make_board([["wR", "bK"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+
+        engine.force_win("b")
+
+        assert received[0].reason == "forfeit"
+
+    def test_no_event_bus_is_fine(self):
+        board = make_board([["wR", "bK"]])
+        engine = GameEngine(board, jump_duration_ms=1000)  # no event_bus
+        engine.force_win("w")  # must not raise
+        assert engine.winner == "w"
+
+    def test_is_a_no_op_once_the_game_is_already_over(self):
+        # A forfeit must never overwrite a game that already ended
+        # naturally (e.g. a king capture that resolved microseconds
+        # before the disconnect grace period would have expired).
+        board = make_board([["wR", "bK"]])
+        bus = EventBus()
+        received = []
+        bus.subscribe(received.append)
+        engine = GameEngine(board, jump_duration_ms=1000, event_bus=bus)
+        engine.request_move(0, 0, 0, 1)
+        engine.advance_time(1000)  # white already won by king capture
+        received.clear()
+
+        engine.force_win("b")
+
+        assert engine.winner == "w"  # unchanged
+        assert received == []  # no second GameOverEvent
+
         assert [e for e in received if isinstance(e, GameOverEvent)] == []

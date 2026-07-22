@@ -47,7 +47,12 @@ class TestMoveRejectedEvent:
 
 class TestGameEndedEvent:
     def test_stores_all_fields(self):
-        event = GameEndedEvent(game_id="g_1", winner="w", timestamp_ms=9000)
+        event = GameEndedEvent(game_id="g_1", winner="w", timestamp_ms=9000, reason="forfeit")
         assert event.game_id == "g_1"
         assert event.winner == "w"
         assert event.timestamp_ms == 9000
+        assert event.reason == "forfeit"
+
+    def test_reason_defaults_to_king_capture(self):
+        event = GameEndedEvent(game_id="g_1", winner="w")
+        assert event.reason == "king_capture"

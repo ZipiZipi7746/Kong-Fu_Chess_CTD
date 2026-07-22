@@ -258,3 +258,50 @@ class TestRatingApplication:
 
         await service.handle_move_request(session.game_id, "alice", 0, 0, 0, 1)
         await service.tick(session.game_id, 1000)  # must not raise
+
+
+class TestForfeit:
+    """Master Plan v2 Section 10.3/Decision 7: a disconnect-timeout
+    forfeit ends the game through the exact same GameOverEvent ->
+    GameEndedEvent path as any other win - including rating
+    application for a rated game."""
+
+    @pytest.mark.asyncio
+    async def test_the_opponent_of_the_forfeiting_player_wins(self):
+        service, bus = make_service()
+        session = service.create_session(white="alice", black="bob")
+        received = subscribe(bus, GameEndedEvent)
+
+        await service.forfeit(session.game_id, "alice")
+
+        assert session.engine.game_over is True
+        assert session.engine.winner == "b"
+        assert len(received) == 1
+        assert received[0].winner == "b"
+
+    @pytest.mark.asyncio
+    async def test_a_rated_games_forfeit_still_applies_rating(self):
+        repository = InMemoryUserRepository()
+        repository.add("alice", "hash", "salt", 1200)
+        repository.add("bob", "hash", "salt", 1200)
+        service, bus = make_service(user_repository=repository)
+        session = service.create_session(white="alice", black="bob", rated=True)
+
+        await service.forfeit(session.game_id, "alice")
+
+        assert repository.get_by_username("bob").rating == 1216
+        assert repository.get_by_username("alice").rating == 1184
+
+    @pytest.mark.asyncio
+    async def test_forfeiting_an_unknown_game_id_is_a_noop(self):
+        service, bus = make_service()
+        await service.forfeit("nonexistent", "alice")  # must not raise
+
+    @pytest.mark.asyncio
+    async def test_forfeiting_an_identity_not_in_the_game_is_a_noop(self):
+        service, bus = make_service()
+        session = service.create_session(white="alice", black="bob")
+
+        await service.forfeit(session.game_id, "mallory")
+
+        assert session.engine.game_over is False

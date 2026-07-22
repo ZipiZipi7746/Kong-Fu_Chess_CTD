@@ -45,13 +45,14 @@ not&nbsp;built&nbsp;ahead&nbsp;of&nbsp;a&nbsp;consumer&nbsp;that&nbsp;needs&nbsp
 <td class="section-title" colspan=3>&nbsp;<br><a name="GameEndedEvent">class <strong>GameEndedEvent</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
     
 <tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
-<td class="decor title-decor" colspan=2><span class="code"><a href="#GameEndedEvent">GameEndedEvent</a>(game_id,&nbsp;winner,&nbsp;timestamp_ms=0)<br>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameEndedEvent">GameEndedEvent</a>(game_id,&nbsp;winner,&nbsp;timestamp_ms=0,&nbsp;reason='king_capture')<br>
 &nbsp;<br>
 GameService's&nbsp;translation&nbsp;of&nbsp;a&nbsp;domain&nbsp;GameOverEvent,&nbsp;with&nbsp;game_id<br>
-attached.<br>&nbsp;</span></td></tr>
+attached.&nbsp;reason&nbsp;passes&nbsp;through&nbsp;GameOverEvent.reason&nbsp;unchanged<br>
+("king_capture"&nbsp;or&nbsp;Decision&nbsp;7's&nbsp;"forfeit").<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
-<dl><dt><a name="GameEndedEvent-__init__"><strong>__init__</strong></a>(self, game_id, winner, timestamp_ms=0)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+<dl><dt><a name="GameEndedEvent-__init__"><strong>__init__</strong></a>(self, game_id, winner, timestamp_ms=0, reason='king_capture')</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>

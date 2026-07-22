@@ -57,9 +57,11 @@ class MoveRejectedEvent:
 
 class GameEndedEvent:
     """GameService's translation of a domain GameOverEvent, with game_id
-    attached."""
+    attached. reason passes through GameOverEvent.reason unchanged
+    ("king_capture" or Decision 7's "forfeit")."""
 
-    def __init__(self, game_id, winner, timestamp_ms=0):
+    def __init__(self, game_id, winner, timestamp_ms=0, reason="king_capture"):
         self.game_id = game_id
         self.winner = winner
         self.timestamp_ms = timestamp_ms
+        self.reason = reason

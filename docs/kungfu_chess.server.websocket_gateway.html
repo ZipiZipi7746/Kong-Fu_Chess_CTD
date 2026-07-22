@@ -27,10 +27,20 @@ always&nbsp;rated&nbsp;(Decision&nbsp;14);&nbsp;quick_local&nbsp;is&nbsp;not&nbs
 &nbsp;<br>
 Phase&nbsp;B&nbsp;replaces&nbsp;the&nbsp;password-less&nbsp;"connect"&nbsp;message&nbsp;with&nbsp;the&nbsp;permanent<br>
 CLI&nbsp;login&nbsp;flow&nbsp;(Decision&nbsp;2):&nbsp;"register"&nbsp;creates&nbsp;an&nbsp;account,&nbsp;"login"<br>
-authenticates&nbsp;and&nbsp;returns&nbsp;a&nbsp;session&nbsp;token&nbsp;(Decision&nbsp;7&nbsp;-&nbsp;consumed&nbsp;fully<br>
-once&nbsp;Phase&nbsp;D&nbsp;adds&nbsp;reconnection).&nbsp;GameSession.color_for/white/black&nbsp;are<br>
-still&nbsp;plain&nbsp;display-name&nbsp;strings&nbsp;(unchanged&nbsp;from&nbsp;Phase&nbsp;A)&nbsp;-&nbsp;only&nbsp;the<br>
-identification&nbsp;step&nbsp;gained&nbsp;real&nbsp;credentials.</span></p>
+authenticates&nbsp;and&nbsp;returns&nbsp;a&nbsp;session&nbsp;token.&nbsp;Phase&nbsp;D&nbsp;consumes&nbsp;that&nbsp;token<br>
+fully:&nbsp;a&nbsp;mid-game&nbsp;disconnect&nbsp;starts&nbsp;a&nbsp;grace-period&nbsp;timer&nbsp;(Decision&nbsp;7)<br>
+and&nbsp;notifies&nbsp;the&nbsp;opponent&nbsp;("player_disconnected");&nbsp;a&nbsp;"reconnect"&nbsp;message<br>
+carrying&nbsp;the&nbsp;token&nbsp;rebinds&nbsp;the&nbsp;new&nbsp;connection&nbsp;to&nbsp;the&nbsp;same&nbsp;GameSession<br>
+and&nbsp;sends&nbsp;one&nbsp;fresh&nbsp;state_snapshot&nbsp;(never&nbsp;an&nbsp;event&nbsp;replay&nbsp;-&nbsp;see<br>
+Section&nbsp;3.1's&nbsp;board-sync&nbsp;guarantee)&nbsp;if&nbsp;the&nbsp;window&nbsp;hasn't&nbsp;elapsed.<br>
+GameSession.color_for/white/black&nbsp;are&nbsp;still&nbsp;plain&nbsp;display-name&nbsp;strings<br>
+(unchanged&nbsp;from&nbsp;Phase&nbsp;A)&nbsp;-&nbsp;only&nbsp;the&nbsp;identification&nbsp;step&nbsp;gained&nbsp;real<br>
+credentials.<br>
+&nbsp;<br>
+Also&nbsp;guards&nbsp;against&nbsp;a&nbsp;duplicate&nbsp;move_request&nbsp;retry&nbsp;(Section&nbsp;3.3's<br>
+hardening&nbsp;note):&nbsp;an&nbsp;already-scheduled&nbsp;move's&nbsp;message_id&nbsp;is&nbsp;cached&nbsp;and<br>
+its&nbsp;response&nbsp;replayed&nbsp;rather&nbsp;than&nbsp;reprocessed,&nbsp;so&nbsp;a&nbsp;client&nbsp;resending<br>
+after&nbsp;a&nbsp;lost&nbsp;ack&nbsp;can&nbsp;never&nbsp;schedule&nbsp;the&nbsp;same&nbsp;Motion&nbsp;twice.</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -67,7 +77,8 @@ identification&nbsp;step&nbsp;gained&nbsp;real&nbsp;credentials.</span></p>
 &nbsp;&nbsp;&nbsp;&nbsp;message_bus,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;connection_manager=None,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;auth_service=None,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;matchmaking_service=None<br>
+&nbsp;&nbsp;&nbsp;&nbsp;matchmaking_service=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;connection_service=None<br>
 )<br>
 &nbsp;<br>
 <br>&nbsp;</span></td></tr>
@@ -79,8 +90,11 @@ identification&nbsp;step&nbsp;gained&nbsp;real&nbsp;credentials.</span></p>
     message_bus,
     connection_manager=None,
     auth_service=None,
-    matchmaking_service=None
+    matchmaking_service=None,
+    connection_service=None
 )</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt>async <a name="WebSocketGateway-advance_connection_clock"><strong>advance_connection_clock</strong></a>(self, ms)</dt></dl>
 
 <dl><dt>async <a name="WebSocketGateway-advance_matchmaking_clock"><strong>advance_matchmaking_clock</strong></a>(self, ms)</dt></dl>
 

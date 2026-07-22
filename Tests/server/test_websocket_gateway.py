@@ -502,6 +502,167 @@ class TestDisconnection:
                 assert snapshot["type"] == "state_snapshot"
 
 
+class TestReconnection:
+    """Master Plan v2 Section 10.3/Decision 7: a mid-game disconnect
+    notifies the opponent and gives the affected player a grace window
+    to reconnect with their session token and resume the exact same
+    GameSession - closing the Section 3.3/3.4 board-sync gap."""
+
+    @pytest.mark.asyncio
+    async def test_disconnecting_mid_game_notifies_the_opponent(self):
+        async with running_gateway() as (gateway, service, url):
+            white_ws = await websockets.connect(url)
+            black_ws = await websockets.connect(url)
+            try:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+
+                await black_ws.close()
+                await asyncio.sleep(0.05)  # let the server observe the close
+
+                notice = await recv(white_ws)
+                assert notice["type"] == "player_disconnected"
+                assert notice["payload"]["grace_period_ms"] > 0
+            finally:
+                await white_ws.close()
+
+    @pytest.mark.asyncio
+    async def test_reconnecting_with_the_session_token_resumes_the_same_game(self):
+        async with running_gateway() as (gateway, service, url):
+            white_ws = await websockets.connect(url)
+            black_ws = await websockets.connect(url)
+            try:
+                await register_and_login(white_ws, "alice")
+                black_login = await register_and_login(black_ws, "bob")
+                black_token = black_login["payload"]["session_token"]
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+                game_id = white_snapshot["game_id"]
+
+                await black_ws.close()
+                await asyncio.sleep(0.05)
+                await recv(white_ws)  # player_disconnected
+
+                async with websockets.connect(url) as reconnect_ws:
+                    await send(reconnect_ws, "reconnect", {"session_token": black_token})
+                    snapshot = await recv(reconnect_ws)
+                    assert snapshot["type"] == "state_snapshot"
+                    assert snapshot["game_id"] == game_id
+            finally:
+                await white_ws.close()
+
+    @pytest.mark.asyncio
+    async def test_a_reconnected_player_can_move_again(self):
+        async with running_gateway() as (gateway, service, url):
+            white_ws = await websockets.connect(url)
+            black_ws = await websockets.connect(url)
+            try:
+                white_login = await register_and_login(white_ws, "alice")
+                white_token = white_login["payload"]["session_token"]
+                await register_and_login(black_ws, "bob")
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+                game_id = white_snapshot["game_id"]
+
+                await white_ws.close()
+                await asyncio.sleep(0.05)
+                await recv(black_ws)  # player_disconnected
+
+                async with websockets.connect(url) as reconnect_ws:
+                    await send(reconnect_ws, "reconnect", {"session_token": white_token})
+                    await recv(reconnect_ws)  # state_snapshot
+
+                    await send(reconnect_ws, "move_request",
+                               {"from_row": 6, "from_col": 4, "to_row": 5, "to_col": 4},
+                               game_id=game_id)
+                    accepted = await recv(reconnect_ws)
+                    assert accepted["type"] == "move_accepted"
+            finally:
+                await black_ws.close()
+
+    @pytest.mark.asyncio
+    async def test_a_player_who_never_reconnects_forfeits_and_the_opponent_is_notified(self):
+        async with running_gateway() as (gateway, service, url):
+            white_ws = await websockets.connect(url)
+            black_ws = await websockets.connect(url)
+            try:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+
+                await black_ws.close()
+                await asyncio.sleep(0.05)
+                await recv(white_ws)  # player_disconnected
+
+                await gateway.advance_connection_clock(20_000)
+
+                game_over = await recv(white_ws)
+                assert game_over["type"] == "game_over"
+                assert game_over["payload"]["winner"] == "w"
+                assert game_over["payload"]["reason"] == "forfeit"
+            finally:
+                await white_ws.close()
+
+    @pytest.mark.asyncio
+    async def test_reconnecting_with_an_unknown_token_is_rejected_cleanly(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await send(ws, "reconnect", {"session_token": "not-a-real-token"})
+                response = await recv(ws)
+                assert response["type"] == "error"
+                assert response["payload"]["code"] == "NO_RECONNECTABLE_GAME"
+
+    @pytest.mark.asyncio
+    async def test_duplicate_move_request_message_id_is_not_double_applied(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await send(white_ws, "join_game", {"mode": "quick_local"})
+                await send(black_ws, "join_game", {"mode": "quick_local"})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)
+                await recv(black_ws)
+                game_id = white_snapshot["game_id"]
+
+                envelope = schemas.make_envelope(
+                    "move_request", {"from_row": 6, "from_col": 4, "to_row": 5, "to_col": 4},
+                    game_id=game_id, message_id="fixed-id-1")
+                await white_ws.send(schemas.encode(envelope))
+                first_response = await recv(white_ws)
+                assert first_response["type"] == "move_accepted"
+
+                # A retry with the exact same message_id (e.g. a flaky
+                # connection resending after a lost ack) must not
+                # schedule a second Motion for the same piece.
+                await white_ws.send(schemas.encode(envelope))
+                second_response = await recv(white_ws)
+                assert second_response == first_response
+
+                session = service.get_session(game_id)
+                assert len(session.engine.arbiter.pending_motions) == 1
+
+
 class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_malformed_message_receives_an_error_without_closing_the_connection(self):

@@ -20,11 +20,18 @@ class GameOverEvent:
     GameEngine.game_over transitions from False to True. Carries only
     domain values (no game_id/user_id - those are an application-layer
     concern, added by whatever translates this into a network message),
-    same design as MoveResolvedEvent."""
+    same design as MoveResolvedEvent.
 
-    def __init__(self, winner, timestamp_ms=0):
+    reason defaults to "king_capture" - today's only real WinCondition -
+    and is overridden explicitly by GameEngine.force_win's "forfeit"
+    (Master Plan v2 Section 10.3/Decision 7). Not generalized further
+    (e.g. into a reason enum/registry) until a second real reason beyond
+    these two actually exists."""
+
+    def __init__(self, winner, timestamp_ms=0, reason="king_capture"):
         self.winner = winner
         self.timestamp_ms = timestamp_ms
+        self.reason = reason
 
 
 class EventBus:

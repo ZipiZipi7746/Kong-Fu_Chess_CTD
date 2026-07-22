@@ -69,6 +69,13 @@ published&nbsp;directly&nbsp;by&nbsp;<a href="#GameService-create_session">creat
     rated=False
 )</dt></dl>
 
+<dl><dt>async <a name="GameService-forfeit"><strong>forfeit</strong></a>(self, game_id, forfeiting_identity)</dt><dd><span class="code">Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;10.3/Decision&nbsp;7:&nbsp;called&nbsp;once&nbsp;a<br>
+disconnected&nbsp;player's&nbsp;grace&nbsp;period&nbsp;has&nbsp;elapsed&nbsp;with&nbsp;no<br>
+reconnect.&nbsp;Ends&nbsp;the&nbsp;game&nbsp;via&nbsp;GameEngine.force_win&nbsp;-&nbsp;the&nbsp;same<br>
+GameOverEvent&nbsp;-&gt;&nbsp;GameEndedEvent&nbsp;path&nbsp;(and&nbsp;rating&nbsp;application,<br>
+for&nbsp;a&nbsp;rated&nbsp;game)&nbsp;as&nbsp;any&nbsp;other&nbsp;win,&nbsp;just&nbsp;for&nbsp;the&nbsp;opponent&nbsp;of<br>
+whoever&nbsp;failed&nbsp;to&nbsp;return&nbsp;in&nbsp;time.</span></dd></dl>
+
 <dl><dt><a name="GameService-get_session"><strong>get_session</strong></a>(self, game_id)</dt></dl>
 
 <dl><dt>async <a name="GameService-handle_jump_request"><strong>handle_jump_request</strong></a>(self, game_id, requester, row, col)</dt></dl>

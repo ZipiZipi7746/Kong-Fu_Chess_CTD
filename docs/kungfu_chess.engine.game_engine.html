@@ -95,6 +95,13 @@ game;&nbsp;defaults&nbsp;to&nbsp;CaptureKingWinCondition&nbsp;(Rule&nbsp;11).</s
 (row,&nbsp;col),&nbsp;or&nbsp;None&nbsp;if&nbsp;it&nbsp;isn't&nbsp;on&nbsp;cooldown.&nbsp;Purely&nbsp;for&nbsp;the&nbsp;UI<br>
 to&nbsp;draw&nbsp;a&nbsp;sandclock-style&nbsp;fill&nbsp;-&nbsp;never&nbsp;affects&nbsp;game&nbsp;rules.</span></dd></dl>
 
+<dl><dt><a name="GameEngine-force_win"><strong>force_win</strong></a>(self, winner)</dt><dd><span class="code">Ends&nbsp;the&nbsp;game&nbsp;immediately&nbsp;for&nbsp;the&nbsp;given&nbsp;winner,&nbsp;without&nbsp;any<br>
+arrival&nbsp;triggering&nbsp;it&nbsp;-&nbsp;Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;10.3/Decision&nbsp;7's<br>
+disconnect-timeout&nbsp;forfeit.&nbsp;Publishes&nbsp;GameOverEvent&nbsp;exactly&nbsp;like<br>
+any&nbsp;other&nbsp;win&nbsp;(Section&nbsp;9's&nbsp;rating&nbsp;path&nbsp;treats&nbsp;a&nbsp;forfeit&nbsp;the&nbsp;same<br>
+as&nbsp;a&nbsp;king&nbsp;capture);&nbsp;a&nbsp;no-op&nbsp;if&nbsp;the&nbsp;game&nbsp;already&nbsp;ended,&nbsp;so&nbsp;a<br>
+forfeit&nbsp;can&nbsp;never&nbsp;overwrite&nbsp;a&nbsp;win&nbsp;that&nbsp;resolved&nbsp;first.</span></dd></dl>
+
 <dl><dt><a name="GameEngine-has_pending_move_from"><strong>has_pending_move_from</strong></a>(self, row, col)</dt></dl>
 
 <dl><dt><a name="GameEngine-is_airborne"><strong>is_airborne</strong></a>(self, row, col)</dt></dl>

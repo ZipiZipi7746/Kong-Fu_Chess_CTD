@@ -63,3 +63,11 @@ class TestGameOverEvent:
     def test_stores_timestamp_ms_when_given(self):
         event = GameOverEvent(winner="b", timestamp_ms=5000)
         assert event.timestamp_ms == 5000
+
+    def test_reason_defaults_to_king_capture(self):
+        event = GameOverEvent(winner="w")
+        assert event.reason == "king_capture"
+
+    def test_stores_reason_when_given(self):
+        event = GameOverEvent(winner="w", reason="forfeit")
+        assert event.reason == "forfeit"

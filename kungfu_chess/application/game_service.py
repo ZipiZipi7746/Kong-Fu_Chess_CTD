@@ -114,7 +114,7 @@ class GameService:
                     self._apply_rating(session, event.winner)
                 self._message_bus.publish(GameEndedEvent(
                     game_id=session.game_id, winner=event.winner,
-                    timestamp_ms=event.timestamp_ms))
+                    timestamp_ms=event.timestamp_ms, reason=event.reason))
         return translate
 
     def _apply_rating(self, session, winner):
@@ -173,3 +173,21 @@ class GameService:
 
         async with session.lock:
             session.engine.advance_time(elapsed_ms)
+
+    async def forfeit(self, game_id, forfeiting_identity):
+        """Master Plan v2 Section 10.3/Decision 7: called once a
+        disconnected player's grace period has elapsed with no
+        reconnect. Ends the game via GameEngine.force_win - the same
+        GameOverEvent -> GameEndedEvent path (and rating application,
+        for a rated game) as any other win, just for the opponent of
+        whoever failed to return in time."""
+        session = self._sessions.get(game_id)
+        if session is None:
+            return
+
+        async with session.lock:
+            color = session.color_for(forfeiting_identity)
+            if color is None:
+                return
+            winner = "b" if color == "w" else "w"
+            session.engine.force_win(winner)

@@ -57,17 +57,23 @@ Data descriptors defined here:<br>
 <td class="section-title" colspan=3>&nbsp;<br><a name="GameOverEvent">class <strong>GameOverEvent</strong></a>(<a href="builtins.html#object">builtins.object</a>)</td></tr>
     
 <tr><td class="decor title-decor" rowspan=2><span class="code">&nbsp;&nbsp;&nbsp;</span></td>
-<td class="decor title-decor" colspan=2><span class="code"><a href="#GameOverEvent">GameOverEvent</a>(winner,&nbsp;timestamp_ms=0)<br>
+<td class="decor title-decor" colspan=2><span class="code"><a href="#GameOverEvent">GameOverEvent</a>(winner,&nbsp;timestamp_ms=0,&nbsp;reason='king_capture')<br>
 &nbsp;<br>
 Published&nbsp;the&nbsp;instant&nbsp;a&nbsp;resolved&nbsp;arrival's&nbsp;injected&nbsp;WinCondition<br>
 (see&nbsp;rules/win_condition.py)&nbsp;declares&nbsp;a&nbsp;winner&nbsp;-&nbsp;i.e.&nbsp;exactly&nbsp;when<br>
 GameEngine.game_over&nbsp;transitions&nbsp;from&nbsp;False&nbsp;to&nbsp;True.&nbsp;Carries&nbsp;only<br>
 domain&nbsp;values&nbsp;(no&nbsp;game_id/user_id&nbsp;-&nbsp;those&nbsp;are&nbsp;an&nbsp;application-layer<br>
 concern,&nbsp;added&nbsp;by&nbsp;whatever&nbsp;translates&nbsp;this&nbsp;into&nbsp;a&nbsp;network&nbsp;message),<br>
-same&nbsp;design&nbsp;as&nbsp;<a href="#MoveResolvedEvent">MoveResolvedEvent</a>.<br>&nbsp;</span></td></tr>
+same&nbsp;design&nbsp;as&nbsp;<a href="#MoveResolvedEvent">MoveResolvedEvent</a>.<br>
+&nbsp;<br>
+reason&nbsp;defaults&nbsp;to&nbsp;"king_capture"&nbsp;-&nbsp;today's&nbsp;only&nbsp;real&nbsp;WinCondition&nbsp;-<br>
+and&nbsp;is&nbsp;overridden&nbsp;explicitly&nbsp;by&nbsp;GameEngine.force_win's&nbsp;"forfeit"<br>
+(Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;10.3/Decision&nbsp;7).&nbsp;Not&nbsp;generalized&nbsp;further<br>
+(e.g.&nbsp;into&nbsp;a&nbsp;reason&nbsp;enum/registry)&nbsp;until&nbsp;a&nbsp;second&nbsp;real&nbsp;reason&nbsp;beyond<br>
+these&nbsp;two&nbsp;actually&nbsp;exists.<br>&nbsp;</span></td></tr>
 <tr><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
-<dl><dt><a name="GameOverEvent-__init__"><strong>__init__</strong></a>(self, winner, timestamp_ms=0)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+<dl><dt><a name="GameOverEvent-__init__"><strong>__init__</strong></a>(self, winner, timestamp_ms=0, reason='king_capture')</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
 <hr>
 Data descriptors defined here:<br>

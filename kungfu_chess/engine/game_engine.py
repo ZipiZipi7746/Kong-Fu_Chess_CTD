@@ -154,6 +154,21 @@ class GameEngine:
         for motion in self.arbiter.advance(ms):
             self._resolve_motion(motion)
 
+    def force_win(self, winner):
+        """Ends the game immediately for the given winner, without any
+        arrival triggering it - Master Plan v2 Section 10.3/Decision 7's
+        disconnect-timeout forfeit. Publishes GameOverEvent exactly like
+        any other win (Section 9's rating path treats a forfeit the same
+        as a king capture); a no-op if the game already ended, so a
+        forfeit can never overwrite a win that resolved first."""
+        if self.game_over:
+            return
+        self.game_over = True
+        self.winner = winner
+        if self.event_bus is not None:
+            self.event_bus.publish(GameOverEvent(
+                winner, timestamp_ms=self.arbiter.clock, reason="forfeit"))
+
     def _resolve_motion(self, motion):
         piece = self.board.get_cell(motion.from_row, motion.from_col)
 
