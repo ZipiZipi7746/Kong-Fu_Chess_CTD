@@ -18,7 +18,18 @@ surface,&nbsp;without&nbsp;either&nbsp;of&nbsp;them&nbsp;needing&nbsp;to&nbsp;kn
 Holds&nbsp;no&nbsp;board-legality&nbsp;logic&nbsp;and&nbsp;imports&nbsp;nothing&nbsp;from<br>
 kungfu_chess.rules/realtime/model&nbsp;-&nbsp;it&nbsp;only&nbsp;ever&nbsp;remembers&nbsp;whatever&nbsp;the<br>
 server's&nbsp;most&nbsp;recent&nbsp;render_state&nbsp;said&nbsp;(Master&nbsp;Plan&nbsp;v2&nbsp;Section&nbsp;1's&nbsp;hard<br>
-rule:&nbsp;the&nbsp;client&nbsp;only&nbsp;ever&nbsp;renders&nbsp;and&nbsp;requests).</span></p>
+rule:&nbsp;the&nbsp;client&nbsp;only&nbsp;ever&nbsp;renders&nbsp;and&nbsp;requests).<br>
+&nbsp;<br>
+The&nbsp;server&nbsp;only&nbsp;broadcasts&nbsp;a&nbsp;fresh&nbsp;render_state&nbsp;every&nbsp;~75ms<br>
+(server_main.py's&nbsp;TICK_INTERVAL_MS),&nbsp;but&nbsp;the&nbsp;render&nbsp;loop&nbsp;draws&nbsp;far&nbsp;more<br>
+often&nbsp;-&nbsp;advance(dt_ms)&nbsp;accumulates&nbsp;real&nbsp;per-frame&nbsp;time&nbsp;since&nbsp;the&nbsp;last<br>
+update()&nbsp;so&nbsp;motion_progress()&nbsp;can&nbsp;extrapolate&nbsp;smoothly&nbsp;between&nbsp;server<br>
+ticks&nbsp;using&nbsp;the&nbsp;progress&nbsp;rate&nbsp;observed&nbsp;across&nbsp;the&nbsp;last&nbsp;two&nbsp;updates,<br>
+rather&nbsp;than&nbsp;holding&nbsp;a&nbsp;motion&nbsp;frozen&nbsp;for&nbsp;~75ms&nbsp;then&nbsp;jumping.&nbsp;This&nbsp;is&nbsp;pure<br>
+polish:&nbsp;the&nbsp;server's&nbsp;own&nbsp;progress&nbsp;value&nbsp;is&nbsp;still&nbsp;authoritative,&nbsp;and<br>
+extrapolation&nbsp;is&nbsp;capped&nbsp;short&nbsp;of&nbsp;full&nbsp;arrival&nbsp;so&nbsp;a&nbsp;motion&nbsp;is&nbsp;never&nbsp;shown<br>
+as&nbsp;complete&nbsp;before&nbsp;the&nbsp;server&nbsp;itself&nbsp;says&nbsp;so&nbsp;(has_pending_move_from&nbsp;is<br>
+unaffected).</span></p>
 <p>
 <table class="section">
 <tr class="decor index-decor heading-text">
@@ -41,6 +52,8 @@ rule:&nbsp;the&nbsp;client&nbsp;only&nbsp;ever&nbsp;renders&nbsp;and&nbsp;reques
 <tr><td class="decor title-decor"><span class="code">&nbsp;&nbsp;&nbsp;</span></td><td>&nbsp;</td>
 <td class="singlecolumn">Methods defined here:<br>
 <dl><dt><a name="NetworkEngineView-__init__"><strong>__init__</strong></a>(self)</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
+
+<dl><dt><a name="NetworkEngineView-advance"><strong>advance</strong></a>(self, dt_ms)</dt></dl>
 
 <dl><dt><a name="NetworkEngineView-cooldown_progress"><strong>cooldown_progress</strong></a>(self, row, col)</dt></dl>
 

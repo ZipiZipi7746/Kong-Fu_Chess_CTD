@@ -236,6 +236,11 @@ async def _render_loop(state, controller, moves_log, score,  # pragma: no cover
         cell_w = image_w // cols
         cell_h = image_h // rows
 
+        # Smooths in-flight motions between the server's own ~75ms ticks
+        # (network_engine_view.py) - purely a rendering-side extrapolation,
+        # never a source of truth about whether a motion has arrived.
+        controller.engine.advance(dt_ms)
+
         _draw_cell_highlights(board_renderer, board, controller, cell_w, cell_h)
         registry.render(board, board_renderer, controller.engine, image_w, image_h, dt_ms)
         board_canvas.draw_on(content, board_x, 0)

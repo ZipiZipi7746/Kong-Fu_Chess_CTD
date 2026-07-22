@@ -1,3 +1,5 @@
+import pytest
+
 from kungfu_chess.gui.network.network_engine_view import NetworkEngineView
 
 
@@ -77,3 +79,56 @@ class TestUpdate:
         assert view.has_pending_move_from(0, 0) is False
         assert view.is_airborne(0, 0) is False
         assert view.is_on_cooldown(0, 0) is False
+
+
+class TestMotionProgressExtrapolation:
+    """The server only broadcasts a fresh render_state every ~75ms
+    (server_main.py's TICK_INTERVAL_MS), but the render loop draws at a
+    much higher frame rate - without smoothing, a piece would visibly
+    jump in ~75ms steps. advance(dt_ms) accumulates real per-frame time
+    between two server updates; once two updates for the same in-flight
+    motion are seen, the progress rate between them is used to
+    extrapolate motion_progress() smoothly for the frames in between."""
+
+    def test_first_sighting_of_a_motion_has_no_rate_yet_and_returns_the_raw_value(self):
+        view = NetworkEngineView()
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.0}]))
+        view.advance(50)
+        assert view.motion_progress(6, 4) == 0.0
+
+    def test_extrapolates_using_the_rate_between_two_updates(self):
+        view = NetworkEngineView()
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.0}]))
+        view.advance(75)
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.2}]))
+        # Rate established: 0.2 progress / 75ms. Halfway to the next
+        # server update, the piece should be roughly halfway further.
+        view.advance(37.5)
+        assert view.motion_progress(6, 4) == pytest.approx(0.3)
+
+    def test_extrapolated_progress_never_reaches_full_arrival_before_the_server_confirms_it(self):
+        view = NetworkEngineView()
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.0}]))
+        view.advance(75)
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.2}]))
+        view.advance(10_000)  # far longer than the server actually took
+        assert view.motion_progress(6, 4) < 1.0
+
+    def test_a_motion_starting_fresh_at_a_previously_tracked_cell_does_not_inherit_the_old_rate(self):
+        view = NetworkEngineView()
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.0}]))
+        view.advance(75)
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.2}]))
+        view.advance(75)
+        view.update(make_render_state())  # the motion arrived - nothing in flight
+        view.advance(75)
+        # A brand new motion happens to start from the same cell.
+        view.update(make_render_state(motions=[{"from": [6, 4], "to": [5, 4], "progress": 0.0}]))
+        view.advance(37.5)
+        assert view.motion_progress(6, 4) == 0.0
+
+    def test_cooldown_progress_is_not_extrapolated(self):
+        view = NetworkEngineView()
+        view.update(make_render_state(cooldowns=[{"row": 2, "col": 2, "progress": 0.5}]))
+        view.advance(1000)
+        assert view.cooldown_progress(2, 2) == 0.5
