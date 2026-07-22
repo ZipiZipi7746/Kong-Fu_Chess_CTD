@@ -30,6 +30,20 @@ Also guards against a duplicate move_request retry (Section 3.3's
 hardening note): an already-scheduled move's message_id is cached and
 its response replayed rather than reprocessed, so a client resending
 after a lost ack can never schedule the same Motion twice.
+
+Phase E adds "create_room"/"join_room": the creator is White, the
+second joiner is Black (starting a rated GameSession exactly like
+"play" does), and everyone after that is a read-only spectator -
+RoomService enforces the spectator cap and room-membership rules;
+this module only translates that into wire messages and, for a
+spectator, one catch-up state_snapshot (never an event replay, same
+guarantee as a fresh join or a reconnect). _broadcast/connections_in_game
+already generalize to "everyone in this game, players and spectators
+alike" - a spectator connection is just another entry returned by
+connections_in_game, not a special case. A spectator's move_request is
+already rejected with no new authorization code: GameSession.color_for
+returns None for anyone who isn't white/black, and
+GameService.handle_move_request already rejects a None color.
 """
 
 import asyncio
@@ -40,6 +54,11 @@ from kungfu_chess.application import dto
 from kungfu_chess.application.auth_service import AuthenticationService, InvalidCredentialsError
 from kungfu_chess.application.connection_service import ConnectionService
 from kungfu_chess.application.matchmaking_service import MatchmakingService
+from kungfu_chess.application.room_service import (
+    RoomNotFoundError,
+    RoomService,
+    SpectatorCapExceededError,
+)
 from kungfu_chess.messaging.application_events import (
     GameStartedEvent,
     GameMoveAppliedEvent,
@@ -55,7 +74,8 @@ logger = logging.getLogger(__name__)
 
 class WebSocketGateway:
     def __init__(self, game_service, message_bus, connection_manager=None,
-                 auth_service=None, matchmaking_service=None, connection_service=None):
+                 auth_service=None, matchmaking_service=None, connection_service=None,
+                 room_service=None):
         self._game_service = game_service
         self._message_bus = message_bus
         self._connections = connection_manager if connection_manager is not None else ConnectionManager()
@@ -64,6 +84,13 @@ class WebSocketGateway:
             matchmaking_service if matchmaking_service is not None else MatchmakingService())
         self._connection_service = (
             connection_service if connection_service is not None else ConnectionService())
+        self._room_service = room_service if room_service is not None else RoomService()
+        # room_id -> game_id, populated once a room's second joiner
+        # starts the GameSession - bridges RoomService's own rooms
+        # (which know nothing about GameService) and GameService's
+        # sessions (which know nothing about rooms), so a later
+        # spectator join_room can find the right session to catch up on.
+        self._game_id_by_room_id = {}
         self._quick_local_waiting_connection_id = None
         # Two independent monotonic counters, each driven only by their
         # own advance_*_clock method (server_main.py's tick loop calls
@@ -99,8 +126,12 @@ class WebSocketGateway:
             self._connections.unregister(connection_id)
 
     async def _handle_disconnect(self, connection_id):
-        game_id = self._connections.get_game_id(connection_id)
+        room_id = self._connections.get_room_id(connection_id)
         identity = self._connections.get_identity(connection_id)
+        if room_id is not None and identity is not None:
+            self._room_service.leave_room(room_id, identity)
+
+        game_id = self._connections.get_game_id(connection_id)
         if game_id is None or identity is None:
             return
 
@@ -110,18 +141,16 @@ class WebSocketGateway:
 
         self._connection_service.record_disconnect(game_id, identity, self._connection_clock_ms)
 
-        opponent_id = self._find_connection_in_game_other_than(game_id, identity)
-        if opponent_id is not None:
-            await self._send(self._connections.get_socket(opponent_id), schemas.make_envelope(
-                "player_disconnected",
-                {"grace_period_ms": self._connection_service.grace_period_ms},
-                game_id=game_id))
-
-    def _find_connection_in_game_other_than(self, game_id, identity):
-        for connection_id in self._connections.connections_in_game(game_id):
-            if self._connections.get_identity(connection_id) != identity:
-                return connection_id
-        return None
+        # Every other connection in the game - players and spectators
+        # alike (Phase E) - is notified, not just "the opponent".
+        notice = schemas.make_envelope(
+            "player_disconnected",
+            {"grace_period_ms": self._connection_service.grace_period_ms},
+            game_id=game_id)
+        for other_id in self._connections.connections_in_game(game_id):
+            if other_id == connection_id:
+                continue
+            await self._send(self._connections.get_socket(other_id), notice)
 
     # ---------------------------------------------------------------
     # Incoming client -> server messages
@@ -134,6 +163,8 @@ class WebSocketGateway:
         "join_game": "_handle_join_game",
         "play": "_handle_play",
         "cancel_matchmaking": "_handle_cancel_matchmaking",
+        "create_room": "_handle_create_room",
+        "join_room": "_handle_join_room",
         "move_request": "_handle_move_request",
         "jump_request": "_handle_jump_request",
         "ping": "_handle_ping",
@@ -246,6 +277,60 @@ class WebSocketGateway:
         if identity is not None:
             self._matchmaking_service.cancel(identity)
 
+    async def _handle_create_room(self, connection_id, websocket, envelope):
+        identity = self._connections.get_identity(connection_id)
+        if identity is None:
+            await self._send(websocket, schemas.make_envelope(
+                "error", {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
+            return
+
+        room = self._room_service.create_room(identity)
+        self._connections.set_room_id(connection_id, room.room_id)
+        await self._send(websocket, schemas.make_envelope(
+            "room_created", {"room_id": room.room_id}, correlation_id=envelope["message_id"]))
+
+    async def _handle_join_room(self, connection_id, websocket, envelope):
+        identity = self._connections.get_identity(connection_id)
+        if identity is None:
+            await self._send(websocket, schemas.make_envelope(
+                "error", {"code": "NOT_LOGGED_IN"}, correlation_id=envelope["message_id"]))
+            return
+
+        room_id = envelope["payload"].get("room_id")
+        try:
+            role = self._room_service.join_room(room_id, identity)
+        except RoomNotFoundError:
+            await self._send(websocket, schemas.make_envelope(
+                "error", {"code": "ROOM_NOT_FOUND"}, correlation_id=envelope["message_id"]))
+            return
+        except SpectatorCapExceededError:
+            await self._send(websocket, schemas.make_envelope(
+                "error", {"code": "SPECTATOR_CAP_EXCEEDED"}, correlation_id=envelope["message_id"]))
+            return
+
+        self._connections.set_room_id(connection_id, room_id)
+
+        if role == "black":
+            room = self._room_service.get_room(room_id)
+            white_id = self._connections.find_connection_by_identity(room.white)
+            if white_id is None:
+                return  # the creator vanished before anyone joined - nothing to start
+            session = await self._start_game(white_id, connection_id, rated=True)
+            self._game_id_by_room_id[room_id] = session.game_id
+            return
+
+        # role == "spectator": the game is already running - catch up
+        # with one full state_snapshot (Section 3.1's guarantee, same as
+        # a fresh join or a reconnect), then receive every future
+        # broadcast exactly like a player from here on.
+        game_id = self._game_id_by_room_id.get(room_id)
+        session = self._game_service.get_session(game_id) if game_id is not None else None
+        if session is None:
+            return
+        self._connections.set_game_id(connection_id, game_id)
+        await self._send(websocket, schemas.make_envelope(
+            "state_snapshot", dto.build_state_snapshot(session), game_id=game_id))
+
     async def _start_game(self, white_id, black_id, rated):
         session = self._game_service.create_session(
             white=self._connections.get_identity(white_id),
@@ -259,6 +344,7 @@ class WebSocketGateway:
             "state_snapshot", dto.build_state_snapshot(session), game_id=session.game_id)
         await self._send(self._connections.get_socket(white_id), snapshot_envelope)
         await self._send(self._connections.get_socket(black_id), snapshot_envelope)
+        return session
 
     async def _handle_move_request(self, connection_id, websocket, envelope):
         message_id = envelope["message_id"]

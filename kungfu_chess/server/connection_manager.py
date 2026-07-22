@@ -11,7 +11,8 @@ class ConnectionManager:
 
     def register(self, connection_id, socket):
         self._connections[connection_id] = {
-            "socket": socket, "identity": None, "game_id": None, "session_token": None}
+            "socket": socket, "identity": None, "game_id": None,
+            "session_token": None, "room_id": None}
 
     def unregister(self, connection_id):
         self._connections.pop(connection_id, None)
@@ -36,6 +37,12 @@ class ConnectionManager:
 
     def get_game_id(self, connection_id):
         return self._get(connection_id, "game_id")
+
+    def set_room_id(self, connection_id, room_id):
+        self._connections[connection_id]["room_id"] = room_id
+
+    def get_room_id(self, connection_id):
+        return self._get(connection_id, "room_id")
 
     def find_connection_by_identity(self, identity):
         for connection_id, info in self._connections.items():

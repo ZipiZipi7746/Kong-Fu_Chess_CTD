@@ -663,6 +663,187 @@ class TestReconnection:
                 assert len(session.engine.arbiter.pending_motions) == 1
 
 
+class TestRooms:
+    """Master Plan v2 Section 10.4/Decisions 8/9: room create/join,
+    creator=White, second joiner=Black, everyone after=read-only
+    spectator, capped and torn down per RoomService's own rules -
+    exercised here through the gateway's wire protocol."""
+
+    @pytest.mark.asyncio
+    async def test_creating_a_room_returns_a_room_id(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await register_and_login(ws, "alice")
+                await send(ws, "create_room", {})
+                response = await recv(ws)
+                assert response["type"] == "room_created"
+                assert 4 <= len(response["payload"]["room_id"]) <= 6
+
+    @pytest.mark.asyncio
+    async def test_the_second_joiner_starts_a_rated_game_as_black(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+
+                await send(white_ws, "create_room", {})
+                created = await recv(white_ws)
+                room_id = created["payload"]["room_id"]
+
+                await send(black_ws, "join_room", {"room_id": room_id})
+                white_snapshot = await recv(white_ws)
+                black_snapshot = await recv(black_ws)
+
+                assert white_snapshot["type"] == "state_snapshot"
+                assert white_snapshot["payload"] == black_snapshot["payload"]
+
+                game_id = white_snapshot["game_id"]
+                session = service.get_session(game_id)
+                assert session.rated is True
+                assert session.white == "alice"
+                assert session.black == "bob"
+
+    @pytest.mark.asyncio
+    async def test_a_third_joiner_becomes_a_spectator_and_catches_up_on_state(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws, \
+                    websockets.connect(url) as spectator_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await register_and_login(spectator_ws, "carol")
+
+                await send(white_ws, "create_room", {})
+                created = await recv(white_ws)
+                room_id = created["payload"]["room_id"]
+
+                await send(black_ws, "join_room", {"room_id": room_id})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+                game_id = white_snapshot["game_id"]
+
+                await send(spectator_ws, "join_room", {"room_id": room_id})
+                spectator_snapshot = await recv(spectator_ws)
+
+                assert spectator_snapshot["type"] == "state_snapshot"
+                assert spectator_snapshot["game_id"] == game_id
+                assert spectator_snapshot["payload"] == white_snapshot["payload"]
+
+    @pytest.mark.asyncio
+    async def test_a_spectator_receives_the_same_game_event_as_the_players(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws, \
+                    websockets.connect(url) as spectator_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await register_and_login(spectator_ws, "carol")
+
+                await send(white_ws, "create_room", {})
+                created = await recv(white_ws)
+                room_id = created["payload"]["room_id"]
+
+                await send(black_ws, "join_room", {"room_id": room_id})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+                game_id = white_snapshot["game_id"]
+
+                await send(spectator_ws, "join_room", {"room_id": room_id})
+                await recv(spectator_ws)  # state_snapshot catch-up
+
+                await send(white_ws, "move_request",
+                           {"from_row": 6, "from_col": 4, "to_row": 5, "to_col": 4},
+                           game_id=game_id)
+                await recv(white_ws)  # move_accepted
+                await service.tick(game_id, 1000)
+
+                white_event = await recv(white_ws)
+                black_event = await recv(black_ws)
+                spectator_event = await recv(spectator_ws)
+                assert spectator_event["type"] == "game_event"
+                assert spectator_event["payload"] == white_event["payload"] == black_event["payload"]
+
+    @pytest.mark.asyncio
+    async def test_a_spectators_move_request_is_rejected(self):
+        # No new authorization code needed - GameSession.color_for
+        # already returns None for anyone who isn't white/black, and
+        # GameService.handle_move_request already rejects a None color.
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as white_ws, websockets.connect(url) as black_ws, \
+                    websockets.connect(url) as spectator_ws:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await register_and_login(spectator_ws, "carol")
+
+                await send(white_ws, "create_room", {})
+                created = await recv(white_ws)
+                room_id = created["payload"]["room_id"]
+
+                await send(black_ws, "join_room", {"room_id": room_id})
+                white_snapshot = await recv(white_ws)
+                await recv(black_ws)
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+                game_id = white_snapshot["game_id"]
+
+                await send(spectator_ws, "join_room", {"room_id": room_id})
+                await recv(spectator_ws)
+
+                await send(spectator_ws, "move_request",
+                           {"from_row": 6, "from_col": 4, "to_row": 5, "to_col": 4},
+                           game_id=game_id)
+                rejected = await recv(spectator_ws)
+                assert rejected["type"] == "move_rejected"
+                assert rejected["payload"]["reason"] == "NOT_YOUR_TURN_OR_ACTION"
+
+    @pytest.mark.asyncio
+    async def test_joining_an_unknown_room_id_is_rejected_cleanly(self):
+        async with running_gateway() as (gateway, service, url):
+            async with websockets.connect(url) as ws:
+                await register_and_login(ws, "alice")
+                await send(ws, "join_room", {"room_id": "NOPE1"})
+                response = await recv(ws)
+                assert response["type"] == "error"
+                assert response["payload"]["code"] == "ROOM_NOT_FOUND"
+
+    @pytest.mark.asyncio
+    async def test_disconnecting_notifies_every_other_connection_in_the_game(self):
+        async with running_gateway() as (gateway, service, url):
+            white_ws = await websockets.connect(url)
+            black_ws = await websockets.connect(url)
+            spectator_ws = await websockets.connect(url)
+            try:
+                await register_and_login(white_ws, "alice")
+                await register_and_login(black_ws, "bob")
+                await register_and_login(spectator_ws, "carol")
+
+                await send(white_ws, "create_room", {})
+                created = await recv(white_ws)
+                room_id = created["payload"]["room_id"]
+
+                await send(black_ws, "join_room", {"room_id": room_id})
+                await recv(white_ws)  # state_snapshot
+                await recv(black_ws)  # state_snapshot
+                await recv(white_ws)  # game_started
+                await recv(black_ws)  # game_started
+
+                await send(spectator_ws, "join_room", {"room_id": room_id})
+                await recv(spectator_ws)
+
+                await black_ws.close()
+                await asyncio.sleep(0.05)
+
+                notice = await recv(white_ws)
+                assert notice["type"] == "player_disconnected"
+                spectator_notice = await recv(spectator_ws)
+                assert spectator_notice["type"] == "player_disconnected"
+            finally:
+                await white_ws.close()
+                await spectator_ws.close()
+
+
 class TestErrorHandling:
     @pytest.mark.asyncio
     async def test_malformed_message_receives_an_error_without_closing_the_connection(self):

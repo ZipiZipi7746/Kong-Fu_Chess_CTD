@@ -40,7 +40,21 @@ credentials.<br>
 Also&nbsp;guards&nbsp;against&nbsp;a&nbsp;duplicate&nbsp;move_request&nbsp;retry&nbsp;(Section&nbsp;3.3's<br>
 hardening&nbsp;note):&nbsp;an&nbsp;already-scheduled&nbsp;move's&nbsp;message_id&nbsp;is&nbsp;cached&nbsp;and<br>
 its&nbsp;response&nbsp;replayed&nbsp;rather&nbsp;than&nbsp;reprocessed,&nbsp;so&nbsp;a&nbsp;client&nbsp;resending<br>
-after&nbsp;a&nbsp;lost&nbsp;ack&nbsp;can&nbsp;never&nbsp;schedule&nbsp;the&nbsp;same&nbsp;Motion&nbsp;twice.</span></p>
+after&nbsp;a&nbsp;lost&nbsp;ack&nbsp;can&nbsp;never&nbsp;schedule&nbsp;the&nbsp;same&nbsp;Motion&nbsp;twice.<br>
+&nbsp;<br>
+Phase&nbsp;E&nbsp;adds&nbsp;"create_room"/"join_room":&nbsp;the&nbsp;creator&nbsp;is&nbsp;White,&nbsp;the<br>
+second&nbsp;joiner&nbsp;is&nbsp;Black&nbsp;(starting&nbsp;a&nbsp;rated&nbsp;GameSession&nbsp;exactly&nbsp;like<br>
+"play"&nbsp;does),&nbsp;and&nbsp;everyone&nbsp;after&nbsp;that&nbsp;is&nbsp;a&nbsp;read-only&nbsp;spectator&nbsp;-<br>
+RoomService&nbsp;enforces&nbsp;the&nbsp;spectator&nbsp;cap&nbsp;and&nbsp;room-membership&nbsp;rules;<br>
+this&nbsp;module&nbsp;only&nbsp;translates&nbsp;that&nbsp;into&nbsp;wire&nbsp;messages&nbsp;and,&nbsp;for&nbsp;a<br>
+spectator,&nbsp;one&nbsp;catch-up&nbsp;state_snapshot&nbsp;(never&nbsp;an&nbsp;event&nbsp;replay,&nbsp;same<br>
+guarantee&nbsp;as&nbsp;a&nbsp;fresh&nbsp;join&nbsp;or&nbsp;a&nbsp;reconnect).&nbsp;_broadcast/connections_in_game<br>
+already&nbsp;generalize&nbsp;to&nbsp;"everyone&nbsp;in&nbsp;this&nbsp;game,&nbsp;players&nbsp;and&nbsp;spectators<br>
+alike"&nbsp;-&nbsp;a&nbsp;spectator&nbsp;connection&nbsp;is&nbsp;just&nbsp;another&nbsp;entry&nbsp;returned&nbsp;by<br>
+connections_in_game,&nbsp;not&nbsp;a&nbsp;special&nbsp;case.&nbsp;A&nbsp;spectator's&nbsp;move_request&nbsp;is<br>
+already&nbsp;rejected&nbsp;with&nbsp;no&nbsp;new&nbsp;authorization&nbsp;code:&nbsp;GameSession.color_for<br>
+returns&nbsp;None&nbsp;for&nbsp;anyone&nbsp;who&nbsp;isn't&nbsp;white/black,&nbsp;and<br>
+GameService.handle_move_request&nbsp;already&nbsp;rejects&nbsp;a&nbsp;None&nbsp;color.</span></p>
 <p>
 <table class="section">
 <tr class="decor pkg-content-decor heading-text">
@@ -78,7 +92,8 @@ after&nbsp;a&nbsp;lost&nbsp;ack&nbsp;can&nbsp;never&nbsp;schedule&nbsp;the&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;connection_manager=None,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;auth_service=None,<br>
 &nbsp;&nbsp;&nbsp;&nbsp;matchmaking_service=None,<br>
-&nbsp;&nbsp;&nbsp;&nbsp;connection_service=None<br>
+&nbsp;&nbsp;&nbsp;&nbsp;connection_service=None,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;room_service=None<br>
 )<br>
 &nbsp;<br>
 <br>&nbsp;</span></td></tr>
@@ -91,7 +106,8 @@ after&nbsp;a&nbsp;lost&nbsp;ack&nbsp;can&nbsp;never&nbsp;schedule&nbsp;the&nbsp;
     connection_manager=None,
     auth_service=None,
     matchmaking_service=None,
-    connection_service=None
+    connection_service=None,
+    room_service=None
 )</dt><dd><span class="code">Initialize&nbsp;self.&nbsp;&nbsp;See&nbsp;help(type(self))&nbsp;for&nbsp;accurate&nbsp;signature.</span></dd></dl>
 
 <dl><dt>async <a name="WebSocketGateway-advance_connection_clock"><strong>advance_connection_clock</strong></a>(self, ms)</dt></dl>

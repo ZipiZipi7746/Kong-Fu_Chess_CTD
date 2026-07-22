@@ -60,6 +60,19 @@ class TestSessionToken:
         assert manager.get_session_token("c1") == "tok-123"
 
 
+class TestRoomAssignment:
+    def test_room_id_defaults_to_none(self):
+        manager = ConnectionManager()
+        manager.register("c1", socket="s")
+        assert manager.get_room_id("c1") is None
+
+    def test_set_room_id_is_retrievable(self):
+        manager = ConnectionManager()
+        manager.register("c1", socket="s")
+        manager.set_room_id("c1", "AB3XZ")
+        assert manager.get_room_id("c1") == "AB3XZ"
+
+
 class TestGameAssignment:
     def test_game_id_defaults_to_none(self):
         manager = ConnectionManager()
